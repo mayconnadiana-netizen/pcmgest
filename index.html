@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Gestão Integrada — PCM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c0f;--s1:#111417;--s2:#181c22;--s3:#1f242d;
+  --border:#252c38;--border2:#2e3848;
+  --gold:#e8a000;--gold2:#fbbf24;--goldl:#e8a00022;
+  --blue:#3b82f6;--bluel:#3b82f622;
+  --green:#22c55e;--greenl:#22c55e22;
+  --red:#ef4444;--redl:#ef444422;
+  --amber:#f59e0b;--amberl:#f59e0b22;
+  --purple:#a855f7;--purplel:#a855f722;
+  --text:#dde3ef;--muted:#5a6478;--muted2:#8896af;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--disp:'Bebas Neue',cursive;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:215px;min-width:215px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.content{flex:1;overflow-y:auto;padding:22px 24px}
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-title{font-family:var(--disp);font-size:20px;letter-spacing:1px}
+.tb-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sb-hdr{padding:16px 14px 12px;border-bottom:1px solid var(--border)}
+.sb-name{font-family:var(--disp);font-size:15px;letter-spacing:1px}
+.sb-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.sb-bdg{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-top:5px;border:1px solid}
+.sb-bdg.g{background:var(--goldl);color:var(--gold);border-color:#e8a00044}
+.sb-bdg.b{background:var(--bluel);color:var(--blue);border-color:#3b82f644}
+.sb-bdg.p{background:var(--purplel);color:var(--purple);border-color:#a855f744}
+.sb-sec{padding:10px 14px 3px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;font-weight:500;color:var(--muted2);border-left:2px solid transparent;cursor:pointer;transition:all .1s;user-select:none}
+.sb-item:hover{color:var(--text);background:var(--s2)}
+.sb-item.act{color:var(--text);border-left-color:var(--gold);background:var(--goldl)}
+.sb-item.act-b{color:var(--text);border-left-color:var(--blue);background:var(--bluel)}
+.sb-item.act-p{color:var(--text);border-left-color:var(--purple);background:var(--purplel)}
+.pill{margin-left:auto;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;min-width:18px;text-align:center}
+.pill.g{background:var(--gold);color:#000}.pill.b{background:var(--blue);color:#fff}
+.pill.r{background:var(--red);color:#fff}.pill.p{background:var(--purple);color:#fff}
+.sb-foot{margin-top:auto;padding:10px 14px;border-top:1px solid var(--border)}
+.card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.ctitle{font-family:var(--disp);font-size:14px;letter-spacing:.5px;color:var(--gold);margin-bottom:12px}
+.ctitle.b{color:var(--blue)}.ctitle.p{color:var(--purple)}
+.kgrid{display:grid;gap:11px;margin-bottom:18px}
+.k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}.k2{grid-template-columns:repeat(2,1fr)}
+.kpi{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden}
+.kbar{position:absolute;top:0;left:0;right:0;height:2px}
+.klbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.kval{font-family:var(--disp);font-size:32px;line-height:1;margin:4px 0 2px;letter-spacing:1px}
+.kval.sm{font-size:18px;margin-top:7px;letter-spacing:0}
+.ksub{font-size:11px;color:var(--muted2)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:7px 11px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#ffffff04}
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;white-space:nowrap;border:1px solid}
+.bdg.ok{background:var(--greenl);color:#4ade80;border-color:#22c55e44}
+.bdg.warn{background:var(--goldl);color:var(--gold2);border-color:#e8a00044}
+.bdg.err{background:var(--redl);color:#fca5a5;border-color:#ef444444}
+.bdg.info{background:var(--bluel);color:#93c5fd;border-color:#3b82f644}
+.bdg.amr{background:var(--amberl);color:#fcd34d;border-color:#f59e0b44}
+.bdg.neu{background:var(--s3);color:var(--muted2);border-color:var(--border)}
+.bdg.pur{background:var(--purplel);color:#d8b4fe;border-color:#a855f744}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:none;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .13s;white-space:nowrap;font-family:var(--font);line-height:1}
+.btn:active{transform:scale(.97)}
+.btn-g{background:var(--gold);color:#000}.btn-g:hover{background:var(--gold2)}
+.btn-b{background:var(--blue);color:#fff}.btn-b:hover{filter:brightness(1.15)}
+.btn-p{background:var(--purple);color:#fff}.btn-p:hover{filter:brightness(1.15)}
+.btn-gh{background:var(--s3);border:1px solid var(--border);color:var(--muted2)}.btn-gh:hover{border-color:var(--border2);color:var(--text)}
+.btn-d{background:var(--redl);border:1px solid #ef444444;color:#fca5a5}.btn-d:hover{background:#ef444430}
+.btn-sm{padding:4px 9px;font-size:11.5px}
+.frow{display:grid;gap:11px;margin-bottom:11px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px}
+input,select,textarea{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s;font-family:var(--font)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px #e8a00018}
+.fb input:focus,.fb select:focus{border-color:var(--blue);box-shadow:0 0 0 2px #3b82f618}
+.fp input:focus,.fp select:focus{border-color:var(--purple);box-shadow:0 0 0 2px #a855f718}
+select option{background:var(--s1)}
+textarea{resize:vertical;min-height:60px}
+.herr{font-size:11px;color:#fca5a5;margin-top:2px}
+.overlay{position:fixed;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
+.modal{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:22px;width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:fu .18s}
+.mtitle{font-family:var(--disp);font-size:19px;letter-spacing:.5px;margin-bottom:16px;color:var(--gold)}
+.mtitle.b{color:var(--blue)}.mtitle.p{color:var(--purple)}
+.mfoot{display:flex;gap:7px;justify-content:flex-end;margin-top:16px;padding-top:13px;border-top:1px solid var(--border)}
+.shdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:10px;flex-wrap:wrap}
+.stitle{font-family:var(--disp);font-size:16px;letter-spacing:.5px}
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 15px;font-size:12.5px;color:var(--text);display:flex;align-items:center;gap:7px;pointer-events:all;max-width:300px;animation:si .2s ease}
+.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red);color:#fca5a5}
+.toast.info{border-left:3px solid var(--blue);color:#93c5fd}.toast.warn{border-left:3px solid var(--amber);color:#fcd34d}
+.toast-fade{opacity:0;transition:opacity .2s}
+.infobox{background:var(--s3);border:1px solid var(--border2);border-radius:7px;padding:12px 14px;margin-bottom:12px;font-size:12.5px}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty .ei{font-size:32px;margin-bottom:8px}.empty p{font-size:13px}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#000;flex-shrink:0;font-family:var(--disp)}
+/* COVER */
+.cover{height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+.cgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.18;pointer-events:none}
+.cglow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(#e8a00012,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.cinner{position:relative;z-index:1;text-align:center;max-width:900px;width:100%;animation:fu .4s}
+.ceye{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:4px;margin-bottom:14px;font-weight:600}
+.ctit{font-family:var(--disp);font-size:clamp(44px,7vw,80px);letter-spacing:2px;line-height:.92;margin-bottom:10px}
+.ctit span{color:var(--gold)}
+.csub{font-size:14px;color:var(--muted2);margin:0 auto 44px;line-height:1.7;max-width:380px}
+.ccards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%}
+.ccard{background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:24px 22px;cursor:pointer;transition:all .22s;text-align:left}
+.ccard.cg:hover{border-color:#e8a00060;transform:translateY(-4px)}
+.ccard.cb:hover{border-color:#3b82f660;transform:translateY(-4px)}
+.ccard.cp:hover{border-color:#a855f760;transform:translateY(-4px)}
+.ccard-ico{font-size:34px;margin-bottom:12px}
+.ccard-name{font-family:var(--disp);font-size:24px;letter-spacing:1px;margin-bottom:5px}
+.ccard-name.g{color:var(--gold)}.ccard-name.b{color:var(--blue)}.ccard-name.p{color:var(--purple)}
+.ccard-desc{font-size:12.5px;color:var(--muted2);line-height:1.7;margin-bottom:14px}
+.ctags{display:flex;flex-wrap:wrap;gap:5px}
+.ctag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid}
+.ctag.g{background:var(--goldl);color:var(--gold2);border-color:#e8a00044}
+.ctag.b{background:var(--bluel);color:#93c5fd;border-color:#3b82f644}
+.ctag.p{background:var(--purplel);color:#d8b4fe;border-color:#a855f744}
+/* BIBLIOTECA */
+.lib-wrap{display:flex;height:calc(100vh - 97px);overflow:hidden}
+.lib-tree{width:260px;min-width:260px;border-right:1px solid var(--border);overflow-y:auto;padding:12px 0;flex-shrink:0}
+.lib-main{flex:1;overflow-y:auto;padding:20px 22px}
+.tree-item{display:flex;align-items:center;gap:6px;padding:7px 14px 7px 0;font-size:13px;cursor:pointer;border-radius:6px;transition:background .1s;user-select:none}
+.tree-item:hover{background:var(--s2)}.tree-item.selected{background:var(--purplel);color:var(--purple)}
+.tree-item .toggle{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:var(--muted);transition:transform .15s}
+.tree-item .toggle.open{transform:rotate(90deg)}
+.tree-item .ico{font-size:15px;flex-shrink:0}.tree-item .lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree-item .cnt{font-size:10px;color:var(--muted);flex-shrink:0}
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.file-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.file-card:hover{border-color:var(--purple);transform:translateY(-2px)}
+.file-ico{font-size:38px;margin-bottom:8px;text-align:center}
+.file-name{font-size:12px;font-weight:600;word-break:break-word;line-height:1.4;text-align:center;margin-bottom:4px}
+.file-meta{font-size:10px;color:var(--muted);text-align:center}
+.file-actions{display:flex;gap:4px;justify-content:center;margin-top:9px}
+.breadcrumb{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted2);margin-bottom:16px;flex-wrap:wrap}
+.breadcrumb span{cursor:pointer}.breadcrumb span:hover{color:var(--purple)}
+.breadcrumb span.cur{color:var(--text);font-weight:600;cursor:default}.breadcrumb .sep{color:var(--muted)}
+.drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:28px;text-align:center;transition:all .2s;cursor:pointer;margin-bottom:14px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--purple);background:var(--purplel)}
+.drop-zone .dz-ico{font-size:28px;margin-bottom:7px}.drop-zone p{font-size:12.5px;color:var(--muted2)}
+.ctx-menu{position:fixed;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px;z-index:600;min-width:160px;box-shadow:0 8px 24px #0006;animation:fu .12s}
+.ctx-item{padding:7px 12px;font-size:12.5px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:7px;color:var(--text)}
+.ctx-item:hover{background:var(--s3)}.ctx-item.danger{color:#fca5a5}.ctx-item.danger:hover{background:var(--redl)}
+.ctx-sep{height:1px;background:var(--border);margin:4px 0}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes si{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@media(max-width:820px){.k4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.ccards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast-wrap" id="toasts"></div>
+<script>
+// ═══════ FIREBASE ═══════
+const firebaseConfig={apiKey:"AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA",projectId:"pcm-gest"};
+const FB={
+  base(col){return`https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/${col}`},
+  key(){return firebaseConfig.apiKey},
+  toFS(obj){const f={};for(const[k,v]of Object.entries(obj)){if(v===null||v===undefined)f[k]={nullValue:null};else if(typeof v==='boolean')f[k]={booleanValue:v};else if(typeof v==='number')f[k]={doubleValue:v};else if(typeof v==='string')f[k]={stringValue:v};else f[k]={stringValue:JSON.stringify(v)};}return{fields:f}},
+  fromFS(doc){if(!doc||!doc.fields)return null;const o={};for(const[k,v]of Object.entries(doc.fields)){if(v.nullValue!==undefined)o[k]=null;else if(v.booleanValue!==undefined)o[k]=v.booleanValue;else if(v.doubleValue!==undefined)o[k]=v.doubleValue;else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);else if(v.stringValue!==undefined){try{const p=JSON.parse(v.stringValue);o[k]=(typeof p==='object'&&p!==null)?p:v.stringValue;}catch(e){o[k]=v.stringValue;}}}return o},
+  async getAll(col){try{const r=await fetch(`${this.base(col)}?key=${this.key()}&pageSize=300`);if(!r.ok)return[];const d=await r.json();if(!d.documents)return[];return d.documents.map(doc=>this.fromFS(doc));}catch(e){return[];}},
+  async set(col,id,obj){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.toFS(obj))});}catch(e){}},
+  async delete(col,id){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'DELETE'});}catch(e){}}
+};
+
+// ═══════ LOCAL CACHE ═══════
+const KEYS={tools:'gi_tools',mechs:'gi_mechs',loans:'gi_loans',machines:'gi_machines',batteries:'gi_batteries',batHist:'gi_bathist',libTree:'gi_libtree'};
+const LOCAL={
+  get(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]')}catch(e){return[]}},
+  set(k,v){try{localStorage.setItem(KEYS[k],JSON.stringify(v))}catch(e){}},
+  upsert(k,obj){const a=LOCAL.get(k);const i=a.findIndex(x=>x.id===obj.id);if(i>=0)a[i]={...a[i],...obj};else a.push(obj);LOCAL.set(k,a)},
+  remove(k,id){LOCAL.set(k,LOCAL.get(k).filter(x=>x.id!==id))},
+  find(k,id){return LOCAL.get(k).find(x=>x.id===id)||null}
+};
+
+// ═══════ DB ═══════
+const DB={
+  get(k){
+    const all=LOCAL.get(k);
+    if(!APP.unidade) return all;
+    return all.filter(x=>!x.unidade||x.unidade===APP.unidade);
+  },
+  find(k,id){return this.get(k).find(x=>x.id===id)||null},
+  async add(k,obj){
+    const withU={...obj, unidade: APP.unidade||'geral'};
+    LOCAL.upsert(k, withU);
+    FB.set(k, withU.id, withU);
+    return withU;
+  },
+  async update(k,id,data){
+    const e=LOCAL.find(k,id)||{};
+    const u={...e,...data,id,unidade:APP.unidade||'geral'};
+    LOCAL.upsert(k,u);FB.set(k,id,u);return u;
+  },
+  async remove(k,id){LOCAL.remove(k,id);FB.delete(k,id)},
+  async syncAll(){
+    const tables=['tools','mechs','loans','machines','batteries','batHist','libTree'];
+    let total=0;
+    await Promise.all(tables.map(async t=>{
+      const docs=await FB.getAll(t);
+      if(docs.length>0){LOCAL.set(t,docs);total+=docs.length;}
+    }));
+    return total;
+  }
+};
+
+// ═══════ HELPERS ═══════
+function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
+function fmt(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0)}
+function fmtD(s){return s?new Date(s).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—'}
+function fmtDate(s){return s?new Date(s).toLocaleDateString('pt-BR'):'—'}
+function fmtSize(b){if(!b)return'—';if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
+function nowDT(){return new Date().toISOString().slice(0,16)}
+function daysLeft(d){return d?Math.floor((new Date(d)-new Date())/86400000):null}
+function daysAgo(d){return Math.floor((new Date()-new Date(d))/86400000)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fileIcon(ext){const m={pdf:'📄',xlsx:'📊',xls:'📊',docx:'📝',doc:'📝',pptx:'📋',ppt:'📋',txt:'📃',csv:'📊',zip:'🗜',jpg:'🖼',jpeg:'🖼',png:'🖼'};return m[ext?.toLowerCase()]||'📎'}
+function fileType(ext){const m={pdf:'PDF',xlsx:'Excel',xls:'Excel',docx:'Word',doc:'Word',pptx:'PPT',csv:'CSV',txt:'Texto'};return m[ext?.toLowerCase()]||ext?.toUpperCase()||'Arquivo'}
+function wBadge(w){const d=daysLeft(w);if(d===null)return`<span class="bdg neu">Sem garantia</span>`;if(d<0)return`<span class="bdg err">⚠ Venc. há ${Math.abs(d)}d</span>`;if(d<60)return`<span class="bdg amr">⏳ ${d}d</span>`;if(d<180)return`<span class="bdg warn">✓ ${d}d</span>`;return`<span class="bdg ok">✓ Válida</span>`}
+
+// ═══════ TOAST & MODAL ═══════
+function toast(msg,type='ok'){const c=document.getElementById('toasts');const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<span>${{ok:'✓',err:'✕',info:'ℹ',warn:'⚠'}[type]||'•'}</span><span>${esc(msg)}</span>`;c.appendChild(t);setTimeout(()=>{t.classList.add('toast-fade');setTimeout(()=>t.remove(),220)},3200)}
+function openModal(html){closeModal();const d=document.createElement('div');d.id='modal-overlay';d.className='overlay';d.innerHTML=html;d.addEventListener('click',e=>{if(e.target===d)closeModal()});document.body.appendChild(d)}
+function closeModal(){document.getElementById('modal-overlay')?.remove()}
+function qid(id){return document.getElementById(id)}
+function qval(id){const el=qid(id);return el?el.value.trim():''}
+function qfloat(id){return parseFloat(qval(id))||0}
+
+// ═══════ UNIDADES ═══════
+const UNIDADES = ['Tunica','Santo André II','Caregi','Reata','Sulinense'];
+
+// ═══════ APP STATE ═══════
+let APP={module:null,page:'dash',toolSearch:'',toolFilter:'todos',batSearch:'',libSelected:null,libOpenFolders:{},libSearchQ:'',unidade:localStorage.getItem('gi_unidade')||null};
+
+function render(){document.getElementById('root').innerHTML=buildApp();bindEvents()}
+function bindEvents(){document.onkeydown=e=>{if(e.key==='Escape'){closeModal();document.getElementById('lib-ctx')?.remove()}}}
+
+function buildApp(){
+  if(!APP.unidade) return buildUnidadeSelect();
+  if(!APP.module)return buildCover();
+  if(APP.module==='tools')return buildToolsShell();
+  if(APP.module==='battery')return buildBatShell();
+  if(APP.module==='library')return buildLibShell();
+  return'';
+}
+
+// ═══════ SELEÇÃO DE UNIDADE ═══════
+function buildUnidadeSelect(){
+  return`<div class="cover">
+  <div class="cgrid"></div><div class="cglow"></div>
+  <div class="cinner" style="max-width:560px">
+    <div class="ceye">Sistema de Gestão de Manutenção Agrícola</div>
+    <div class="ctit">PCM<br/><span>GEST</span></div>
+    <p class="csub">Selecione sua unidade para continuar.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%">
+      ${UNIDADES.map(u=>`
+      <div onclick="selecionarUnidade('${esc(u)}')" style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:28px">🏭</span>
+          <div><div style="font-family:var(--disp);font-size:20px;letter-spacing:1px;color:var(--gold)">${esc(u)}</div>
+          <div style="font-size:11px;color:var(--muted)">Unidade · PCM Gest</div></div>
+        </div>
+        <span style="color:var(--muted2);font-size:18px">→</span>
+      </div>`).join('')}
+    </div>
+  </div>
+</div>`;
+}
+
+function selecionarUnidade(u){
+  APP.unidade=u;
+  localStorage.setItem('gi_unidade',u);
+  render();
+}
+
+// ═══════ COVER ═══════
+function buildCover(){
+  return`<div class="cover">
+  <div class="cgrid"></div><div class="cglow"></div>
+  <div class="cinner">
+    <div class="ceye">🏭 ${esc(APP.unidade)} · Sistema de Gestão de Manutenção Agrícola</div>
+    <div class="ctit">PCM<br/><span>GEST</span></div>
+    <p class="csub">Selecione o módulo para acessar o sistema.</p>
+    <div class="ccards">
+      <div class="ccard cg" onclick="APP.module='tools';APP.page='dash';render()">
+        <div class="ccard-ico">🔧</div><div class="ccard-name g">FERRAMENTARIA</div>
+        <p class="ccard-desc">Ferramentas, mecânicos, empréstimos e termos de responsabilidade.</p>
+        <div class="ctags"><span class="ctag g">Ferramentas</span><span class="ctag g">Mecânicos</span><span class="ctag g">Termos PDF</span></div>
+      </div>
+      <div class="ccard cb" onclick="APP.module='battery';APP.page='dash';render()">
+        <div class="ccard-ico">🔋</div><div class="ccard-name b">BATERIAS</div>
+        <p class="ccard-desc">Máquinas, baterias, alocações e controle de garantias.</p>
+        <div class="ctags"><span class="ctag b">Máquinas</span><span class="ctag b">Baterias</span><span class="ctag b">Garantias</span></div>
+      </div>
+      <div class="ccard cp" onclick="APP.module='library';APP.page='files';render()">
+        <div class="ccard-ico">📚</div><div class="ccard-name p">BIBLIOTECA</div>
+        <p class="ccard-desc">Pastas, subpastas e arquivos Excel, PDF, Word organizados.</p>
+        <div class="ctags"><span class="ctag p">Pastas</span><span class="ctag p">PDF</span><span class="ctag p">Excel</span><span class="ctag p">Word</span></div>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-gh" onclick="openRelatorioModal()">📊 Relatórios PDF</button>
+      <button class="btn btn-gh" onclick="trocarUnidade()">🏭 Trocar Unidade</button>
+    </div>
+  </div>
+</div>`}
+
+function trocarUnidade(){
+  APP.unidade=null;APP.module=null;
+  localStorage.removeItem('gi_unidade');
+  render();
+}
+
+// ═══════ FERRAMENTARIA ═══════
+function buildToolsShell(){
+  const tools=DB.get('tools'),mechs=DB.get('mechs'),loans=DB.get('loans');
+  const active=loans.filter(l=>!l.returnDate);
+  const disp=tools.filter(t=>t.status==='disponivel').length;
+  const old=active.filter(l=>daysAgo(l.loanDate)>5);
+  const pages=[{id:'dash',ico:'📊',lbl:'Dashboard',sec:'Principal'},{id:'tools',ico:'🔧',lbl:'Ferramentas',sec:null,pill:disp,pillc:'g'},{id:'mechs',ico:'👷',lbl:'Mecânicos',sec:null,pill:mechs.length,pillc:'b'},{id:'loans',ico:'📋',lbl:'Empréstimos Ativos',sec:'Movimentação',pill:active.length||'',pillc:active.length?'r':'g'},{id:'hist',ico:'📁',lbl:'Histórico',sec:null},{id:'reports',ico:'📈',lbl:'Relatórios',sec:'Análise'}];
+  let pc='';
+  if(APP.page==='dash')pc=buildToolsDash(tools,mechs,loans,active);
+  else if(APP.page==='tools')pc=buildToolsList(tools);
+  else if(APP.page==='mechs')pc=buildMechsList(mechs,tools,active);
+  else if(APP.page==='loans')pc=buildLoansList(loans,tools,mechs,true);
+  else if(APP.page==='hist')pc=buildLoansList(loans,tools,mechs,false);
+  else if(APP.page==='reports')pc=buildToolsReports();
+  return`<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">⚙ FERRAMENTARIA</div><div class="sb-sub">${esc(APP.unidade)}</div><span class="sb-bdg g">ATIVO</span></div>
+    ${pages.map(p=>`${p.sec?`<div class="sb-sec">${p.sec}</div>`:''}<div class="sb-item ${APP.page===p.id?'act':''}" onclick="APP.page='${p.id}';render()"><span>${p.ico}</span><span style="flex:1">${p.lbl}</span>${p.pill?`<span class="pill ${p.pillc}">${p.pill}</span>`:''}</div>`).join('')}
+    <div class="sb-foot">
+      <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title">${pages.find(p=>p.id===APP.page)?.ico} ${pages.find(p=>p.id===APP.page)?.lbl}</div>
+      <div class="tb-sub">🏭 ${esc(APP.unidade)} · ${tools.length} ferramentas · ${mechs.length} mecânicos · ${active.length} ativos${old.length?` · <span style="color:var(--red)">${old.length} vencidos</span>`:''}</div></div>
+      <span style="font-size:12px;color:var(--muted2)">Acervo: <strong style="color:var(--gold)">${fmt(tools.reduce((s,t)=>s+(t.value||0),0))}</strong></span>
+    </div>
+    <div class="content">${pc}</div>
+  </div>
+</div>`}
+
+function buildToolsDash(tools,mechs,loans,active){
+  const lentVal=tools.filter(t=>t.status==='emprestada').reduce((s,t)=>s+(t.value||0),0);
+  const old=active.filter(l=>daysAgo(l.loanDate)>5);
+  const cats=[...new Set(tools.map(t=>t.category).filter(Boolean))];
+  return`<div class="kgrid k4">
+    <div class="kpi"><div class="kbar" style="background:var(--gold)"></div><div class="klbl">Ferramentas</div><div class="kval">${tools.length}</div><div class="ksub">${tools.filter(t=>t.status==='disponivel').length} disponíveis</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="klbl">Emp. Ativos</div><div class="kval">${active.length}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="klbl">Valor Acervo</div><div class="kval sm">${fmt(tools.reduce((s,t)=>s+(t.value||0),0))}</div><div class="ksub">${fmt(lentVal)} emprestado</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="klbl">Emp. &gt;5 dias</div><div class="kval" style="${old.length?'color:var(--red)':''}">${old.length}</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle">📋 Empréstimos Ativos</div>
+    ${active.length===0?`<div class="empty"><div class="ei">✅</div><p>Nenhum empréstimo ativo</p></div>`:`<div class="tw"><table><thead><tr><th>Ferramenta</th><th>Mecânico</th><th>Dias</th></tr></thead><tbody>
+    ${active.slice(0,8).map(l=>{const t=tools.find(x=>x.id===l.toolId),m=mechs.find(x=>x.id===l.mechId),d=daysAgo(l.loanDate);return`<tr><td><strong>${esc(t?.name||'?')}</strong></td><td>${esc(m?.name||'?')}</td><td><span class="bdg ${d>7?'err':d>3?'amr':'ok'}">${d}d</span></td></tr>`}).join('')}</tbody></table></div>`}
+    </div>
+    <div class="card"><div class="ctitle">👷 Valor em Posse</div>
+    <div class="tw"><table><thead><tr><th>Mecânico</th><th>Itens</th><th>Valor</th></tr></thead><tbody>
+    ${mechs.map(m=>{const ml=active.filter(l=>l.mechId===m.id);const v=ml.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);return`<tr><td><strong>${esc(m.name)}</strong></td><td><span class="bdg info">${ml.length}</span></td><td style="color:var(--gold);font-weight:600">${fmt(v)}</td></tr>`}).join('')}</tbody></table></div>
+    </div>
+    <div class="card"><div class="ctitle">📦 Por Categoria</div>
+    <div class="tw"><table><thead><tr><th>Categoria</th><th>Total</th><th>Disp.</th><th>Emp.</th></tr></thead><tbody>
+    ${cats.map(c=>{const ct=tools.filter(t=>t.category===c);return`<tr><td><strong>${esc(c)}</strong></td><td>${ct.length}</td><td><span class="bdg ok">${ct.filter(t=>t.status==='disponivel').length}</span></td><td><span class="bdg warn">${ct.filter(t=>t.status==='emprestada').length}</span></td></tr>`}).join('')}</tbody></table></div>
+    </div>
+    <div class="card"><div class="ctitle">💰 Resumo</div>
+    ${[{l:'Total acervo',v:tools.reduce((s,t)=>s+(t.value||0),0),c:'var(--text)'},{l:'Disponível',v:tools.filter(t=>t.status==='disponivel').reduce((s,t)=>s+(t.value||0),0),c:'var(--green)'},{l:'Emprestado',v:lentVal,c:'var(--gold)'}].map(r=>`<div style="display:flex;justify-content:space-between;padding:8px 11px;background:var(--s3);border-radius:6px;margin-bottom:7px"><span style="font-size:12px;color:var(--muted2)">${r.l}</span><strong style="color:${r.c}">${fmt(r.v)}</strong></div>`).join('')}
+    </div>
+  </div>`}
+
+function buildToolsList(tools){
+  const q=APP.toolSearch||'',f=APP.toolFilter||'todos';
+  const filtered=tools.filter(t=>(f==='todos'||t.status===f)&&[t.name,t.category,t.serial,t.desc].some(s=>(s||'').toLowerCase().includes(q.toLowerCase())));
+  return`<div class="shdr">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="tsearch" value="${esc(q)}" placeholder="Buscar..." style="width:220px" oninput="APP.toolSearch=this.value;render()"/>
+      <select onchange="APP.toolFilter=this.value;render()">
+        <option value="todos" ${f==='todos'?'selected':''}>Todos</option>
+        <option value="disponivel" ${f==='disponivel'?'selected':''}>Disponíveis</option>
+        <option value="emprestada" ${f==='emprestada'?'selected':''}>Emprestadas</option>
+      </select>
+    </div>
+    <button class="btn btn-g" onclick="openToolModal()">+ Nova Ferramenta</button>
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>Ferramenta</th><th>Categoria</th><th>Valor</th><th>Série</th><th>Local</th><th>Status</th><th>Ações</th></tr></thead>
+    <tbody>
+    ${filtered.length===0?`<tr><td colspan="7"><div class="empty"><div class="ei">🔧</div><p>Nenhuma encontrada</p></div></td></tr>`:''}
+    ${filtered.map(t=>`<tr>
+      <td><strong>${esc(t.name)}</strong><div style="font-size:11px;color:var(--muted2)">${esc(t.desc||'')}</div></td>
+      <td><span class="bdg neu">${esc(t.category||'—')}</span></td>
+      <td style="color:var(--gold);font-weight:600">${fmt(t.value)}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${esc(t.serial||'—')}</td>
+      <td style="font-size:11px;color:var(--muted2)">${esc(t.location||'—')}</td>
+      <td>${t.status==='disponivel'?`<span class="bdg ok">✓ Disponível</span>`:`<span class="bdg warn">↗ Emprestada</span>`}</td>
+      <td><div style="display:flex;gap:4px"><button class="btn btn-gh btn-sm" onclick="openToolModal('${t.id}')">✏</button><button class="btn btn-d btn-sm" onclick="delTool('${t.id}')">✕</button></div></td>
+    </tr>`).join('')}
+    </tbody></table></div></div>`}
+
+function buildMechsList(mechs,tools,active){
+  return`<div class="shdr"><div class="stitle">Mecânicos (${mechs.length})</div><button class="btn btn-g" onclick="openMechModal()">+ Novo Mecânico</button></div>
+  <div class="g3">${mechs.map(m=>{const ml=active.filter(l=>l.mechId===m.id);const v=ml.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);return`<div class="card" style="cursor:pointer;margin-bottom:0" onclick="openMechDetail('${m.id}')">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:11px"><div class="avatar">${esc(m.name[0])}</div>
+    <div><div style="font-weight:700;font-size:14px">${esc(m.name)}</div><div style="font-size:11px;color:var(--muted2)">Mat. ${esc(m.mat)}</div></div></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border)">
+      <div><div style="font-size:10px;color:var(--muted);margin-bottom:3px">Em posse</div><span class="bdg warn">${ml.length} itens</span></div>
+      <div style="text-align:right"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">Valor</div><span style="color:var(--gold);font-weight:700">${fmt(v)}</span></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px" onclick="event.stopPropagation()">
+      <button class="btn btn-gh btn-sm" style="flex:1" onclick="openMechModal('${m.id}')">✏ Editar</button>
+      <button class="btn btn-d btn-sm" onclick="delMech('${m.id}')">✕</button>
+    </div>
+  </div>`}).join('')}</div>`}
+
+function buildLoansList(loans,tools,mechs,onlyActive){
+  const list=onlyActive?[...loans.filter(l=>!l.returnDate)]:[...loans.filter(l=>l.returnDate)];
+  list.sort((a,b)=>new Date(b.loanDate)-new Date(a.loanDate));
+  return`<div class="shdr">
+    <div style="font-size:13px;color:var(--muted2)">${list.length} ${onlyActive?'empréstimos ativos':'devoluções'}</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      ${onlyActive&&list.length>0?`<button class="btn btn-gh" onclick="openTermoMechModal()">🖨 Termo por Mecânico</button>`:''}
+      ${onlyActive?`<button class="btn btn-g" onclick="openLoanModal()">+ Novo Empréstimo</button>`:''}
+    </div>
+  </div>
+  <div class="card"><div class="tw"><table>
+    <thead><tr><th>Ferramenta</th><th>Mecânico</th><th>Valor</th><th>Data</th><th>${onlyActive?'Dias':'Devolvido'}</th><th>Obs.</th><th>Ações</th></tr></thead>
+    <tbody>
+    ${list.length===0?`<tr><td colspan="7"><div class="empty"><div class="ei">${onlyActive?'✅':'📁'}</div><p>${onlyActive?'Nenhum ativo.':'Nenhuma devolução.'}</p></div></td></tr>`:''}
+    ${list.map(l=>{const t=tools.find(x=>x.id===l.toolId),m=mechs.find(x=>x.id===l.mechId),d=daysAgo(l.loanDate);return`<tr>
+      <td><strong>${esc(t?.name||'?')}</strong></td>
+      <td><strong>${esc(m?.name||'?')}</strong><div style="font-size:10px;color:var(--muted2)">Mat. ${esc(m?.mat||'—')}</div></td>
+      <td style="color:var(--gold);font-weight:600">${fmt(t?.value)}</td>
+      <td style="font-size:11px;color:var(--muted2)">${fmtD(l.loanDate)}</td>
+      <td>${onlyActive?`<span class="bdg ${d>7?'err':d>3?'amr':'ok'}">${d}d</span>`:`<span style="font-size:11px">${fmtD(l.returnDate)}</span>`}</td>
+      <td style="font-size:11px;color:var(--muted2)">${esc(l.note||'—')}</td>
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-gh btn-sm" onclick="printTermo('${l.id}')">🖨 Termo</button>
+        ${onlyActive?`<button class="btn btn-g btn-sm" onclick="openReturnModal('${l.id}')">↩ Devolver</button>`:''}
+      </div></td>
+    </tr>`}).join('')}
+    </tbody></table></div></div>`}
+
+function buildToolsReports(){
+  return`<div class="shdr"><div class="stitle">Relatórios PDF</div><button class="btn btn-g" onclick="openRelatorioModal()">📊 Gerar Relatório</button></div>
+  <div class="g2">${[{t:'Inventário',s:'Lista completa',fn:'relTools',ico:'🔧'},{t:'Empréstimos',s:'Ativos',fn:'relLoans',ico:'📋'},{t:'Por Mecânico',s:'Responsabilidade',fn:'relMechs',ico:'👷'},{t:'Completo',s:'Todos os módulos',fn:'relAll',ico:'📦'}].map(r=>`<div class="card" style="cursor:pointer" onclick="${r.fn}()"><div style="font-size:28px;margin-bottom:8px">${r.ico}</div><div style="font-weight:700;margin-bottom:4px">${r.t}</div><div style="font-size:12px;color:var(--muted2)">${r.s}</div></div>`).join('')}</div>`}
+
+// ═══════ BATTERY SHELL ═══════
+function buildBatShell(){
+  const machines=DB.get('machines'),batteries=DB.get('batteries'),batHist=DB.get('batHist');
+  const inUse=batteries.filter(b=>b.machineId);
+  const exp=batteries.filter(b=>b.warranty&&daysLeft(b.warranty)<0);
+  const soon=batteries.filter(b=>{const d=daysLeft(b.warranty);return d!==null&&d>=0&&d<90});
+  const pages=[{id:'dash',ico:'📊',lbl:'Dashboard',sec:'Principal'},{id:'machines',ico:'🚜',lbl:'Máquinas',sec:null,pill:machines.length,pillc:'b'},{id:'batteries',ico:'🔋',lbl:'Baterias',sec:null,pill:batteries.length,pillc:'b'},{id:'alloc',ico:'🔄',lbl:'Alocação',sec:'Operação',pill:inUse.length,pillc:'b'},{id:'warranty',ico:'🛡',lbl:'Garantias',sec:null,pill:(exp.length+soon.length)||'',pillc:exp.length?'r':'amr'},{id:'reports',ico:'📈',lbl:'Relatórios',sec:'Análise'}];
+  let pc='';
+  if(APP.page==='dash')pc=buildBatDash(machines,batteries);
+  else if(APP.page==='machines')pc=buildMachinesList(machines,batteries);
+  else if(APP.page==='batteries')pc=buildBatteriesList(batteries,machines);
+  else if(APP.page==='alloc')pc=buildAllocPage(batteries,machines,batHist);
+  else if(APP.page==='warranty')pc=buildWarrantyPage(batteries,machines);
+  else if(APP.page==='reports')pc=`<div class="shdr"><div class="stitle">Relatórios PDF</div><button class="btn btn-b" onclick="openRelatorioModal()">📊 Gerar</button></div><div class="g2">${[{t:'Baterias',fn:'relBat',ico:'🔋'},{t:'Garantias',fn:'relWarranty',ico:'🛡'}].map(r=>`<div class="card" style="cursor:pointer" onclick="${r.fn}()"><div style="font-size:28px;margin-bottom:8px">${r.ico}</div><div style="font-weight:700">${r.t}</div></div>`).join('')}</div>`;
+  return`<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">🔋 BATERIAS</div><div class="sb-sub">${esc(APP.unidade)}</div><span class="sb-bdg b">ATIVO</span></div>
+    ${pages.map(p=>`${p.sec?`<div class="sb-sec">${p.sec}</div>`:''}<div class="sb-item ${APP.page===p.id?'act-b':''}" onclick="APP.page='${p.id}';render()"><span>${p.ico}</span><span style="flex:1">${p.lbl}</span>${p.pill?`<span class="pill ${p.pillc}">${p.pill}</span>`:''}</div>`).join('')}
+    <div class="sb-foot">
+      <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title" style="color:var(--blue)">${pages.find(p=>p.id===APP.page)?.ico} ${pages.find(p=>p.id===APP.page)?.lbl}</div>
+      <div class="tb-sub">🏭 ${esc(APP.unidade)} · ${machines.length} máquinas · ${batteries.length} baterias · ${inUse.length} alocadas</div></div>
+      <div style="display:flex;gap:8px;align-items:center">${exp.length?`<span class="bdg err">⚠ ${exp.length} vencidas</span>`:''}</div>
+    </div>
+    <div class="content">${pc}</div>
+  </div>
+</div>`}
+
+function buildBatDash(machines,batteries){
+  const inUse=batteries.filter(b=>b.machineId),stock=batteries.filter(b=>!b.machineId);
+  const exp=batteries.filter(b=>b.warranty&&daysLeft(b.warranty)<0);
+  const soon=batteries.filter(b=>{const d=daysLeft(b.warranty);return d!==null&&d>=0&&d<90});
+  return`<div class="kgrid k4">
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="klbl">Total</div><div class="kval">${batteries.length}</div><div class="ksub">${stock.length} em estoque</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="klbl">Alocadas</div><div class="kval">${inUse.length}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--gold)"></div><div class="klbl">Valor Total</div><div class="kval sm">${fmt(batteries.reduce((s,b)=>s+(b.purchaseValue||0),0))}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="klbl">Alertas</div><div class="kval" style="${(exp.length+soon.length)?'color:var(--red)':''}">${exp.length+soon.length}</div><div class="ksub">${exp.length} venc.</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle b">🚜 Máquinas</div>
+    <div class="tw"><table><thead><tr><th>Máquina</th><th>Setor</th><th>Bateria</th><th>Garantia</th></tr></thead><tbody>
+    ${machines.map(m=>{const b=batteries.find(x=>x.machineId===m.id);return`<tr><td><strong>${esc(m.name)}</strong></td><td style="font-size:11px;color:var(--muted2)">${esc(m.sector||'—')}</td><td>${b?`<span class="bdg info">${esc(b.code)}</span>`:`<span class="bdg neu">Sem bateria</span>`}</td><td>${b?wBadge(b.warranty):'—'}</td></tr>`}).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="ctitle b">⚠ Alertas</div>
+    ${[...exp,...soon].length===0?`<div class="empty"><div class="ei">✅</div><p>Garantias em dia!</p></div>`:`<div class="tw"><table><thead><tr><th>Código</th><th>Máquina</th><th>Status</th></tr></thead><tbody>
+    ${[...exp,...soon].map(b=>{const m=machines.find(x=>x.id===b.machineId);return`<tr><td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td><td>${esc(m?.name||'Estoque')}</td><td>${wBadge(b.warranty)}</td></tr>`}).join('')}
+    </tbody></table></div>`}
+    </div>
+  </div>`}
+
+function buildMachinesList(machines,batteries){
+  return`<div class="shdr"><div class="stitle">Máquinas (${machines.length})</div><button class="btn btn-b" onclick="openMachineModal()">+ Nova Máquina</button></div>
+  <div class="card"><div class="tw"><table><thead><tr><th>Máquina</th><th>Placa</th><th>Ano</th><th>Setor</th><th>Bateria</th><th>Ações</th></tr></thead><tbody>
+  ${machines.length===0?`<tr><td colspan="6"><div class="empty"><div class="ei">🚜</div><p>Nenhuma.</p></div></td></tr>`:''}
+  ${machines.map(m=>{const b=batteries.find(x=>x.machineId===m.id);return`<tr>
+    <td><strong>${esc(m.name)}</strong></td><td style="font-family:var(--mono);font-size:11px">${esc(m.plate||'—')}</td>
+    <td>${esc(m.year||'—')}</td><td>${esc(m.sector||'—')}</td>
+    <td>${b?`<span class="bdg info">${esc(b.code)}</span>`:`<span class="bdg neu">Sem bateria</span>`}</td>
+    <td><div style="display:flex;gap:4px"><button class="btn btn-gh btn-sm" onclick="openMachineModal('${m.id}')">✏</button><button class="btn btn-d btn-sm" onclick="delMachine('${m.id}')">✕</button></div></td>
+  </tr>`}).join('')}</tbody></table></div></div>`}
+
+function buildBatteriesList(batteries,machines){
+  const q=APP.batSearch||'';
+  const filtered=batteries.filter(b=>[b.code,b.brand,b.model].some(s=>(s||'').toLowerCase().includes(q.toLowerCase())));
+  return`<div class="shdr"><input value="${esc(q)}" placeholder="Buscar..." style="width:240px" oninput="APP.batSearch=this.value;render()"/><button class="btn btn-b" onclick="openBatModal()">+ Nova Bateria</button></div>
+  <div class="card"><div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Cap.</th><th>Valor</th><th>Garantia</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+  ${filtered.map(b=>{const m=machines.find(x=>x.id===b.machineId);return`<tr>
+    <td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td>
+    <td><strong>${esc(b.brand||'—')}</strong> ${esc(b.model||'')}</td>
+    <td>${esc(b.capacity||'—')}</td><td style="color:var(--blue);font-weight:600">${fmt(b.purchaseValue)}</td>
+    <td>${wBadge(b.warranty)}</td>
+    <td>${b.machineId?`<span class="bdg info">⚡ ${esc((m?.name||'').split(' ').slice(0,2).join(' ')||'Alocada')}</span>`:`<span class="bdg neu">Estoque</span>`}</td>
+    <td><div style="display:flex;gap:4px"><button class="btn btn-gh btn-sm" onclick="openBatModal('${b.id}')">✏</button><button class="btn btn-d btn-sm" onclick="delBat('${b.id}')">✕</button></div></td>
+  </tr>`}).join('')}</tbody></table></div></div>`}
+
+function buildAllocPage(batteries,machines,batHist){
+  const inUse=batteries.filter(b=>b.machineId),stock=batteries.filter(b=>!b.machineId);
+  const recent=[...batHist].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+  return`<div class="shdr"><div class="stitle">Alocação</div><button class="btn btn-b" onclick="openAllocModal()">+ Alocar Bateria</button></div>
+  <div class="g2">
+    <div class="card"><div class="ctitle b">⚡ Alocadas (${inUse.length})</div>
+    <div class="tw"><table><thead><tr><th>Bateria</th><th>Máquina</th><th>Garantia</th><th>Ação</th></tr></thead><tbody>
+    ${inUse.map(b=>{const m=machines.find(x=>x.id===b.machineId);return`<tr><td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td><td><strong>${esc(m?.name||'?')}</strong></td><td>${wBadge(b.warranty)}</td><td><button class="btn btn-d btn-sm" onclick="deallocBat('${b.id}')">↩</button></td></tr>`}).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="ctitle">📦 Estoque (${stock.length})</div>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Marca</th><th>Cap.</th></tr></thead><tbody>
+    ${stock.map(b=>`<tr><td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td><td>${esc(b.brand||'')} ${esc(b.model||'')}</td><td>${esc(b.capacity||'—')}</td></tr>`).join('')}
+    </tbody></table></div></div>
+  </div>
+  <div class="card"><div class="ctitle b">📅 Histórico</div>
+  <div class="tw"><table><thead><tr><th>Data</th><th>Bateria</th><th>Máquina</th><th>Ação</th></tr></thead><tbody>
+  ${recent.map(h=>{const b=batteries.find(x=>x.id===h.batId),m=machines.find(x=>x.id===h.machId);return`<tr><td style="font-size:11px;color:var(--muted2)">${fmtD(h.date)}</td><td><strong style="font-family:var(--mono)">${esc(b?.code||'—')}</strong></td><td>${esc(m?.name||'—')}</td><td><span class="bdg ${h.action==='alocada'?'info':'neu'}">${h.action==='alocada'?'⚡ Alocada':'↩ Removida'}</span></td></tr>`}).join('')}
+  </tbody></table></div></div>`}
+
+function buildWarrantyPage(batteries,machines){
+  const sorted=[...batteries].sort((a,b)=>(daysLeft(a.warranty)??9999)-(daysLeft(b.warranty)??9999));
+  return`<div class="card"><div class="ctitle b">🛡 Garantias por Criticidade</div>
+  <div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Validade</th><th>Dias</th><th>Status</th><th>Máquina</th></tr></thead><tbody>
+  ${sorted.map(b=>{const m=machines.find(x=>x.id===b.machineId),d=daysLeft(b.warranty);return`<tr>
+    <td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td>
+    <td>${esc(b.brand||'')} ${esc(b.model||'')}</td>
+    <td style="font-size:11px">${fmtDate(b.warranty)||'—'}</td>
+    <td>${d===null?`<span class="bdg neu">—</span>`:d<0?`<span class="bdg err">Venc. há ${Math.abs(d)}d</span>`:`<span class="bdg ${d<60?'err':d<180?'amr':'ok'}">${d}d</span>`}</td>
+    <td>${wBadge(b.warranty)}</td>
+    <td>${b.machineId?esc(m?.name||'?'):`<span class="bdg neu">Estoque</span>`}</td>
+  </tr>`}).join('')}</tbody></table></div></div>`}
+
+// ═══════ BIBLIOTECA SHELL ═══════
+function buildLibShell(){
+  const nodes=DB.get('libTree');
+  const totalFolders=nodes.filter(n=>n.type==='folder').length;
+  const totalFiles=nodes.filter(n=>n.type==='file').length;
+  const pages=[{id:'files',ico:'📂',lbl:'Arquivos',sec:'Biblioteca'},{id:'recent',ico:'🕐',lbl:'Recentes',sec:null},{id:'search',ico:'🔍',lbl:'Buscar',sec:null}];
+  let pc='';
+  if(APP.page==='files')pc=buildLibBrowser();
+  else if(APP.page==='recent')pc=buildLibRecent();
+  else if(APP.page==='search')pc=buildLibSearch();
+  return`<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">📚 BIBLIOTECA</div><div class="sb-sub">Documentos</div><span class="sb-bdg p">ATIVO</span></div>
+    ${pages.map(p=>`${p.sec?`<div class="sb-sec">${p.sec}</div>`:''}<div class="sb-item ${APP.page===p.id?'act-p':''}" onclick="APP.page='${p.id}';render()"><span>${p.ico}</span><span style="flex:1">${p.lbl}</span></div>`).join('')}
+    <div class="sb-sec">Info</div>
+    <div style="padding:6px 14px"><div style="padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="color:var(--muted2)">Pastas</span><strong style="color:var(--purple)">${totalFolders}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted2)">Arquivos</span><strong style="color:var(--purple)">${totalFiles}</strong></div>
+    </div></div>
+    <div class="sb-foot">
+      <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title" style="color:var(--purple)">📚 Biblioteca de Documentos</div>
+      <div class="tb-sub">${totalFolders} pastas · ${totalFiles} arquivos</div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-gh btn-sm" onclick="openNewFolderModal(${APP.libSelected?`'${APP.libSelected}'`:'null'})">📁 Nova Pasta</button>
+        <button class="btn btn-p btn-sm" onclick="openUploadModal(${APP.libSelected?`'${APP.libSelected}'`:'null'})">⬆ Upload</button>
+      </div>
+    </div>
+    <div class="lib-wrap">${buildLibTree()}<div class="lib-main">${pc}</div></div>
+  </div>
+</div>`}
+
+function libNodes(){return DB.get('libTree')}
+function libPath(nodeId){const nodes=libNodes();const path=[];let cur=nodeId;while(cur){const n=nodes.find(x=>x.id===cur);if(!n)break;path.unshift(n);cur=n.parentId}return path}
+function libCountChildren(id){const nodes=libNodes();let c=0;function r(fid){nodes.filter(n=>n.parentId===fid).forEach(n=>{c++;if(n.type==='folder')r(n.id)})}r(id);return c}
+function libSelectFolder(id){APP.libSelected=(id===null||id==='null')?null:id;APP.page='files';render()}
+function libToggleFolder(id){if(!APP.libOpenFolders)APP.libOpenFolders={};APP.libOpenFolders[id]=!APP.libOpenFolders[id];render()}
+
+function buildLibTree(){
+  const nodes=libNodes();
+  function renderFolder(parentId,depth){
+    return nodes.filter(n=>n.type==='folder'&&n.parentId===(parentId||null)).map(f=>{
+      const isOpen=APP.libOpenFolders[f.id],isSel=APP.libSelected===f.id;
+      const childFolders=nodes.filter(n=>n.type==='folder'&&n.parentId===f.id).length;
+      const total=nodes.filter(n=>n.parentId===f.id).length;
+      return`<div>
+        <div class="tree-item ${isSel?'selected':''}" style="padding-left:${12+depth*14}px" onclick="libSelectFolder('${f.id}')">
+          <span class="toggle ${isOpen?'open':''}" onclick="event.stopPropagation();libToggleFolder('${f.id}')">${childFolders?'▶':''}</span>
+          <span class="ico">${isOpen?'📂':'📁'}</span><span class="lbl">${esc(f.name)}</span>
+          ${total?`<span class="cnt">${total}</span>`:''}
+        </div>
+        ${isOpen?`<div>${renderFolder(f.id,depth+1)}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+  return`<div class="lib-tree">
+    <div class="tree-item ${!APP.libSelected?'selected':''}" style="padding-left:12px" onclick="libSelectFolder(null)">
+      <span class="toggle"></span><span class="ico">🏠</span><span class="lbl">Raiz</span>
+    </div>${renderFolder(null,0)}
+  </div>`}
+
+function buildLibBrowser(){
+  const nodes=libNodes(),parentId=APP.libSelected||null;
+  const folders=nodes.filter(n=>n.parentId===parentId&&n.type==='folder');
+  const files=nodes.filter(n=>n.parentId===parentId&&n.type==='file');
+  const path=parentId?libPath(parentId):[];
+  return`<div class="breadcrumb"><span onclick="libSelectFolder(null)">🏠 Raiz</span>${path.map((n,i)=>`<span class="sep">/</span><span class="${i===path.length-1?'cur':''}" onclick="libSelectFolder('${n.id}')">${esc(n.name)}</span>`).join('')}</div>
+  <div class="shdr" style="margin-bottom:10px">
+    <div style="font-size:13px;color:var(--muted2)">${folders.length} pasta${folders.length!==1?'s':''} · ${files.length} arquivo${files.length!==1?'s':''}</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-gh btn-sm" onclick="openNewFolderModal(${parentId?`'${parentId}'`:'null'})">📁 Nova Pasta</button>
+      <button class="btn btn-p btn-sm" onclick="openUploadModal(${parentId?`'${parentId}'`:'null'})">⬆ Upload</button>
+    </div>
+  </div>
+  ${folders.length===0&&files.length===0?`<div class="empty" style="padding:50px"><div class="ei">📂</div><p>Pasta vazia. Crie subpastas ou faça upload.</p></div>`:`
+  ${folders.length>0?`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px">Pastas</div>
+  <div class="file-grid" style="margin-bottom:18px">
+    ${folders.map(f=>{const sub=nodes.filter(n=>n.parentId===f.id).length;return`<div class="file-card" onclick="libSelectFolder('${f.id}')" oncontextmenu="libCtxMenu(event,'${f.id}','folder')">
+      <div class="file-ico">📁</div><div class="file-name">${esc(f.name)}</div><div class="file-meta">${sub} item${sub!==1?'s':''}</div>
+      <div class="file-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-gh btn-sm" onclick="openRenameFolderModal('${f.id}')">✏</button>
+        <button class="btn btn-d btn-sm" onclick="libDelFolder('${f.id}')">✕</button>
+      </div>
+    </div>`}).join('')}
+  </div>`:''}
+  ${files.length>0?`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px">Arquivos</div>
+  <div class="file-grid">
+    ${files.map(f=>{const ext=f.name?.split('.').pop();return`<div class="file-card" oncontextmenu="libCtxMenu(event,'${f.id}','file')">
+      <div class="file-ico">${fileIcon(ext)}</div><div class="file-name">${esc(f.name)}</div>
+      <div class="file-meta"><span class="bdg pur" style="font-size:9px">${fileType(ext)}</span></div>
+      <div class="file-meta" style="margin-top:4px">${fmtSize(f.size)} · ${fmtDate(f.uploadedAt)}</div>
+      ${f.desc?`<div class="file-meta" style="font-style:italic;margin-top:3px">${esc(f.desc)}</div>`:''}
+      <div class="file-actions">
+        <button class="btn btn-gh btn-sm" onclick="libDownload('${f.id}')">⬇</button>
+        <button class="btn btn-gh btn-sm" onclick="openEditFileModal('${f.id}')">✏</button>
+        <button class="btn btn-d btn-sm" onclick="libDelFile('${f.id}')">✕</button>
+      </div>
+    </div>`}).join('')}
+  </div>`:''}
+  `}`}
+
+function buildLibRecent(){
+  const files=libNodes().filter(n=>n.type==='file').sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt)).slice(0,30);
+  return`<div class="stitle" style="margin-bottom:14px">🕐 Recentes</div>
+  ${files.length===0?`<div class="empty"><div class="ei">📂</div><p>Nenhum arquivo ainda.</p></div>`:`
+  <div class="card"><div class="tw"><table><thead><tr><th>Arquivo</th><th>Tipo</th><th>Tamanho</th><th>Data</th><th>Caminho</th><th>Ações</th></tr></thead><tbody>
+  ${files.map(f=>{const ext=f.name?.split('.').pop();const path=libPath(f.parentId).map(n=>n.name).join(' / ')||'Raiz';return`<tr>
+    <td><span style="font-size:15px;margin-right:6px">${fileIcon(ext)}</span><strong>${esc(f.name)}</strong></td>
+    <td><span class="bdg pur">${fileType(ext)}</span></td>
+    <td style="font-size:11px;color:var(--muted2)">${fmtSize(f.size)}</td>
+    <td style="font-size:11px;color:var(--muted2)">${fmtDate(f.uploadedAt)}</td>
+    <td style="font-size:11px;color:var(--muted2)">📁 ${esc(path)}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-gh btn-sm" onclick="libDownload('${f.id}')">⬇</button>
+      <button class="btn btn-gh btn-sm" onclick="libSelectFolder('${f.parentId||'null'}');APP.page='files';render()">📂 Abrir</button>
+    </div></td>
+  </tr>`}).join('')}</tbody></table></div></div>`}`}
+
+function buildLibSearch(){
+  const q=APP.libSearchQ||'';
+  const results=q?libNodes().filter(n=>(n.name||'').toLowerCase().includes(q.toLowerCase())):[];
+  return`<div class="stitle" style="margin-bottom:14px">🔍 Buscar</div>
+  <div style="margin-bottom:14px"><input value="${esc(q)}" placeholder="Nome do arquivo ou pasta..." style="max-width:400px" oninput="APP.libSearchQ=this.value;render()"/></div>
+  ${q&&results.length===0?`<div class="empty"><div class="ei">🔍</div><p>Nenhum resultado.</p></div>`:''}
+  ${results.length>0?`<div class="card"><div class="tw"><table><thead><tr><th>Nome</th><th>Tipo</th><th>Caminho</th><th>Ações</th></tr></thead><tbody>
+  ${results.map(n=>{const ext=n.type==='file'?n.name?.split('.').pop():null;const path=libPath(n.parentId).map(x=>x.name).join(' / ')||'Raiz';return`<tr>
+    <td><span style="font-size:14px;margin-right:6px">${n.type==='folder'?'📁':fileIcon(ext)}</span><strong>${esc(n.name)}</strong></td>
+    <td><span class="bdg ${n.type==='folder'?'warn':'pur'}">${n.type==='folder'?'Pasta':fileType(ext)}</span></td>
+    <td style="font-size:11px;color:var(--muted2)">📁 ${esc(path)}</td>
+    <td><button class="btn btn-gh btn-sm" onclick="libSelectFolder('${n.type==='folder'?n.id:n.parentId||'null'}');APP.page='files';render()">📂 Abrir</button></td>
+  </tr>`}).join('')}</tbody></table></div></div>`:''}`;
+}
+
+function libCtxMenu(e,id,type){
+  e.preventDefault();document.getElementById('lib-ctx')?.remove();
+  const m=document.createElement('div');m.id='lib-ctx';m.className='ctx-menu';
+  m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';
+  if(type==='folder'){m.innerHTML=`<div class="ctx-item" onclick="libCtxClose();libSelectFolder('${id}')">📂 Abrir</div><div class="ctx-item" onclick="libCtxClose();openNewFolderModal('${id}')">📁 Nova subpasta</div><div class="ctx-item" onclick="libCtxClose();openUploadModal('${id}')">⬆ Upload aqui</div><div class="ctx-item" onclick="libCtxClose();openRenameFolderModal('${id}')">✏ Renomear</div><div class="ctx-sep"></div><div class="ctx-item danger" onclick="libCtxClose();libDelFolder('${id}')">✕ Excluir</div>`;}
+  else{m.innerHTML=`<div class="ctx-item" onclick="libCtxClose();libDownload('${id}')">⬇ Baixar</div><div class="ctx-item" onclick="libCtxClose();openEditFileModal('${id}')">✏ Editar</div><div class="ctx-sep"></div><div class="ctx-item danger" onclick="libCtxClose();libDelFile('${id}')">✕ Excluir</div>`;}
+  document.body.appendChild(m);setTimeout(()=>document.addEventListener('click',libCtxClose,{once:true}),10);
+}
+function libCtxClose(){document.getElementById('lib-ctx')?.remove()}
+
+// ═══════ LIB MODALS ═══════
+function openNewFolderModal(parentId){
+  const pid=(parentId===null||parentId==='null')?null:parentId;
+  const name=pid?libNodes().find(n=>n.id===pid)?.name:null;
+  openModal(`<div class="modal fp"><div class="mtitle p">📁 Nova Pasta</div>
+    ${name?`<div class="infobox" style="font-size:12px">Dentro de: <strong>📁 ${esc(name)}</strong></div>`:'<div class="infobox" style="font-size:12px">Na <strong>raiz</strong></div>'}
+    <div class="frow"><div><label>Nome *</label><input id="fn" placeholder="Ex: Manuais..."/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="libCreateFolder('${pid||'null'}')">Criar</button></div>
+  </div>`);setTimeout(()=>qid('fn')?.focus(),50);
+}
+
+async function libCreateFolder(parentId){
+  const name=qval('fn');if(!name)return toast('Digite um nome.','err');
+  const pid=(parentId===null||parentId==='null')?null:parentId;
+  const nodes=libNodes();
+  if(nodes.some(n=>n.type==='folder'&&n.parentId===pid&&n.name.toLowerCase()===name.toLowerCase()))return toast('Pasta já existe.','err');
+  const node={id:uid(),name,type:'folder',parentId:pid,createdAt:new Date().toISOString()};
+  nodes.push(node);LOCAL.set('libTree',nodes);FB.set('libTree',node.id,node);
+  if(pid)APP.libOpenFolders[pid]=true;
+  closeModal();toast('Pasta criada!');render();
+}
+
+function openRenameFolderModal(id){
+  const f=libNodes().find(n=>n.id===id);
+  openModal(`<div class="modal fp"><div class="mtitle p">✏ Renomear</div>
+    <div class="frow"><div><label>Novo Nome *</label><input id="fn" value="${esc(f?.name||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="libRenameFolder('${id}')">Salvar</button></div>
+  </div>`);setTimeout(()=>qid('fn')?.select(),50);
+}
+
+async function libRenameFolder(id){
+  const name=qval('fn');if(!name)return toast('Digite um nome.','err');
+  const nodes=libNodes();const i=nodes.findIndex(n=>n.id===id);
+  if(i>=0){nodes[i].name=name;LOCAL.set('libTree',nodes);FB.set('libTree',id,nodes[i]);}
+  closeModal();toast('Renomeada!');render();
+}
+
+async function libDelFolder(id){
+  const count=libCountChildren(id);
+  if(count>0&&!confirm(`Contém ${count} item(ns). Excluir tudo?`))return;
+  const nodes=libNodes();const toDelete=[];
+  function collect(fid){nodes.filter(n=>n.parentId===fid).forEach(n=>{toDelete.push(n.id);if(n.type==='folder')collect(n.id)});}
+  collect(id);toDelete.push(id);
+  LOCAL.set('libTree',nodes.filter(n=>!toDelete.includes(n.id)));
+  toDelete.forEach(did=>FB.delete('libTree',did));
+  if(APP.libSelected===id)APP.libSelected=null;
+  toast('Excluída.');render();
+}
+
+function openUploadModal(parentId){
+  const pid=(parentId===null||parentId==='null')?null:parentId;
+  const folder=pid?libNodes().find(n=>n.id===pid):null;
+  openModal(`<div class="modal fp"><div class="mtitle p">⬆ Upload</div>
+    ${folder?`<div class="infobox" style="font-size:12px">Para: <strong>📁 ${esc(folder.name)}</strong></div>`:'<div class="infobox" style="font-size:12px">Para a <strong>raiz</strong></div>'}
+    <div id="dz" class="drop-zone" onclick="qid('ffile').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="libHandleDrop(event,'${parentId||'null'}')">
+      <div class="dz-ico">📎</div><p><strong>Clique para selecionar</strong> ou arraste</p>
+      <p style="margin-top:5px;font-size:11px;color:var(--muted)">PDF, Excel, Word, imagens...</p>
+    </div>
+    <input type="file" id="ffile" multiple style="display:none" onchange="libHandleFiles(this.files,'${parentId||'null'}')"/>
+    <div class="frow"><div><label>Descrição (opcional)</label><input id="fdesc"/></div></div>
+    <div id="upload-preview"></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Fechar</button></div>
+  </div>`);
+}
+
+function libHandleDrop(e,parentId){e.preventDefault();document.getElementById('dz')?.classList.remove('drag-over');libHandleFiles(e.dataTransfer.files,parentId);}
+
+function libHandleFiles(fileList,parentId){
+  const pid=(parentId===null||parentId==='null')?null:parentId;
+  const desc=qval('fdesc');let added=0;
+  Array.from(fileList).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      const node={id:uid(),name:file.name,type:'file',parentId:pid,size:file.size,uploadedAt:new Date().toISOString(),desc,ext:file.name.split('.').pop().toLowerCase(),data:e.target.result};
+      const fresh=libNodes();fresh.push(node);
+      try{LOCAL.set('libTree',fresh);FB.set('libTree',node.id,node);added++;
+        const prev=document.getElementById('upload-preview');
+        if(prev)prev.innerHTML=`<div class="infobox" style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${added} arquivo${added>1?'s':''} adicionado${added>1?'s':''}</div>`;
+        toast(`${file.name} adicionado!`);
+        if(pid)APP.libOpenFolders[pid]=true;
+      }catch(err){toast('Arquivo grande demais.','err');}
+    };reader.readAsDataURL(file);
+  });
+}
+
+function libDownload(id){
+  const f=libNodes().find(n=>n.id===id);if(!f||!f.data)return toast('Arquivo não encontrado.','err');
+  const a=document.createElement('a');a.href=f.data;a.download=f.name;document.body.appendChild(a);a.click();a.remove();
+  toast(`Download: ${f.name}`);
+}
+
+function openEditFileModal(id){
+  const f=libNodes().find(n=>n.id===id);if(!f)return;
+  openModal(`<div class="modal fp"><div class="mtitle p">✏ Editar Arquivo</div>
+    <div class="frow"><div><label>Nome *</label><input id="fn" value="${esc(f.name)}"/></div></div>
+    <div class="frow"><div><label>Descrição</label><input id="fdesc" value="${esc(f.desc||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="libEditFile('${id}')">Salvar</button></div>
+  </div>`);
+}
+
+async function libEditFile(id){
+  const name=qval('fn'),desc=qval('fdesc');if(!name)return toast('Digite um nome.','err');
+  const nodes=libNodes();const i=nodes.findIndex(n=>n.id===id);
+  if(i>=0){nodes[i].name=name;nodes[i].desc=desc;LOCAL.set('libTree',nodes);FB.set('libTree',id,nodes[i]);}
+  closeModal();toast('Atualizado!');render();
+}
+
+async function libDelFile(id){
+  if(!confirm('Excluir?'))return;
+  LOCAL.set('libTree',libNodes().filter(n=>n.id!==id));FB.delete('libTree',id);
+  toast('Excluído.');render();
+}
+
+// ═══════ FERRAMENTARIA MODALS ═══════
+function openToolModal(id){
+  const tool=id?DB.find('tools',id):null;
+  const cats=[...new Set(DB.get('tools').map(t=>t.category).filter(Boolean))];
+  openModal(`<div class="modal"><div class="mtitle">🔧 ${tool?'Editar':'Nova'} Ferramenta</div>
+    <div class="frow c2"><div><label>Nome *</label><input id="fn" value="${esc(tool?.name||'')}"/></div><div><label>Categoria</label><input id="fc" value="${esc(tool?.category||'')}" list="cat-dl"/><datalist id="cat-dl">${cats.map(c=>`<option value="${esc(c)}"/>`).join('')}</datalist></div></div>
+    <div class="frow"><div><label>Descrição</label><input id="fd" value="${esc(tool?.desc||'')}"/></div></div>
+    <div class="frow c3"><div><label>Valor (R$) *</label><input id="fv" type="number" step="0.01" value="${tool?.value||''}"/></div><div><label>Nº Série</label><input id="fs" value="${esc(tool?.serial||'')}"/></div><div><label>Localização</label><input id="fl" value="${esc(tool?.location||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="saveTool('${id||''}')">Salvar</button></div>
+  </div>`);
+}
+
+async function saveTool(id){
+  const name=qval('fn'),value=qfloat('fv');
+  if(!name)return toast('Preencha o nome.','err');
+  if(!value||value<=0)return toast('Valor inválido.','err');
+  const existing=id?DB.find('tools',id):{};
+  await DB.add('tools',{id:id||uid(),name,value,category:qval('fc'),desc:qval('fd'),serial:qval('fs'),location:qval('fl'),notes:'',status:existing?.status||'disponivel'});
+  closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
+}
+
+async function delTool(id){
+  if(DB.get('loans').some(l=>!l.returnDate&&l.toolId===id))return toast('Ferramenta emprestada.','err');
+  if(!confirm('Excluir?'))return;await DB.remove('tools',id);toast('Removida.');render();
+}
+
+function openMechModal(id){
+  const m=id?DB.find('mechs',id):null;
+  openModal(`<div class="modal"><div class="mtitle">👷 ${m?'Editar':'Novo'} Mecânico</div>
+    <div class="frow c2"><div><label>Nome *</label><input id="fn" value="${esc(m?.name||'')}"/></div><div><label>Matrícula *</label><input id="fm" value="${esc(m?.mat||'')}"/></div></div>
+    <div class="frow c2"><div><label>CPF</label><input id="fc" value="${esc(m?.cpf||'')}"/></div><div><label>Telefone</label><input id="fp" value="${esc(m?.phone||'')}"/></div></div>
+    <div class="frow"><div><label>Departamento</label><input id="fd" value="${esc(m?.dept||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="saveMech('${id||''}')">Salvar</button></div>
+  </div>`);
+}
+
+async function saveMech(id){
+  const name=qval('fn'),mat=qval('fm');
+  if(!name)return toast('Preencha o nome.','err');
+  if(!mat)return toast('Preencha a matrícula.','err');
+  if(!id&&DB.get('mechs').some(x=>x.mat===mat))return toast('Matrícula já existe.','err');
+  await DB.add('mechs',{id:id||uid(),name,mat,cpf:qval('fc'),phone:qval('fp'),dept:qval('fd')});
+  closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
+}
+
+async function delMech(id){
+  if(DB.get('loans').filter(l=>!l.returnDate).some(l=>l.mechId===id))return toast('Mecânico com ferramentas.','err');
+  if(!confirm('Excluir?'))return;await DB.remove('mechs',id);toast('Removido.');render();
+}
+
+function openMechDetail(id){
+  const m=DB.find('mechs',id),tools=DB.get('tools');
+  const active=DB.get('loans').filter(l=>!l.returnDate&&l.mechId===id);
+  const total=active.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);
+  openModal(`<div class="modal"><div class="mtitle">👷 ${esc(m.name)}</div>
+    <div class="infobox" style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted2)">
+      <span>Mat. <strong style="color:var(--text)">${esc(m.mat)}</strong></span>
+      <span>Setor: <strong style="color:var(--text)">${esc(m.dept||'—')}</strong></span>
+      <span>Tel: <strong style="color:var(--text)">${esc(m.phone||'—')}</strong></span>
+    </div>
+    ${active.length===0?`<div class="empty"><div class="ei">✅</div><p>Nenhuma ferramenta.</p></div>`:`
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr>
+      <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);text-transform:uppercase">Ferramenta</th>
+      <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);text-transform:uppercase">Valor</th>
+      <th style="text-align:left;padding:6px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);text-transform:uppercase">Desde</th>
+    </tr></thead><tbody>
+    ${active.map(l=>{const t=tools.find(x=>x.id===l.toolId);return`<tr><td style="padding:8px 0"><strong>${esc(t?.name||'?')}</strong></td><td style="color:var(--gold);font-weight:600">${fmt(t?.value)}</td><td style="font-size:11px;color:var(--muted2)">${fmtD(l.loanDate)}</td></tr>`}).join('')}</tbody></table>
+    <div style="margin-top:10px;padding:8px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between"><span style="color:var(--muted2)">Total:</span><strong style="color:var(--gold)">${fmt(total)}</strong></div>`}
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Fechar</button></div>
+  </div>`);
+}
+
+function openLoanModal(){
+  const tools=DB.get('tools').filter(t=>t.status==='disponivel'),mechs=DB.get('mechs');
+  openModal(`<div class="modal"><div class="mtitle">📋 Registrar Empréstimo</div>
+    <div class="frow c2">
+      <div><label>Ferramenta *</label><select id="ftool" onchange="updateLoanValue()"><option value="">Selecione...</option>${tools.map(t=>`<option value="${t.id}">${esc(t.name)} — ${fmt(t.value)}</option>`).join('')}</select>${tools.length===0?`<div class="herr">Nenhuma disponível.</div>`:''}</div>
+      <div><label>Mecânico *</label><select id="fmech"><option value="">Selecione...</option>${mechs.map(m=>`<option value="${m.id}">${esc(m.name)} — Mat. ${esc(m.mat)}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow c2"><div><label>Data/Hora</label><input type="datetime-local" id="fdate" value="${nowDT()}"/></div><div><label>Finalidade</label><input id="fnote" placeholder="Para qual serviço?"/></div></div>
+    <div id="loanval"></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="saveLoan()">✓ Registrar & Gerar Termo</button></div>
+  </div>`);
+}
+
+function updateLoanValue(){const t=DB.find('tools',qval('ftool'));const el=qid('loanval');if(el)el.innerHTML=t?`<div class="infobox">💰 Valor: <strong style="color:var(--gold)">${fmt(t.value)}</strong></div>`:''}
+
+async function saveLoan(){
+  const toolId=qval('ftool'),mechId=qval('fmech');
+  if(!toolId)return toast('Selecione ferramenta.','err');
+  if(!mechId)return toast('Selecione mecânico.','err');
+  const loan={id:uid(),toolId,mechId,loanDate:qid('fdate').value||nowDT(),note:qval('fnote'),returnDate:null};
+  await DB.add('loans',loan);await DB.update('tools',toolId,{status:'emprestada'});
+  closeModal();toast('Registrado!');render();setTimeout(()=>printTermo(loan.id),300);
+}
+
+function openReturnModal(loanId){
+  const loan=DB.find('loans',loanId),tool=DB.find('tools',loan.toolId),mech=DB.find('mechs',loan.mechId);
+  openModal(`<div class="modal"><div class="mtitle">↩ Confirmar Devolução</div>
+    <div class="infobox"><div style="font-weight:700;font-size:14px;margin-bottom:6px">${esc(tool?.name||'?')}</div>
+    <div style="font-size:12px;color:var(--muted2)">Mecânico: <strong style="color:var(--text)">${esc(mech?.name||'—')}</strong></div>
+    <div style="font-size:12px;color:var(--muted2)">Duração: <strong style="color:var(--text)">${daysAgo(loan.loanDate)} dias</strong></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" onclick="doReturn('${loanId}')">✓ Confirmar</button></div>
+  </div>`);
+}
+
+async function doReturn(loanId){
+  await DB.update('loans',loanId,{returnDate:nowDT()});
+  const loan=DB.find('loans',loanId);await DB.update('tools',loan.toolId,{status:'disponivel'});
+  closeModal();toast('Devolução registrada!');render();
+}
+
+// ═══════ BATTERY MODALS ═══════
+function openMachineModal(id){
+  const m=id?DB.find('machines',id):null;
+  openModal(`<div class="modal fb"><div class="mtitle b">🚜 ${m?'Editar':'Nova'} Máquina</div>
+    <div class="frow c2"><div><label>Nome *</label><input id="fn" value="${esc(m?.name||'')}"/></div><div><label>Placa</label><input id="fp" value="${esc(m?.plate||'')}"/></div></div>
+    <div class="frow c3"><div><label>Ano</label><input id="fy" value="${esc(m?.year||'')}"/></div><div><label>Tipo</label><input id="ft" value="${esc(m?.type||'')}"/></div><div><label>Setor</label><input id="fs" value="${esc(m?.sector||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveMachine('${id||''}')">Salvar</button></div>
+  </div>`);
+}
+
+async function saveMachine(id){
+  const name=qval('fn');if(!name)return toast('Preencha o nome.','err');
+  await DB.add('machines',{id:id||uid(),name,plate:qval('fp'),year:qval('fy'),type:qval('ft'),sector:qval('fs')});
+  closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
+}
+
+async function delMachine(id){
+  if(DB.get('batteries').some(b=>b.machineId===id))return toast('Máquina com bateria.','err');
+  if(!confirm('Excluir?'))return;await DB.remove('machines',id);toast('Removida.');render();
+}
+
+function openBatModal(id){
+  const b=id?DB.find('batteries',id):null;
+  openModal(`<div class="modal fb"><div class="mtitle b">🔋 ${b?'Editar':'Nova'} Bateria</div>
+    <div class="frow c3"><div><label>Código *</label><input id="fc" value="${esc(b?.code||'')}"/></div><div><label>Marca</label><input id="fbr" value="${esc(b?.brand||'')}"/></div><div><label>Modelo</label><input id="fmo" value="${esc(b?.model||'')}"/></div></div>
+    <div class="frow c4"><div><label>Capacidade</label><input id="fcap" value="${esc(b?.capacity||'')}"/></div><div><label>Voltagem</label><input id="fvolt" value="${esc(b?.voltage||'')}"/></div><div><label>Data Compra</label><input type="date" id="fpd" value="${b?.purchaseDate||''}"/></div><div><label>Valor (R$)</label><input type="number" step="0.01" id="fpv" value="${b?.purchaseValue||''}"/></div></div>
+    <div class="frow c2"><div><label>Garantia</label><input type="date" id="fw" value="${b?.warranty||''}"/></div><div><label>Fornecedor</label><input id="fsup" value="${esc(b?.supplier||'')}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveBat('${id||''}')">Salvar</button></div>
+  </div>`);
+}
+
+async function saveBat(id){
+  const code=qval('fc');if(!code)return toast('Preencha o código.','err');
+  if(!id&&DB.get('batteries').some(b=>b.code===code))return toast('Código já existe.','err');
+  const existing=id?DB.find('batteries',id):{};
+  await DB.add('batteries',{id:id||uid(),code,brand:qval('fbr'),model:qval('fmo'),capacity:qval('fcap'),voltage:qval('fvolt'),purchaseDate:qval('fpd'),purchaseValue:qfloat('fpv'),warranty:qval('fw'),supplier:qval('fsup'),machineId:existing?.machineId||null});
+  closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
+}
+
+async function delBat(id){
+  if(DB.find('batteries',id)?.machineId)return toast('Bateria alocada.','err');
+  if(!confirm('Excluir?'))return;await DB.remove('batteries',id);toast('Removida.');render();
+}
+
+function openAllocModal(){
+  const batteries=DB.get('batteries'),machines=DB.get('machines');
+  const stock=batteries.filter(b=>!b.machineId);
+  const free=machines.filter(m=>!batteries.some(b=>b.machineId===m.id));
+  openModal(`<div class="modal fb"><div class="mtitle b">🔄 Alocar Bateria</div>
+    <div class="frow c2">
+      <div><label>Bateria *</label><select id="fbat"><option value="">Selecione...</option>${stock.map(b=>`<option value="${b.id}">${esc(b.code)} — ${esc(b.brand||'')} ${esc(b.capacity||'')}</option>`).join('')}</select>${stock.length===0?`<div class="herr">Nenhuma em estoque.</div>`:''}</div>
+      <div><label>Máquina *</label><select id="fmach"><option value="">Selecione...</option>${free.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>${free.length===0?`<div class="herr">Todas têm bateria.</div>`:''}</div>
+    </div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveAlloc()">✓ Alocar</button></div>
+  </div>`);
+}
+
+async function saveAlloc(){
+  const batId=qval('fbat'),machId=qval('fmach');
+  if(!batId)return toast('Selecione bateria.','err');
+  if(!machId)return toast('Selecione máquina.','err');
+  await DB.update('batteries',batId,{machineId:machId});
+  await DB.add('batHist',{id:uid(),batId,machId,action:'alocada',date:nowDT()});
+  closeModal();toast('Alocada!');render();
+}
+
+async function deallocBat(batId){
+  const b=DB.find('batteries',batId);if(!b)return;
+  if(!confirm('Remover bateria?'))return;
+  await DB.add('batHist',{id:uid(),batId,machId:b.machineId,action:'removida',date:nowDT()});
+  await DB.update('batteries',batId,{machineId:null});
+  toast('Desalocada.');render();
+}
+
+// ═══════ TERMOS ═══════
+function showTermoViewer(html,title){
+  document.getElementById('termo-viewer')?.remove();
+  const wrap=document.createElement('div');wrap.id='termo-viewer';wrap.style.cssText='position:fixed;inset:0;z-index:800;background:#1e293b;display:flex;flex-direction:column';
+  const bar=document.createElement('div');bar.style.cssText='background:#0f172a;padding:10px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:1px solid #334155';
+  bar.innerHTML=`<span style="flex:1;font-size:13px;color:#e2e8f0;font-family:DM Sans,sans-serif">🖨 ${esc(title)}</span>
+    <button onclick="document.getElementById('termo-iframe').contentWindow.print()" style="padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:#e8a000;color:#000">🖨 Imprimir / PDF</button>
+    <button onclick="document.getElementById('termo-viewer').remove()" style="padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:#334155;color:#e2e8f0">✕ Fechar</button>`;
+  const frame=document.createElement('iframe');frame.id='termo-iframe';frame.style.cssText='flex:1;border:none;background:#fff';frame.srcdoc=html;
+  wrap.appendChild(bar);wrap.appendChild(frame);document.body.appendChild(wrap);
+}
+
+function termoCSS(){return`<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',Arial,sans-serif;background:#fff;color:#111;padding:32px 40px;font-size:13px;line-height:1.55;max-width:760px;margin:0 auto}.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #000}.logo{font-family:'Bebas Neue',Arial,sans-serif;font-size:26px}.logo span{color:#e8a000}.doc-num{text-align:right;font-size:12px;color:#666}.doc-num strong{display:block;font-size:16px;color:#000;font-family:'Bebas Neue',Arial,sans-serif}.sec{margin-bottom:16px}.sec-ttl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#999;margin-bottom:7px;padding-bottom:3px;border-bottom:1px solid #eee}.grid{display:grid;gap:10px;margin-bottom:6px}.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.fld label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:3px}.fld p{font-size:13px;font-weight:600;padding:6px 10px;background:#f4f4f4;border-radius:4px;min-height:30px}.terms{font-size:12px;color:#333;line-height:1.75;padding:14px 16px;background:#f9f9f9;border-radius:5px;border-left:3px solid #000}.sigs{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:30px}.sig-line{border-top:1px solid #999;margin-top:54px;padding-top:5px;font-size:11px;color:#666;text-align:center}.footer{margin-top:22px;padding-top:10px;border-top:1px solid #ddd;font-size:10px;color:#aaa;text-align:center}table{width:100%;border-collapse:collapse}thead tr{background:#111;color:#fff}th{padding:9px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase}td{padding:8px 10px;border-bottom:1px solid #eee}.tfoot-row td{background:#f4f4f4;font-weight:700;padding:9px 10px}</style>`}
+
+function printTermo(loanId){
+  const loan=DB.find('loans',loanId);if(!loan)return toast('Não encontrado.','err');
+  const tool=DB.find('tools',loan.toolId),mech=DB.find('mechs',loan.mechId);
+  if(!tool||!mech)return toast('Dados incompletos.','err');
+  const num='EMP-'+String(loanId).slice(-6).toUpperCase();
+  showTermoViewer(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/>${termoCSS()}</head><body>
+<div class="hdr"><div><div class="logo">PCM<span>GEST</span></div><div style="font-size:11px;color:#666">Termo de Empréstimo</div></div><div class="doc-num"><strong>TERMO DE EMPRÉSTIMO</strong>N° ${num}<br/>${fmtDate(new Date().toISOString())}</div></div>
+<div class="sec"><div class="sec-ttl">Mecânico Responsável</div>
+<div class="grid c3"><div class="fld"><label>Nome</label><p>${esc(mech.name)}</p></div><div class="fld"><label>Matrícula</label><p>${esc(mech.mat)}</p></div><div class="fld"><label>CPF</label><p>${esc(mech.cpf||'—')}</p></div></div>
+<div class="grid c2"><div class="fld"><label>Departamento</label><p>${esc(mech.dept||'—')}</p></div><div class="fld"><label>Telefone</label><p>${esc(mech.phone||'—')}</p></div></div></div>
+<div class="sec"><div class="sec-ttl">Ferramenta</div>
+<div class="grid c2"><div class="fld"><label>Nome</label><p>${esc(tool.name)}</p></div><div class="fld"><label>Categoria</label><p>${esc(tool.category||'—')}</p></div></div>
+<div class="grid c3"><div class="fld"><label>Descrição</label><p>${esc(tool.desc||'—')}</p></div><div class="fld"><label>Valor Patrimonial</label><p style="font-weight:800">${fmt(tool.value)}</p></div><div class="fld"><label>Nº Série</label><p>${esc(tool.serial||'—')}</p></div></div>
+<div class="grid c2"><div class="fld"><label>Data/Hora</label><p>${fmtD(loan.loanDate)}</p></div><div class="fld"><label>Finalidade</label><p>${esc(loan.note||'—')}</p></div></div></div>
+<div class="sec"><div class="sec-ttl">Termos e Condições</div>
+<div class="terms"><strong>Ao assinar, declara que:</strong><br/><br/>1. Recebeu a ferramenta em perfeito estado;<br/>2. Responsabiliza-se pelo uso correto e conservação;<br/>3. Devolverá nas mesmas condições, salvo desgaste normal;<br/>4. Em caso de dano ou perda, arcará com ${fmt(tool.value)};<br/>5. Devolverá assim que o serviço for concluído.</div></div>
+<div class="sigs"><div><div class="sig-line">Assinatura do Mecânico<br/><span style="font-size:10px">${esc(mech.name)} — Mat. ${esc(mech.mat)}</span></div></div><div><div class="sig-line">Assinatura do Responsável<br/><span style="font-size:10px">Ferramentaria / Supervisor</span></div></div></div>
+<div class="footer">PCM Gest · ${new Date().toLocaleString('pt-BR')} · ${num}</div>
+</body></html>`,`Termo — ${tool.name} / ${mech.name}`);
+}
+
+function openTermoMechModal(){
+  const mechs=DB.get('mechs'),active=DB.get('loans').filter(l=>!l.returnDate),tools=DB.get('tools');
+  const withLoans=mechs.filter(m=>active.some(l=>l.mechId===m.id));
+  if(!withLoans.length)return toast('Nenhum mecânico com empréstimos.','warn');
+  openModal(`<div class="modal"><div class="mtitle">🖨 Termo por Mecânico</div>
+    <p style="font-size:12.5px;color:var(--muted2);margin-bottom:12px">Gera termo com todas as ferramentas do mecânico.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${withLoans.map(m=>{const ml=active.filter(l=>l.mechId===m.id);const val=ml.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--s3);border:1px solid var(--border);border-radius:8px">
+        <div style="display:flex;align-items:center;gap:10px"><div class="avatar">${esc(m.name[0])}</div>
+        <div><div style="font-weight:700;font-size:13px">${esc(m.name)}</div><div style="font-size:11px;color:var(--muted2)">Mat. ${esc(m.mat)} · ${ml.length} ferramenta${ml.length>1?'s':''} · <span style="color:var(--gold)">${fmt(val)}</span></div></div></div>
+        <button class="btn btn-g btn-sm" onclick="closeModal();printTermoMech('${m.id}')">🖨 Gerar</button>
+      </div>`}).join('')}
+    </div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Fechar</button></div>
+  </div>`);
+}
+
+function printTermoMech(mechId){
+  const mech=DB.find('mechs',mechId);if(!mech)return;
+  const tools=DB.get('tools'),active=DB.get('loans').filter(l=>!l.returnDate&&l.mechId===mechId);
+  if(!active.length)return toast('Nenhum empréstimo ativo.','warn');
+  const items=active.map(l=>({loan:l,tool:tools.find(t=>t.id===l.toolId)})).filter(x=>x.tool);
+  const total=items.reduce((s,x)=>s+(x.tool.value||0),0);
+  const num='TRM-'+String(mechId).slice(-4).toUpperCase()+'-'+Date.now().toString(36).slice(-4).toUpperCase();
+  showTermoViewer(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/>${termoCSS()}</head><body>
+<div class="hdr"><div><div class="logo">PCM<span>GEST</span></div><div style="font-size:11px;color:#666">Termo de Responsabilidade — Múltiplas Ferramentas</div></div><div class="doc-num"><strong>TERMO DE RESPONSABILIDADE</strong>N° ${num}<br/>${fmtDate(new Date().toISOString())}</div></div>
+<div class="sec"><div class="sec-ttl">Mecânico</div>
+<div class="grid c3"><div class="fld"><label>Nome</label><p>${esc(mech.name)}</p></div><div class="fld"><label>Matrícula</label><p>${esc(mech.mat)}</p></div><div class="fld"><label>CPF</label><p>${esc(mech.cpf||'—')}</p></div></div></div>
+<div class="sec"><div class="sec-ttl">Ferramentas (${items.length} item${items.length>1?'s':''})</div>
+<table><thead><tr><th>#</th><th>Ferramenta</th><th>Categoria</th><th>Série</th><th style="text-align:right">Valor</th><th>Data Emp.</th></tr></thead>
+<tbody>${items.map((x,i)=>`<tr><td>${i+1}</td><td><strong>${esc(x.tool.name)}</strong></td><td>${esc(x.tool.category||'—')}</td><td style="font-family:monospace;font-size:11px">${esc(x.tool.serial||'—')}</td><td style="font-weight:700;text-align:right">${fmt(x.tool.value)}</td><td style="font-size:11px">${fmtD(x.loan.loanDate)}</td></tr>`).join('')}
+<tr class="tfoot-row"><td colspan="4">Total ${items.length} item${items.length>1?'s':''}</td><td colspan="2" style="text-align:right;font-size:14px">TOTAL: ${fmt(total)}</td></tr></tbody></table></div>
+<div class="sec"><div class="sec-ttl">Termos</div><div class="terms"><strong>Ao assinar, declara que:</strong><br/><br/>1. Recebeu todos os itens em perfeito estado;<br/>2. Responsabiliza-se pelo uso correto e conservação;<br/>3. Devolverá nas mesmas condições;<br/>4. Em caso de perda total, arcará com ${fmt(total)};<br/>5. A devolução ocorrerá quando os serviços forem concluídos.</div></div>
+<div class="sigs"><div><div class="sig-line">Assinatura do Mecânico<br/><span style="font-size:10px">${esc(mech.name)} — Mat. ${esc(mech.mat)}</span></div></div><div><div class="sig-line">Assinatura do Responsável<br/><span style="font-size:10px">Ferramentaria / Supervisor</span></div></div></div>
+<div class="footer">PCM Gest · ${new Date().toLocaleString('pt-BR')} · ${num} · Total: ${fmt(total)}</div>
+</body></html>`,`Termo — ${mech.name}`);
+}
+
+// ═══════ RELATÓRIOS PDF ═══════
+function openRelatorioModal(){
+  openModal(`<div class="modal"><div class="mtitle">📊 Gerar Relatório PDF</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${[{ico:'🔧',t:'Inventário de Ferramentas',s:'Lista completa com status e valores',fn:'relTools'},{ico:'📋',t:'Empréstimos Ativos',s:'Ferramentas fora do estoque',fn:'relLoans'},{ico:'👷',t:'Responsabilidade por Mecânico',s:'Valor em posse por colaborador',fn:'relMechs'},{ico:'🔋',t:'Inventário de Baterias',s:'Baterias, máquinas e garantias',fn:'relBat'},{ico:'🛡',t:'Relatório de Garantias',s:'Vencidas, a vencer e válidas',fn:'relWarranty'},{ico:'📚',t:'Índice da Biblioteca',s:'Estrutura de pastas e arquivos',fn:'relLib'},{ico:'📦',t:'Relatório Completo',s:'Todos os módulos em um PDF',fn:'relAll'}].map(r=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--s3);border:1px solid var(--border);border-radius:8px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">${r.ico}</span>
+        <div><div style="font-weight:700;font-size:13px">${r.t}</div><div style="font-size:11px;color:var(--muted2)">${r.s}</div></div></div>
+        <button class="btn btn-g btn-sm" onclick="closeModal();${r.fn}()">📄 Gerar</button>
+      </div>`).join('')}
+    </div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Fechar</button></div>
+  </div>`);
+}
+
+function showRelViewer(html,title){
+  document.getElementById('rel-viewer')?.remove();
+  const wrap=document.createElement('div');wrap.id='rel-viewer';wrap.style.cssText='position:fixed;inset:0;z-index:800;background:#1e293b;display:flex;flex-direction:column';
+  const bar=document.createElement('div');bar.style.cssText='background:#0f172a;padding:10px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:1px solid #334155';
+  bar.innerHTML=`<span style="flex:1;font-size:13px;color:#e2e8f0">📊 ${esc(title)}</span>
+    <button onclick="document.getElementById('rel-iframe').contentWindow.print()" style="padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:#e8a000;color:#000">🖨 Imprimir / PDF</button>
+    <button onclick="document.getElementById('rel-viewer').remove()" style="padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;background:#334155;color:#e2e8f0">✕ Fechar</button>`;
+  const frame=document.createElement('iframe');frame.id='rel-iframe';frame.style.cssText='flex:1;border:none;background:#fff';frame.srcdoc=html;
+  wrap.appendChild(bar);wrap.appendChild(frame);document.body.appendChild(wrap);
+}
+
+function relCSS(){return`<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',Arial,sans-serif;padding:28px 36px;font-size:12px;line-height:1.5;max-width:900px;margin:0 auto}.hdr{display:flex;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:3px solid #111}.logo{font-family:'Bebas Neue',Arial,sans-serif;font-size:24px}.logo span{color:#e8a000}.doc-info{text-align:right;font-size:11px;color:#666}.doc-info strong{display:block;font-size:15px;color:#111;font-family:'Bebas Neue',Arial,sans-serif}.kpis{display:grid;gap:10px;margin-bottom:18px}.k4{grid-template-columns:repeat(4,1fr)}.k3{grid-template-columns:repeat(3,1fr)}.kpi{background:#f8f8f8;border-radius:6px;padding:10px 13px;border-top:3px solid #111}.kpi.g{border-top-color:#e8a000}.kpi.b{border-top-color:#3b82f6}.kpi.r{border-top-color:#ef4444}.kpi.gr{border-top-color:#22c55e}.kpi-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#999;font-weight:700}.kpi-val{font-family:'Bebas Neue',Arial,sans-serif;font-size:26px;line-height:1;margin:2px 0}.kpi-sub{font-size:10px;color:#666}.sec{margin-bottom:20px}.sec-ttl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#999;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #eee}table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}thead tr{background:#111;color:#fff}th{padding:7px 9px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap}td{padding:7px 9px;border-bottom:1px solid #eee}tr:nth-child(even) td{background:#fafafa}.tfoot td{background:#f0f0f0;font-weight:700;border-top:2px solid #ccc}.bdg{display:inline-block;padding:1px 7px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase}.ok{background:#dcfce7;color:#166534}.warn{background:#fef9c3;color:#854d0e}.err{background:#fee2e2;color:#991b1b}.neu{background:#f3f4f6;color:#4b5563}.blue{background:#dbeafe;color:#1e40af}.pur{background:#f3e8ff;color:#6b21a8}.footer{margin-top:20px;padding-top:10px;border-top:1px solid #ddd;font-size:9px;color:#aaa;text-align:center}.page-break{page-break-before:always;margin-top:30px;padding-top:20px;border-top:2px solid #111}@media print{@page{margin:15mm}}</style>`}
+
+function relHeader(title){return`<div class="hdr"><div><div class="logo">PCM<span>GEST</span></div><div style="font-size:10px;color:#666">Sistema de Gestão Industrial</div></div><div class="doc-info"><strong>${title}</strong>Gerado em ${new Date().toLocaleString('pt-BR')}</div></div>`}
+
+function relTools(){
+  const tools=DB.get('tools'),loans=DB.get('loans'),mechs=DB.get('mechs');
+  const active=loans.filter(l=>!l.returnDate);
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('INVENTÁRIO DE FERRAMENTAS')}
+<div class="kpis k4"><div class="kpi g"><div class="kpi-lbl">Total</div><div class="kpi-val">${tools.length}</div></div><div class="kpi gr"><div class="kpi-lbl">Disponíveis</div><div class="kpi-val">${tools.filter(t=>t.status==='disponivel').length}</div></div><div class="kpi b"><div class="kpi-lbl">Emprestadas</div><div class="kpi-val">${tools.filter(t=>t.status==='emprestada').length}</div></div><div class="kpi g"><div class="kpi-lbl">Valor Total</div><div class="kpi-val" style="font-size:18px">${fmt(tools.reduce((s,t)=>s+(t.value||0),0))}</div></div></div>
+<div class="sec"><div class="sec-ttl">Lista Completa</div>
+<table><thead><tr><th>#</th><th>Ferramenta</th><th>Categoria</th><th>Série</th><th>Valor</th><th>Status</th><th>Localização</th></tr></thead>
+<tbody>${tools.map((t,i)=>{const l=active.find(x=>x.toolId===t.id),m=l?mechs.find(x=>x.id===l.mechId):null;return`<tr><td>${i+1}</td><td><strong>${esc(t.name)}</strong>${t.desc?`<br/><span style="color:#666">${esc(t.desc)}</span>`:''}</td><td>${esc(t.category||'—')}</td><td style="font-family:monospace">${esc(t.serial||'—')}</td><td style="font-weight:700">${fmt(t.value)}</td><td>${t.status==='disponivel'?`<span class="bdg ok">Disponível</span>`:`<span class="bdg warn">Emprestada</span>`}</td><td>${m?`<strong>${esc(m.name)}</strong>`:esc(t.location||'Ferramentaria')}</td></tr>`;}).join('')}
+<tr class="tfoot"><td colspan="4">Total: ${tools.length}</td><td colspan="3">${fmt(tools.reduce((s,t)=>s+(t.value||0),0))}</td></tr></tbody></table></div>
+<div class="footer">PCM Gest · Inventário de Ferramentas · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Inventário de Ferramentas');
+}
+
+function relLoans(){
+  const loans=DB.get('loans'),tools=DB.get('tools'),mechs=DB.get('mechs');
+  const active=loans.filter(l=>!l.returnDate);
+  const totalVal=active.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('EMPRÉSTIMOS ATIVOS')}
+<div class="kpis k3"><div class="kpi b"><div class="kpi-lbl">Ativos</div><div class="kpi-val">${active.length}</div></div><div class="kpi r"><div class="kpi-lbl">&gt;5 dias</div><div class="kpi-val">${active.filter(l=>daysAgo(l.loanDate)>5).length}</div></div><div class="kpi g"><div class="kpi-lbl">Valor</div><div class="kpi-val" style="font-size:16px">${fmt(totalVal)}</div></div></div>
+<div class="sec"><div class="sec-ttl">Em Aberto</div>
+<table><thead><tr><th>#</th><th>Ferramenta</th><th>Valor</th><th>Mecânico</th><th>Matrícula</th><th>Data</th><th>Dias</th><th>Finalidade</th></tr></thead>
+<tbody>${active.map((l,i)=>{const t=tools.find(x=>x.id===l.toolId),m=mechs.find(x=>x.id===l.mechId),d=daysAgo(l.loanDate);return`<tr><td>${i+1}</td><td><strong>${esc(t?.name||'?')}</strong></td><td style="font-weight:700">${fmt(t?.value)}</td><td><strong>${esc(m?.name||'?')}</strong></td><td style="font-family:monospace">${esc(m?.mat||'—')}</td><td>${fmtDate(l.loanDate)}</td><td><span class="bdg ${d>7?'err':d>3?'warn':'ok'}">${d}d</span></td><td>${esc(l.note||'—')}</td></tr>`;}).join('')}
+<tr class="tfoot"><td colspan="2">Total</td><td>${fmt(totalVal)}</td><td colspan="5">${active.length} empréstimo${active.length!==1?'s':''}</td></tr></tbody></table></div>
+<div class="footer">PCM Gest · Empréstimos Ativos · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Empréstimos Ativos');
+}
+
+function relMechs(){
+  const mechs=DB.get('mechs'),tools=DB.get('tools'),loans=DB.get('loans');
+  const active=loans.filter(l=>!l.returnDate);
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('RESPONSABILIDADE POR MECÂNICO')}
+<div class="sec"><div class="sec-ttl">Resumo</div>
+<table><thead><tr><th>#</th><th>Nome</th><th>Matrícula</th><th>CPF</th><th>Setor</th><th>Ferramentas</th><th>Valor</th></tr></thead>
+<tbody>${mechs.map((m,i)=>{const ml=active.filter(l=>l.mechId===m.id);const v=ml.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);return`<tr><td>${i+1}</td><td><strong>${esc(m.name)}</strong></td><td style="font-family:monospace">${esc(m.mat)}</td><td style="font-family:monospace">${esc(m.cpf||'—')}</td><td>${esc(m.dept||'—')}</td><td><span class="bdg blue">${ml.length}</span></td><td style="font-weight:700">${fmt(v)}</td></tr>`;}).join('')}
+<tr class="tfoot"><td colspan="5">Total</td><td>${active.length}</td><td>${fmt(active.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0))}</td></tr></tbody></table></div>
+<div class="footer">PCM Gest · Responsabilidade por Mecânico · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Responsabilidade por Mecânico');
+}
+
+function relBat(){
+  const batteries=DB.get('batteries'),machines=DB.get('machines');
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('INVENTÁRIO DE BATERIAS')}
+<div class="kpis k4"><div class="kpi b"><div class="kpi-lbl">Total</div><div class="kpi-val">${batteries.length}</div></div><div class="kpi gr"><div class="kpi-lbl">Alocadas</div><div class="kpi-val">${batteries.filter(b=>b.machineId).length}</div></div><div class="kpi g"><div class="kpi-lbl">Estoque</div><div class="kpi-val">${batteries.filter(b=>!b.machineId).length}</div></div><div class="kpi g"><div class="kpi-lbl">Valor</div><div class="kpi-val" style="font-size:16px">${fmt(batteries.reduce((s,b)=>s+(b.purchaseValue||0),0))}</div></div></div>
+<div class="sec"><div class="sec-ttl">Lista</div>
+<table><thead><tr><th>#</th><th>Código</th><th>Marca/Modelo</th><th>Cap.</th><th>Valor</th><th>Garantia</th><th>Status</th><th>Máquina</th></tr></thead>
+<tbody>${batteries.map((b,i)=>{const m=machines.find(x=>x.id===b.machineId);const d=daysLeft(b.warranty);return`<tr><td>${i+1}</td><td style="font-family:monospace;font-weight:700">${esc(b.code)}</td><td><strong>${esc(b.brand||'')}</strong> ${esc(b.model||'')}</td><td>${esc(b.capacity||'—')}</td><td style="font-weight:700">${fmt(b.purchaseValue)}</td><td>${d===null?'—':d<0?`<span class="bdg err">Vencida</span>`:d<90?`<span class="bdg warn">${d}d</span>`:`<span class="bdg ok">${fmtDate(b.warranty)}</span>`}</td><td>${b.machineId?`<span class="bdg blue">Alocada</span>`:`<span class="bdg neu">Estoque</span>`}</td><td>${m?esc(m.name):'—'}</td></tr>`;}).join('')}
+<tr class="tfoot"><td colspan="4">Total ${batteries.length}</td><td>${fmt(batteries.reduce((s,b)=>s+(b.purchaseValue||0),0))}</td><td colspan="3"></td></tr></tbody></table></div>
+<div class="footer">PCM Gest · Inventário de Baterias · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Inventário de Baterias');
+}
+
+function relWarranty(){
+  const batteries=DB.get('batteries'),machines=DB.get('machines');
+  const sorted=[...batteries].sort((a,b)=>(daysLeft(a.warranty)??9999)-(daysLeft(b.warranty)??9999));
+  const exp=batteries.filter(b=>b.warranty&&daysLeft(b.warranty)<0);
+  const s90=batteries.filter(b=>{const d=daysLeft(b.warranty);return d!==null&&d>=0&&d<90});
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('RELATÓRIO DE GARANTIAS')}
+<div class="kpis k3"><div class="kpi r"><div class="kpi-lbl">Vencidas</div><div class="kpi-val">${exp.length}</div></div><div class="kpi b"><div class="kpi-lbl">Vencem &lt;90 dias</div><div class="kpi-val">${s90.length}</div></div><div class="kpi gr"><div class="kpi-lbl">Válidas</div><div class="kpi-val">${batteries.length-exp.length-s90.length}</div></div></div>
+<div class="sec"><div class="sec-ttl">Por Criticidade</div>
+<table><thead><tr><th>#</th><th>Código</th><th>Marca/Modelo</th><th>Validade</th><th>Dias</th><th>Status</th><th>Máquina</th></tr></thead>
+<tbody>${sorted.map((b,i)=>{const m=machines.find(x=>x.id===b.machineId);const d=daysLeft(b.warranty);return`<tr><td>${i+1}</td><td style="font-family:monospace;font-weight:700">${esc(b.code)}</td><td><strong>${esc(b.brand||'')}</strong> ${esc(b.model||'')}</td><td>${fmtDate(b.warranty)||'—'}</td><td>${d===null?'—':d<0?`<span class="bdg err">Venc. há ${Math.abs(d)}d</span>`:`${d}d`}</td><td>${d===null?`<span class="bdg neu">S/Garantia</span>`:d<0?`<span class="bdg err">Vencida</span>`:d<90?`<span class="bdg warn">A vencer</span>`:`<span class="bdg ok">Válida</span>`}</td><td>${m?esc(m.name):'Estoque'}</td></tr>`;}).join('')}
+</tbody></table></div>
+<div class="footer">PCM Gest · Garantias · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Relatório de Garantias');
+}
+
+function relLib(){
+  const nodes=DB.get('libTree');
+  const files=nodes.filter(n=>n.type==='file');
+  function getPath(id){const p=[];let cur=id;while(cur){const n=nodes.find(x=>x.id===cur);if(!n)break;p.unshift(n.name);cur=n.parentId;}return p.join(' / ')||'Raiz';}
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('ÍNDICE DA BIBLIOTECA')}
+<div class="kpis k3"><div class="kpi pur"><div class="kpi-lbl">Pastas</div><div class="kpi-val">${nodes.filter(n=>n.type==='folder').length}</div></div><div class="kpi b"><div class="kpi-lbl">Arquivos</div><div class="kpi-val">${files.length}</div></div><div class="kpi g"><div class="kpi-lbl">Tamanho</div><div class="kpi-val" style="font-size:16px">${fmtSize(files.reduce((s,f)=>s+(f.size||0),0))}</div></div></div>
+<div class="sec"><div class="sec-ttl">Arquivos</div>
+<table><thead><tr><th>#</th><th>Nome</th><th>Tipo</th><th>Tamanho</th><th>Caminho</th><th>Upload</th></tr></thead>
+<tbody>${files.length===0?`<tr><td colspan="6" style="text-align:center;color:#999;padding:20px">Nenhum arquivo</td></tr>`:files.map((f,i)=>{const ext=f.name?.split('.').pop();return`<tr><td>${i+1}</td><td><strong>${esc(f.name)}</strong>${f.desc?`<br/><span style="color:#666">${esc(f.desc)}</span>`:''}</td><td><span class="bdg pur">${fileType(ext)}</span></td><td>${fmtSize(f.size)}</td><td style="font-size:10px;color:#666">📁 ${esc(getPath(f.parentId))}</td><td>${fmtDate(f.uploadedAt)}</td></tr>`;}).join('')}
+</tbody></table></div>
+<div class="footer">PCM Gest · Biblioteca · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Índice da Biblioteca');
+}
+
+function relAll(){
+  const tools=DB.get('tools'),mechs=DB.get('mechs'),loans=DB.get('loans');
+  const batteries=DB.get('batteries'),machines=DB.get('machines');
+  const active=loans.filter(l=>!l.returnDate);
+  const exp=batteries.filter(b=>b.warranty&&daysLeft(b.warranty)<0);
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('RELATÓRIO COMPLETO')}
+<div class="kpis k4"><div class="kpi g"><div class="kpi-lbl">Ferramentas</div><div class="kpi-val">${tools.length}</div><div class="kpi-sub">${tools.filter(t=>t.status==='disponivel').length} disponíveis</div></div><div class="kpi b"><div class="kpi-lbl">Emp. Ativos</div><div class="kpi-val">${active.length}</div></div><div class="kpi b"><div class="kpi-lbl">Baterias</div><div class="kpi-val">${batteries.length}</div></div><div class="kpi r"><div class="kpi-lbl">Garantias Vencidas</div><div class="kpi-val">${exp.length}</div></div></div>
+<div class="sec"><div class="sec-ttl">🔧 Ferramentas</div>
+<table><thead><tr><th>Ferramenta</th><th>Categoria</th><th>Valor</th><th>Status</th><th>Localização</th></tr></thead>
+<tbody>${tools.map(t=>{const l=active.find(x=>x.toolId===t.id),m=l?mechs.find(x=>x.id===l.mechId):null;return`<tr><td><strong>${esc(t.name)}</strong></td><td>${esc(t.category||'—')}</td><td style="font-weight:700">${fmt(t.value)}</td><td>${t.status==='disponivel'?`<span class="bdg ok">Disponível</span>`:`<span class="bdg warn">Emprestada</span>`}</td><td>${m?esc(m.name):esc(t.location||'Ferramentaria')}</td></tr>`;}).join('')}
+</tbody></table></div>
+<div class="sec page-break"><div class="sec-ttl">🔋 Baterias</div>
+<table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Cap.</th><th>Valor</th><th>Garantia</th><th>Máquina</th></tr></thead>
+<tbody>${batteries.map(b=>{const m=machines.find(x=>x.id===b.machineId);const d=daysLeft(b.warranty);return`<tr><td style="font-family:monospace;font-weight:700">${esc(b.code)}</td><td><strong>${esc(b.brand||'')}</strong> ${esc(b.model||'')}</td><td>${esc(b.capacity||'—')}</td><td style="font-weight:700">${fmt(b.purchaseValue)}</td><td>${d===null?'—':d<0?`<span class="bdg err">Vencida</span>`:d<90?`<span class="bdg warn">${d}d</span>`:`<span class="bdg ok">Válida</span>`}</td><td>${m?esc(m.name):'Estoque'}</td></tr>`;}).join('')}
+</tbody></table></div>
+<div class="footer">PCM Gest · Relatório Completo · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Relatório Completo');
+}
+
+// ═══════ SEED & INIT ═══════
+function seedIfEmpty(){
+  if(DB.get('tools').length)return;
+  LOCAL.set('tools',[{id:uid(),name:'Chave de Torque 3/4"',desc:'40–200 Nm',category:'Chaves',value:850,status:'disponivel',serial:'CT-2021-001',location:'Gaveta A1',notes:''},{id:uid(),name:'Multímetro Fluke 87V',desc:'True RMS',category:'Elétrico',value:1240,status:'disponivel',serial:'FL-2022-004',location:'Gaveta B2',notes:''},{id:uid(),name:'Pistola de Impacto 18V',desc:'Milwaukee 1/2"',category:'Pneumático',value:2100,status:'disponivel',serial:'MIL-2023-007',location:'Prateleira C',notes:''}]);
+  LOCAL.set('mechs',[{id:uid(),name:'João Silva',mat:'M001',cpf:'123.456.789-00',phone:'(65) 98765-4321',dept:'Mecânica Pesada'},{id:uid(),name:'Pedro Santos',mat:'M002',cpf:'987.654.321-00',phone:'(65) 99876-5432',dept:'Elétrica'}]);
+  LOCAL.set('machines',[{id:uid(),name:'Trator John Deere 8520',plate:'ABC-1234',year:'2020',sector:'Lavoura A',type:'Agrícola'},{id:uid(),name:'Colheitadeira New Holland',plate:'DEF-5678',year:'2019',sector:'Lavoura B',type:'Agrícola'}]);
+  LOCAL.set('batteries',[{id:uid(),code:'BAT-001',brand:'Moura',model:'60D',capacity:'60Ah',voltage:'12V',machineId:null,warranty:'2026-03-15',purchaseDate:'2024-03-15',purchaseValue:380,supplier:'Distribuidora Norte'},{id:uid(),code:'BAT-002',brand:'Heliar',model:'80TE',capacity:'80Ah',voltage:'12V',machineId:null,warranty:'2025-07-20',purchaseDate:'2023-07-20',purchaseValue:520,supplier:'AutoParts'}]);
+  LOCAL.set('loans',[]);LOCAL.set('batHist',[]);LOCAL.set('libTree',[]);
+}
+
+// INIT — roda imediatamente
+if(!APP.libOpenFolders)APP.libOpenFolders={};
+seedIfEmpty();
+render();
+
+// Firebase em background
+setTimeout(async()=>{
+  try{
+    const total=await Promise.race([DB.syncAll(),new Promise((_,r)=>setTimeout(()=>r('timeout'),5000))]);
+    if(total>0){toast(`✓ Firebase · ${total} registros`,'info');render();}
+  }catch(e){}
+},100);
+</script>
+</body>
+</html>
