@@ -162,21 +162,48 @@ textarea{resize:vertical;min-height:60px}
 @keyframes si{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
 @media(max-width:820px){.k4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.ccards{grid-template-columns:1fr}}
 </style>
+<!-- Firebase SDK oficial -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div id="root"></div>
 <div class="toast-wrap" id="toasts"></div>
 <script>
-// ═══════ FIREBASE ═══════
-const firebaseConfig={apiKey:"AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA",projectId:"pcm-gest"};
+// ═══════ FIREBASE SDK OFICIAL ═══════
+const firebaseConfig={
+  apiKey:"AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA",
+  authDomain:"pcm-gest.firebaseapp.com",
+  projectId:"pcm-gest",
+  storageBucket:"pcm-gest.firebasestorage.app",
+  messagingSenderId:"173070863997",
+  appId:"1:173070863997:web:eb5cdab8a2342e2519ab14"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ═══════ FIREBASE HELPER ═══════
 const FB={
-  base(col){return`https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/${col}`},
-  key(){return firebaseConfig.apiKey},
-  toFS(obj){const f={};for(const[k,v]of Object.entries(obj)){if(v===null||v===undefined)f[k]={nullValue:null};else if(typeof v==='boolean')f[k]={booleanValue:v};else if(typeof v==='number')f[k]={doubleValue:v};else if(typeof v==='string')f[k]={stringValue:v};else f[k]={stringValue:JSON.stringify(v)};}return{fields:f}},
-  fromFS(doc){if(!doc||!doc.fields)return null;const o={};for(const[k,v]of Object.entries(doc.fields)){if(v.nullValue!==undefined)o[k]=null;else if(v.booleanValue!==undefined)o[k]=v.booleanValue;else if(v.doubleValue!==undefined)o[k]=v.doubleValue;else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);else if(v.stringValue!==undefined){try{const p=JSON.parse(v.stringValue);o[k]=(typeof p==='object'&&p!==null)?p:v.stringValue;}catch(e){o[k]=v.stringValue;}}}return o},
-  async getAll(col){try{const r=await fetch(`${this.base(col)}?key=${this.key()}&pageSize=300`);if(!r.ok)return[];const d=await r.json();if(!d.documents)return[];return d.documents.map(doc=>this.fromFS(doc));}catch(e){return[];}},
-  async set(col,id,obj){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.toFS(obj))});}catch(e){}},
-  async delete(col,id){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'DELETE'});}catch(e){}}
+  col(k){ return db.collection(k); },
+
+  async getAll(k){
+    try{
+      const snap = await db.collection(k).get();
+      return snap.docs.map(d=>({id:d.id,...d.data()}));
+    }catch(e){ console.error('FB.getAll',k,e); return []; }
+  },
+
+  async set(k, id, obj){
+    try{
+      await db.collection(k).doc(id).set(obj, {merge:true});
+    }catch(e){ console.error('FB.set',k,id,e); }
+  },
+
+  async delete(k, id){
+    try{
+      await db.collection(k).doc(id).delete();
+    }catch(e){ console.error('FB.delete',k,id,e); }
+  }
 };
 
 // ═══════ LOCAL CACHE ═══════
