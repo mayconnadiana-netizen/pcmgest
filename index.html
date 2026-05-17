@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,viewport-fit=cover"/>
 <title>Gestão Integrada — PCM</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -19,7 +19,7 @@
   --text:#dde3ef;--muted:#5a6478;--muted2:#8896af;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--disp:'Bebas Neue',cursive;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden;-webkit-text-size-adjust:100%}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .shell{display:flex;height:100vh;overflow:hidden}
@@ -92,7 +92,7 @@ select option{background:var(--s1)}
 textarea{resize:vertical;min-height:60px}
 .herr{font-size:11px;color:#fca5a5;margin-top:2px}
 .overlay{position:fixed;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
-.modal{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:22px;width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;animation:fu .18s}
+.modal{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:22px;width:min(600px,96vw);max-height:90vh;overflow-y:auto;animation:fu .18s}
 .mtitle{font-family:var(--disp);font-size:19px;letter-spacing:.5px;margin-bottom:16px;color:var(--gold)}
 .mtitle.b{color:var(--blue)}.mtitle.p{color:var(--purple)}
 .mfoot{display:flex;gap:7px;justify-content:flex-end;margin-top:16px;padding-top:13px;border-top:1px solid var(--border)}
@@ -108,7 +108,7 @@ textarea{resize:vertical;min-height:60px}
 .empty .ei{font-size:32px;margin-bottom:8px}.empty p{font-size:13px}
 .avatar{width:42px;height:42px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#000;flex-shrink:0;font-family:var(--disp)}
 /* COVER */
-.cover{height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+.cover{min-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;position:relative;overflow-y:auto;overflow-x:hidden}
 .cgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.18;pointer-events:none}
 .cglow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(#e8a00012,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%)}
 .cinner{position:relative;z-index:1;text-align:center;max-width:900px;width:100%;animation:fu .4s}
@@ -160,50 +160,315 @@ textarea{resize:vertical;min-height:60px}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes si{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-@media(max-width:820px){.k4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.ccards{grid-template-columns:1fr}}
+
+/* ═══ RESPONSIVO COMPLETO ═══ */
+
+/* Tablet largo / Desktop pequeno */
+@media(max-width:1100px){
+  .sidebar{width:185px;min-width:185px}
+  .k4{grid-template-columns:repeat(2,1fr)}
+  .ccards{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Tablet */
+@media(max-width:820px){
+  .shell{flex-direction:column}
+  .sidebar{width:100%;min-width:0;height:auto;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:visible}
+  .sb-hdr{padding:10px 12px;border-bottom:none;border-right:1px solid var(--border);flex-shrink:0}
+  .sb-name{font-size:13px}.sb-sub{display:none}.sb-bdg{display:none}
+  .sb-sec{display:none}
+  .sb-item{padding:8px 12px;font-size:12px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap}
+  .sb-item.act{border-left:none;border-bottom-color:var(--gold)}
+  .sb-item.act-b{border-left:none;border-bottom-color:var(--blue)}
+  .sb-item.act-p{border-left:none;border-bottom-color:var(--purple)}
+  .sb-foot{margin-top:0;padding:6px 10px;border-top:none;border-left:1px solid var(--border);margin-left:auto;flex-shrink:0}
+  .main{min-height:0;flex:1}
+  .content{padding:14px 14px}
+  .topbar{padding:10px 14px}
+  .k4{grid-template-columns:repeat(2,1fr)}
+  .k3{grid-template-columns:repeat(2,1fr)}
+  .g2{grid-template-columns:1fr}
+  .ccards{grid-template-columns:1fr}
+  .kval{font-size:24px}
+  .lib-wrap{flex-direction:column;height:auto}
+  .lib-tree{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:200px}
+  .lib-main{padding:14px}
+  table{font-size:11.5px}
+  th,td{padding:7px 8px}
+  .modal{padding:16px;width:calc(100vw - 24px)}
+}
+
+/* Mobile */
+@media(max-width:540px){
+  .k4{grid-template-columns:1fr 1fr}
+  .k3{grid-template-columns:1fr 1fr}
+  .k2{grid-template-columns:1fr}
+  .kval{font-size:20px}
+  .kval.sm{font-size:14px}
+  .klbl{font-size:9px}
+  .topbar{flex-direction:column;align-items:flex-start;gap:6px}
+  .tb-title{font-size:16px}
+  .tb-sub{font-size:10px}
+  .shdr{flex-direction:column;align-items:flex-start}
+  .stitle{font-size:14px}
+  .content{padding:10px}
+  .card{padding:12px}
+  .login-box{padding:24px 18px}
+  .confirm-box{padding:20px 18px}
+  th,td{padding:5px 6px}
+  th{font-size:9px}
+  td{font-size:11px}
+  .btn{padding:6px 10px;font-size:11.5px}
+  .btn-sm{padding:3px 7px;font-size:10.5px}
+  .frow.c2,.frow.c3,.frow.c4{grid-template-columns:1fr}
+  .file-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .user-row{flex-wrap:wrap}
+  .user-acts{width:100%;justify-content:flex-end}
+  .net-bar{font-size:10.5px;padding:6px 10px}
+  .g3{grid-template-columns:1fr}
+  .ccards{grid-template-columns:1fr}
+  .ccard{padding:16px 14px}
+  .ccard-name{font-size:18px}
+}
+
+/* Mobile muito pequeno */
+@media(max-width:360px){
+  .k4,.k3,.k2{grid-template-columns:1fr}
+  .login-box{padding:20px 14px}
+  .sb-item span:last-child{display:none}
+}
+/* LOGIN */
+.login-wrap{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.15;pointer-events:none}
+.login-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(#e8a00010,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.login-box{position:relative;z-index:1;background:var(--s1);border:1px solid var(--border2);border-radius:16px;padding:36px 38px;width:100%;max-width:420px;animation:fu .3s}
+.login-logo{font-family:var(--disp);font-size:36px;letter-spacing:2px;text-align:center;margin-bottom:4px}
+.login-logo span{color:var(--gold)}
+.login-eye{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:28px}
+.login-tabs{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px;margin-bottom:22px}
+.login-tab{flex:1;padding:7px;text-align:center;font-size:12.5px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--muted2);transition:all .15s}
+.login-tab.act{background:var(--s2);color:var(--text);border:1px solid var(--border2)}
+.login-field{margin-bottom:13px}
+.login-field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:4px}
+.login-field input{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;outline:none;transition:border-color .15s;font-family:var(--font)}
+.login-field input:focus{border-color:var(--gold);box-shadow:0 0 0 2px #e8a00018}
+.login-btn{width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.5px;transition:all .15s;margin-top:6px}
+.login-btn:hover{background:var(--gold2)}.login-btn:active{transform:scale(.98)}
+.login-btn.b{background:var(--blue);color:#fff}.login-btn.b:hover{filter:brightness(1.15)}
+.login-err{background:var(--redl);border:1px solid #ef444444;border-radius:7px;padding:9px 12px;font-size:12px;color:#fca5a5;margin-bottom:12px;display:none}
+.login-info{background:var(--bluel);border:1px solid #3b82f644;border-radius:7px;padding:9px 12px;font-size:12px;color:#93c5fd;margin-bottom:12px;display:none}
+.login-pending{text-align:center;padding:16px;background:var(--amberl);border:1px solid #f59e0b44;border-radius:10px;color:#fcd34d;font-size:13px}
+.login-pending .lp-ico{font-size:36px;margin-bottom:8px}
+/* ADMIN USERS */
+.user-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.user-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;font-family:var(--disp);flex-shrink:0}
+.user-av.adm{background:var(--gold);color:#000}.user-av.usr{background:var(--blue);color:#fff}.user-av.pen{background:var(--s3);color:var(--muted2);border:1px solid var(--border2)}
+.user-info{flex:1;min-width:0}
+.user-name{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-meta{font-size:11px;color:var(--muted2)}
+.user-acts{display:flex;gap:6px;flex-shrink:0}
+
+/* CONFIRM MODAL CUSTOMIZADO */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9000;padding:20px;backdrop-filter:blur(4px);animation:fu .15s}
+.confirm-box{background:var(--s2);border:1px solid var(--border2);border-radius:14px;padding:28px 30px;width:100%;max-width:360px;box-shadow:0 24px 60px #000a;animation:fu .18s}
+.confirm-icon{font-size:36px;margin-bottom:12px;text-align:center}
+.confirm-title{font-family:var(--disp);font-size:20px;letter-spacing:.5px;text-align:center;margin-bottom:6px}
+.confirm-msg{font-size:13px;color:var(--muted2);text-align:center;line-height:1.6;margin-bottom:22px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .13s;letter-spacing:.3px}
+.confirm-btns button:active{transform:scale(.97)}
+.cbtn-cancel{background:var(--s3);border:1px solid var(--border2)!important;color:var(--muted2)}
+.cbtn-cancel:hover{border-color:var(--border2);color:var(--text)!important;background:var(--s3)!important}
+.cbtn-confirm{background:var(--red);color:#fff}
+.cbtn-confirm:hover{filter:brightness(1.15)}
+.cbtn-confirm.warn{background:var(--amber);color:#000}
+.cbtn-confirm.info{background:var(--blue);color:#fff}
+
+/* UNIDADES POR USUÁRIO */
+.unidades-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.unid-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;cursor:pointer;transition:all .15s;user-select:none}
+.unid-chip.on{background:var(--goldl);color:var(--gold2);border-color:#e8a00055}
+.unid-chip.off{background:var(--s3);color:var(--muted);border-color:var(--border)}
+.unid-chip:hover{transform:scale(1.04)}
+.user-row-expanded{flex-direction:column;align-items:flex-start;gap:10px}
+.user-row-top{display:flex;align-items:center;gap:12px;width:100%}
+
+/* STATUS DE CONEXÃO */
+.net-bar{position:fixed;top:0;left:0;right:0;z-index:9998;padding:7px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;transition:all .4s;pointer-events:none;opacity:0}
+.net-bar.show{opacity:1;pointer-events:all}
+.net-bar.offline{background:#1a0f00;border-bottom:1px solid #f59e0b55;color:#fcd34d}
+.net-bar.syncing{background:#0a1628;border-bottom:1px solid #3b82f655;color:#93c5fd}
+.net-bar.synced{background:#0a1a0f;border-bottom:1px solid #22c55e55;color:#4ade80}
+.net-bar-left{display:flex;align-items:center;gap:8px}
+.net-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.net-bar.offline .net-dot{background:#f59e0b;box-shadow:0 0 6px #f59e0b}
+.net-bar.syncing .net-dot{background:#3b82f6;box-shadow:0 0 6px #3b82f6;animation:pulse .8s infinite}
+.net-bar.synced .net-dot{background:#22c55e;box-shadow:0 0 6px #22c55e}
+.net-pending{background:#f59e0b22;border:1px solid #f59e0b44;border-radius:20px;padding:1px 9px;font-size:10px;color:#fcd34d}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* IMPORTAÇÃO */
+.import-drop{border:2px dashed var(--border2);border-radius:10px;padding:32px 20px;text-align:center;transition:all .2s;cursor:pointer;margin-bottom:14px;position:relative}
+.import-drop:hover,.import-drop.drag{border-color:var(--gold);background:var(--goldl)}
+.import-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.import-drop .di{font-size:32px;margin-bottom:8px}
+.import-drop p{font-size:12.5px;color:var(--muted2);margin:0}
+.import-drop .ds{font-size:11px;color:var(--muted);margin-top:4px}
+.import-preview{max-height:240px;overflow-y:auto;margin-bottom:12px}
+.import-preview table{font-size:11px}
+.import-preview th{font-size:9.5px}
+.import-row-ok td{background:#22c55e08}
+.import-row-err td{background:#ef444408}
+.import-stats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.import-stat{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600}
+.import-stat.ok{background:#22c55e15;color:#4ade80;border:1px solid #22c55e33}
+.import-stat.err{background:#ef444415;color:#fca5a5;border:1px solid #ef444433}
+.import-stat.info{background:var(--bluel);color:#93c5fd;border:1px solid #3b82f633}
 </style>
-<!-- Firebase SDK oficial -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#e8a000"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="PCM Gest"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
 </head>
 <body>
+<div id="net-bar" class="net-bar"></div>
 <div id="root"></div>
 <div class="toast-wrap" id="toasts"></div>
 <script>
-// ═══════ FIREBASE SDK OFICIAL ═══════
-const firebaseConfig={
-  apiKey:"AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA",
-  authDomain:"pcm-gest.firebaseapp.com",
-  projectId:"pcm-gest",
-  storageBucket:"pcm-gest.firebasestorage.app",
-  messagingSenderId:"173070863997",
-  appId:"1:173070863997:web:eb5cdab8a2342e2519ab14"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// ═══════ AUTH ═══════
+// E-mail do administrador — altere para o seu
+const ADMIN_EMAIL = 'admin@pcmgest.com';
 
-// ═══════ FIREBASE HELPER ═══════
-const FB={
-  col(k){ return db.collection(k); },
+const AUTH = {
+  _key: 'gi_auth_user',
+  _usersKey: 'gi_users_cache',
 
-  async getAll(k){
-    try{
-      const snap = await db.collection(k).get();
-      return snap.docs.map(d=>({id:d.id,...d.data()}));
-    }catch(e){ console.error('FB.getAll',k,e); return []; }
+  // Usuário atual em sessão
+  current() {
+    try { return JSON.parse(sessionStorage.getItem(this._key) || 'null'); } catch(e){ return null; }
+  },
+  save(u) { sessionStorage.setItem(this._key, JSON.stringify(u)); },
+  logout() { sessionStorage.removeItem(this._key); APP = {...APP, module:null, page:'dash', unidade:null}; localStorage.removeItem('gi_unidade'); render(); },
+  isAdmin() { const u=this.current(); return u && u.email === ADMIN_EMAIL; },
+  isLogged() { return !!this.current(); },
+
+  // Hash simples (SHA-256 via SubtleCrypto)
+  async hash(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
   },
 
-  async set(k, id, obj){
-    try{
-      await db.collection(k).doc(id).set(obj, {merge:true});
-    }catch(e){ console.error('FB.set',k,id,e); }
+  // Busca usuário no Firebase (coleção "users")
+  async findUser(email) {
+    try {
+      const r = await fetch(`https://firestore.googleapis.com/v1/projects/pcm-gest/databases/(default)/documents/users/${encodeURIComponent(email)}?key=AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA`);
+      if (!r.ok) return null;
+      const d = await r.json();
+      if (!d.fields) return null;
+      return FB.fromFS(d);
+    } catch(e){ return null; }
   },
 
-  async delete(k, id){
-    try{
-      await db.collection(k).doc(id).delete();
-    }catch(e){ console.error('FB.delete',k,id,e); }
+  // Salva usuário no Firebase
+  async saveUser(user) {
+    await FB.set('users', user.email, user);
+  },
+
+  // Lista todos os usuários
+  async listUsers() {
+    return await FB.getAll('users');
+  },
+
+  // Login
+  async login(email, password) {
+    email = email.trim().toLowerCase();
+    const hashed = await this.hash(password);
+    const user = await this.findUser(email);
+    if (!user) return { ok: false, msg: 'E-mail não encontrado.' };
+    if (user.passwordHash !== hashed) return { ok: false, msg: 'Senha incorreta.' };
+    if (user.status === 'pending') return { ok: false, msg: 'pending' };
+    if (user.status === 'blocked') return { ok: false, msg: 'Conta bloqueada. Entre em contato com o administrador.' };
+    this.save(user);
+    return { ok: true };
+  },
+
+  // Registro
+  async register(name, email, password) {
+    email = email.trim().toLowerCase();
+    if (!name || !email || !password) return { ok: false, msg: 'Preencha todos os campos.' };
+    if (password.length < 6) return { ok: false, msg: 'A senha deve ter no mínimo 6 caracteres.' };
+    const existing = await this.findUser(email);
+    if (existing) return { ok: false, msg: 'Este e-mail já está cadastrado.' };
+    const hashed = await this.hash(password);
+    const isAdmin = email === ADMIN_EMAIL;
+    const user = {
+      id: uid(),
+      email,
+      name,
+      passwordHash: hashed,
+      status: isAdmin ? 'active' : 'pending',
+      role: isAdmin ? 'admin' : 'user',
+      createdAt: new Date().toISOString()
+    };
+    await this.saveUser(user);
+    if (isAdmin) { this.save(user); return { ok: true }; }
+    return { ok: true, pending: true };
+  },
+
+  // Admin: aprovar usuário com unidades
+  async approveUser(email, unidades) {
+    const u = await this.findUser(email);
+    if (!u) return;
+    const upd = {...u, status:'active'};
+    if(unidades !== undefined) upd.unidades = unidades; // array ou null (= todas)
+    await this.saveUser(upd);
+  },
+
+  // Admin: atualizar unidades de usuário ativo
+  async setUnidades(email, unidades) {
+    const u = await this.findUser(email);
+    if (!u) return;
+    await this.saveUser({...u, unidades});
+  },
+
+  // Unidades acessíveis ao usuário atual
+  unidadesPermitidas() {
+    const u = this.current();
+    if (!u) return [];
+    if (u.role === 'admin') return null; // null = todas
+    if (!u.unidades || u.unidades.length === 0) return [];
+    return u.unidades;
+  },
+
+  // Admin: bloquear usuário
+  async blockUser(email) {
+    const u = await this.findUser(email);
+    if (!u) return;
+    await this.saveUser({...u, status:'blocked'});
+  },
+
+  // Admin: excluir usuário
+  async deleteUser(email) {
+    await FB.delete('users', email);
   }
+};
+
+// ═══════ FIREBASE ═══════
+// ⚠ ATENÇÃO: A API Key abaixo está exposta no código-fonte. Restrinja o domínio
+// permitido no console do Firebase: https://console.firebase.google.com →
+// APIs & Services → Credentials → Restrições de aplicação HTTP.
+const firebaseConfig={apiKey:"AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA",projectId:"pcm-gest"};
+const FB={
+  base(col){return`https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/${col}`},
+  key(){return firebaseConfig.apiKey},
+  toFS(obj){const f={};for(const[k,v]of Object.entries(obj)){if(v===null||v===undefined)f[k]={nullValue:null};else if(typeof v==='boolean')f[k]={booleanValue:v};else if(typeof v==='number')f[k]={doubleValue:v};else if(typeof v==='string')f[k]={stringValue:v};else f[k]={stringValue:JSON.stringify(v)};}return{fields:f}},
+  fromFS(doc){if(!doc||!doc.fields)return null;const o={};for(const[k,v]of Object.entries(doc.fields)){if(v.nullValue!==undefined)o[k]=null;else if(v.booleanValue!==undefined)o[k]=v.booleanValue;else if(v.doubleValue!==undefined)o[k]=v.doubleValue;else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);else if(v.stringValue!==undefined){try{const p=JSON.parse(v.stringValue);o[k]=(typeof p==='object'&&p!==null)?p:v.stringValue;}catch(e){o[k]=v.stringValue;}}}return o},
+  async getAll(col){try{const r=await fetch(`${this.base(col)}?key=${this.key()}&pageSize=300`);if(!r.ok)return[];const d=await r.json();if(!d.documents)return[];return d.documents.map(doc=>this.fromFS(doc));}catch(e){return[];}},
+  async set(col,id,obj){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.toFS(obj))});}catch(e){}},
+  async delete(col,id){try{await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'DELETE'});}catch(e){}}
 };
 
 // ═══════ LOCAL CACHE ═══════
@@ -214,6 +479,69 @@ const LOCAL={
   upsert(k,obj){const a=LOCAL.get(k);const i=a.findIndex(x=>x.id===obj.id);if(i>=0)a[i]={...a[i],...obj};else a.push(obj);LOCAL.set(k,a)},
   remove(k,id){LOCAL.set(k,LOCAL.get(k).filter(x=>x.id!==id))},
   find(k,id){return LOCAL.get(k).find(x=>x.id===id)||null}
+};
+
+// ═══════ OFFLINE QUEUE ═══════
+const QUEUE_KEY = 'gi_sync_queue';
+const QUEUE = {
+  get(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); }catch(e){ return []; } },
+  add(op){ const q=this.get(); q.push({...op, _qid: uid(), _ts: Date.now()}); localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); NET.updateBar(); },
+  remove(qid){ const q=this.get().filter(x=>x._qid!==qid); localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); },
+  clear(){ localStorage.removeItem(QUEUE_KEY); },
+  count(){ return this.get().length; }
+};
+
+const NET = {
+  _online: navigator.onLine,
+  _syncing: false,
+
+  init(){
+    window.addEventListener('online',  ()=>{ this._online=true;  this.updateBar(); this.flushQueue(); });
+    window.addEventListener('offline', ()=>{ this._online=false; this.updateBar(); });
+    this.updateBar();
+  },
+
+  isOnline(){ return this._online && navigator.onLine; },
+
+  updateBar(){
+    const bar = document.getElementById('net-bar');
+    if(!bar) return;
+    const pending = QUEUE.count();
+    if(this._syncing){
+      bar.className='net-bar show syncing';
+      bar.innerHTML=`<div class="net-bar-left"><div class="net-dot"></div>Sincronizando com o servidor...</div><div>${pending} pendente(s)</div>`;
+    } else if(!this.isOnline()){
+      bar.className='net-bar show offline';
+      bar.innerHTML=`<div class="net-bar-left"><div class="net-dot"></div>⚠ Sem internet — dados salvos localmente${pending>0?`, <strong>${pending} aguardando envio</strong>`:''}</div>${pending>0?'<span class="net-pending">'+pending+' na fila</span>':''}`;
+    } else if(pending>0){
+      bar.className='net-bar show syncing';
+      bar.innerHTML=`<div class="net-bar-left"><div class="net-dot"></div>Enviando ${pending} alteração(ões) pendente(s)...</div>`;
+      this.flushQueue();
+    } else {
+      bar.className='net-bar show synced';
+      bar.innerHTML=`<div class="net-bar-left"><div class="net-dot"></div>Online · dados sincronizados</div>`;
+      setTimeout(()=>{ const b=document.getElementById('net-bar'); if(b) b.classList.remove('show'); },3000);
+    }
+  },
+
+  async flushQueue(){
+    if(this._syncing || !this.isOnline()) return;
+    const queue = QUEUE.get();
+    if(queue.length === 0){ this.updateBar(); return; }
+    this._syncing = true;
+    this.updateBar();
+    let failed = 0;
+    for(const op of queue){
+      try{
+        if(op.type==='set')   await FB.set(op.col, op.id, op.data);
+        if(op.type==='delete') await FB.delete(op.col, op.id);
+        QUEUE.remove(op._qid);
+      }catch(e){ failed++; }
+    }
+    this._syncing = false;
+    if(failed>0){ toast(`${failed} item(s) não sincronizaram. Tentando novamente...`,'warn'); }
+    this.updateBar();
+  }
 };
 
 // ═══════ DB ═══════
@@ -227,21 +555,38 @@ const DB={
   async add(k,obj){
     const withU={...obj, unidade: APP.unidade||'geral'};
     LOCAL.upsert(k, withU);
-    FB.set(k, withU.id, withU);
+    if(NET.isOnline()){ FB.set(k, withU.id, withU); }
+    else { QUEUE.add({type:'set', col:k, id:withU.id, data:withU}); NET.updateBar(); }
     return withU;
   },
   async update(k,id,data){
     const e=LOCAL.find(k,id)||{};
     const u={...e,...data,id,unidade:APP.unidade||'geral'};
-    LOCAL.upsert(k,u);FB.set(k,id,u);return u;
+    LOCAL.upsert(k,u);
+    if(NET.isOnline()){ FB.set(k,id,u); }
+    else { QUEUE.add({type:'set', col:k, id, data:u}); NET.updateBar(); }
+    return u;
   },
-  async remove(k,id){LOCAL.remove(k,id);FB.delete(k,id)},
+  async remove(k,id){
+    LOCAL.remove(k,id);
+    if(NET.isOnline()){ FB.delete(k,id); }
+    else { QUEUE.add({type:'delete', col:k, id}); NET.updateBar(); }
+  },
   async syncAll(){
     const tables=['tools','mechs','loans','machines','batteries','batHist','libTree'];
     let total=0;
+    // Primeiro envia fila pendente se estiver online
+    if(NET.isOnline()) await NET.flushQueue();
     await Promise.all(tables.map(async t=>{
       const docs=await FB.getAll(t);
-      if(docs.length>0){LOCAL.set(t,docs);total+=docs.length;}
+      if(docs.length>0){
+        // Mescla: mantém registros locais que não vieram do Firebase (criados offline)
+        const local=LOCAL.get(t);
+        const fbIds=new Set(docs.map(d=>d.id));
+        const onlyLocal=local.filter(l=>!fbIds.has(l.id));
+        LOCAL.set(t,[...docs,...onlyLocal]);
+        total+=docs.length;
+      }
     }));
     return total;
   }
@@ -251,16 +596,248 @@ const DB={
 function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
 function fmt(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0)}
 function fmtD(s){return s?new Date(s).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—'}
-function fmtDate(s){return s?new Date(s).toLocaleDateString('pt-BR'):'—'}
+function fmtDate(s){return s?new Date(s+'T12:00:00').toLocaleDateString('pt-BR'):'—'}
 function fmtSize(b){if(!b)return'—';if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
 function nowDT(){return new Date().toISOString().slice(0,16)}
 function daysLeft(d){return d?Math.floor((new Date(d)-new Date())/86400000):null}
-function daysAgo(d){return Math.floor((new Date()-new Date(d))/86400000)}
+function daysAgo(d){return Math.max(0,Math.floor((new Date()-new Date(d))/86400000))}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function fileIcon(ext){const m={pdf:'📄',xlsx:'📊',xls:'📊',docx:'📝',doc:'📝',pptx:'📋',ppt:'📋',txt:'📃',csv:'📊',zip:'🗜',jpg:'🖼',jpeg:'🖼',png:'🖼'};return m[ext?.toLowerCase()]||'📎'}
 function fileType(ext){const m={pdf:'PDF',xlsx:'Excel',xls:'Excel',docx:'Word',doc:'Word',pptx:'PPT',csv:'CSV',txt:'Texto'};return m[ext?.toLowerCase()]||ext?.toUpperCase()||'Arquivo'}
 function wBadge(w){const d=daysLeft(w);if(d===null)return`<span class="bdg neu">Sem garantia</span>`;if(d<0)return`<span class="bdg err">⚠ Venc. há ${Math.abs(d)}d</span>`;if(d<60)return`<span class="bdg amr">⏳ ${d}d</span>`;if(d<180)return`<span class="bdg warn">✓ ${d}d</span>`;return`<span class="bdg ok">✓ Válida</span>`}
 
+
+// ═══════ CONFIRM CUSTOMIZADO ═══════
+function customConfirm(opts){
+  return new Promise(resolve=>{
+    const {title='Confirmar', msg='Tem certeza?', confirmLabel='Excluir', cancelLabel='Cancelar', type='danger', icon='🗑️'} = opts||{};
+    const id='custom-confirm-'+Date.now();
+    const typeClass = type==='warn'?'warn':type==='info'?'info':'';
+    const div=document.createElement('div');
+    div.id=id;
+    div.className='confirm-overlay';
+    div.innerHTML=`
+      <div class="confirm-box">
+        <div class="confirm-icon">${icon}</div>
+        <div class="confirm-title">${title}</div>
+        <div class="confirm-msg">${msg}</div>
+        <div class="confirm-btns">
+          <button class="cbtn-cancel" id="${id}-no">${cancelLabel}</button>
+          <button class="cbtn-confirm ${typeClass}" id="${id}-yes">${confirmLabel}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(div);
+    div.addEventListener('click',e=>{if(e.target===div){div.remove();resolve(false);}});
+    document.getElementById(id+'-no').onclick=()=>{div.remove();resolve(false)};
+    document.getElementById(id+'-yes').onclick=()=>{div.remove();resolve(true)};
+  });
+}
+
+
+// ═══════ IMPORTAÇÃO / EXPORTAÇÃO ═══════
+
+const SCHEMAS = {
+  tools: {
+    label: 'Ferramentas',
+    cols: ['nome','descricao','categoria','valor','numero_serie','local','observacoes'],
+    headers: ['Nome*','Descrição','Categoria','Valor (R$)','Nº Série','Local/Gaveta','Observações'],
+    example: [['Chave de Torque 3/4"','40-200 Nm','Chaves','850','CT-2021-001','Gaveta A1',''],
+               ['Multímetro Fluke 87V','True RMS','Elétrico','1240','FL-2022-004','Gaveta B2','']],
+    toObj(row){ return { name:row[0], desc:row[1]||'', category:row[2]||'', value:parseFloat(String(row[3]||0).replace(',','.'))||0, serial:row[4]||'', location:row[5]||'', notes:row[6]||'', status:'disponivel' }; },
+    validate(row){ return row[0]?.toString().trim() ? null : 'Nome obrigatório'; }
+  },
+  mechs: {
+    label: 'Mecânicos',
+    cols: ['nome','matricula','cpf','telefone','departamento'],
+    headers: ['Nome*','Matrícula*','CPF','Telefone','Departamento'],
+    example: [['João Silva','M001','123.456.789-00','(65) 98765-4321','Mecânica Pesada'],
+               ['Pedro Santos','M002','987.654.321-00','(65) 99876-5432','Elétrica']],
+    toObj(row){ return { name:row[0], mat:row[1]||'', cpf:row[2]||'', phone:row[3]||'', dept:row[4]||'' }; },
+    validate(row){ if(!row[0]?.toString().trim()) return 'Nome obrigatório'; if(!row[1]?.toString().trim()) return 'Matrícula obrigatória'; return null; }
+  },
+  machines: {
+    label: 'Máquinas',
+    cols: ['nome','placa','ano','setor','tipo'],
+    headers: ['Nome*','Placa','Ano','Setor','Tipo'],
+    example: [['Trator John Deere 8520','ABC-1234','2020','Lavoura A','Agrícola'],
+               ['Colheitadeira New Holland','DEF-5678','2019','Lavoura B','Agrícola']],
+    toObj(row){ return { name:row[0], plate:row[1]||'', year:row[2]||'', sector:row[3]||'', type:row[4]||'' }; },
+    validate(row){ return row[0]?.toString().trim() ? null : 'Nome obrigatório'; }
+  },
+  batteries: {
+    label: 'Baterias',
+    cols: ['codigo','marca','modelo','capacidade','voltagem','data_compra','valor_compra','fornecedor','garantia_ate'],
+    headers: ['Código*','Marca*','Modelo','Capacidade','Voltagem','Data Compra (AAAA-MM-DD)','Valor Compra (R$)','Fornecedor','Garantia até (AAAA-MM-DD)'],
+    example: [['BAT-001','Moura','60D','60Ah','12V','2024-03-15','380','Distribuidora Norte','2026-03-15'],
+               ['BAT-002','Heliar','80TE','80Ah','12V','2025-07-20','520','AutoParts','2027-07-20']],
+    toObj(row){ return { code:row[0], brand:row[1], model:row[2]||'', capacity:row[3]||'', voltage:row[4]||'', purchaseDate:row[5]||'', purchaseValue:parseFloat(String(row[6]||0).replace(',','.'))||0, supplier:row[7]||'', warranty:row[8]||'', machineId:null }; },
+    validate(row){ if(!row[0]?.toString().trim()) return 'Código obrigatório'; if(!row[1]?.toString().trim()) return 'Marca obrigatória'; return null; }
+  }
+};
+
+// ── Exportar modelo Excel ──
+function exportTemplate(type){
+  const s = SCHEMAS[type];
+  if(!s) return;
+  const wb = XLSX.utils.book_new();
+  // Aba modelo
+  const modelData = [s.headers, ...s.example];
+  const ws = XLSX.utils.aoa_to_sheet(modelData);
+  // Largura das colunas
+  ws['!cols'] = s.headers.map(()=>({wch:22}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Modelo');
+  // Aba instruções
+  const inst = [
+    ['INSTRUÇÕES DE PREENCHIMENTO'],
+    [''],
+    ['• Campos com * são obrigatórios'],
+    ['• Não altere os nomes das colunas'],
+    ['• Valores monetários: use ponto ou vírgula (ex: 1250.00 ou 1250,00)'],
+    ['• Datas: formato AAAA-MM-DD (ex: 2024-03-15)'],
+    ['• Salve como .xlsx ou .csv antes de importar'],
+    ['• A primeira linha (cabeçalho) será ignorada na importação'],
+  ];
+  const wsInst = XLSX.utils.aoa_to_sheet(inst);
+  wsInst['!cols'] = [{wch:55}];
+  XLSX.utils.book_append_sheet(wb, wsInst, 'Instruções');
+  XLSX.writeFile(wb, `modelo_${type}_pcmgest.xlsx`);
+  toast(`Modelo de ${s.label} baixado!`, 'ok');
+}
+
+// ── Exportar dados atuais ──
+function exportData(type){
+  const s = SCHEMAS[type];
+  if(!s) return;
+  const items = DB.get(type);
+  if(!items.length){ toast('Nenhum dado para exportar.','warn'); return; }
+  const rows = [s.headers];
+  items.forEach(item => {
+    if(type==='tools')      rows.push([item.name,item.desc,item.category,item.value,item.serial,item.location,item.notes]);
+    if(type==='mechs')      rows.push([item.name,item.mat,item.cpf,item.phone,item.dept]);
+    if(type==='machines')   rows.push([item.name,item.plate,item.year,item.sector,item.type]);
+    if(type==='batteries')  rows.push([item.code,item.brand,item.model,item.capacity,item.voltage,item.purchaseDate,item.purchaseValue,item.supplier,item.warranty]);
+  });
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = s.headers.map(()=>({wch:22}));
+  XLSX.utils.book_append_sheet(wb, ws, s.label);
+  XLSX.writeFile(wb, `${type}_pcmgest_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast(`${items.length} ${s.label} exportados!`, 'ok');
+}
+
+// ── Abrir modal de importação ──
+function openImportModal(type){
+  const s = SCHEMAS[type];
+  closeModal();
+  const m = document.createElement('div');
+  m.className='overlay';
+  m.id='modal-overlay';
+  m.innerHTML=`<div class="modal" style="max-width:680px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div><div class="modal-title">📥 Importar ${s.label}</div>
+      <div style="font-size:11px;color:var(--muted2)">Excel (.xlsx) ou CSV (.csv)</div></div>
+      <button class="btn btn-gh btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-gh btn-sm" onclick="exportTemplate('${type}')">⬇ Baixar Modelo Excel</button>
+      <button class="btn btn-gh btn-sm" onclick="exportData('${type}')">⬆ Exportar Dados Atuais</button>
+    </div>
+    <div class="import-drop" id="import-drop" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleImportDrop(event,'${type}')">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="handleImportFile(this,'${type}')"/>
+      <div class="di">📂</div>
+      <p>Clique para selecionar ou arraste o arquivo aqui</p>
+      <div class="ds">.xlsx · .xls · .csv</div>
+    </div>
+    <div id="import-preview-area" style="display:none">
+      <div id="import-stats" class="import-stats"></div>
+      <div class="import-preview"><div class="tw"><table id="import-table"></table></div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g" id="import-confirm-btn" onclick="confirmImport('${type}')">✓ Importar Válidos</button>
+        <button class="btn btn-gh" onclick="document.getElementById('import-preview-area').style.display='none';document.getElementById('import-drop').style.display=''">↩ Escolher outro</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e=>{ if(e.target===m) closeModal(); });
+}
+
+let _importRows = [];
+
+function handleImportDrop(e, type){
+  e.preventDefault();
+  document.getElementById('import-drop').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(file) processImportFile(file, type);
+}
+
+function handleImportFile(input, type){
+  const file = input.files[0];
+  if(file) processImportFile(file, type);
+}
+
+function processImportFile(file, type){
+  const s = SCHEMAS[type];
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      let rows = [];
+      if(file.name.endsWith('.csv')){
+        const text = e.target.result;
+        rows = text.split('\n').map(l=>l.split(/[,;]/).map(c=>c.trim().replace(/^"|"$/g,'')));
+      } else {
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      }
+      // Remove cabeçalho e linhas vazias
+      const dataRows = rows.slice(1).filter(r=>r.some(c=>c!==''&&c!==null&&c!==undefined));
+      _importRows = dataRows.map(row => {
+        const err = s.validate(row);
+        return { row, err, obj: err ? null : s.toObj(row) };
+      });
+      renderImportPreview(type, s);
+    } catch(err){
+      toast('Erro ao ler arquivo: '+err.message,'err');
+    }
+  };
+  if(file.name.endsWith('.csv')) reader.readAsText(file, 'UTF-8');
+  else reader.readAsBinaryString(file);
+}
+
+function renderImportPreview(type, s){
+  const valid = _importRows.filter(r=>!r.err);
+  const invalid = _importRows.filter(r=>r.err);
+  document.getElementById('import-drop').style.display='none';
+  document.getElementById('import-preview-area').style.display='';
+  document.getElementById('import-stats').innerHTML=`
+    <div class="import-stat info">📄 ${_importRows.length} linhas lidas</div>
+    <div class="import-stat ok">✓ ${valid.length} válidas</div>
+    ${invalid.length?`<div class="import-stat err">✕ ${invalid.length} com erro</div>`:''}`;
+  const thead = `<thead><tr><th>#</th>${s.headers.map(h=>`<th>${h}</th>`).join('')}<th>Status</th></tr></thead>`;
+  const tbody = '<tbody>'+_importRows.map((r,i)=>`
+    <tr class="${r.err?'import-row-err':'import-row-ok'}">
+      <td>${i+1}</td>
+      ${r.row.slice(0,s.headers.length).map(c=>`<td>${esc(String(c??''))}</td>`).join('')}
+      <td>${r.err?`<span style="color:#fca5a5">✕ ${esc(r.err)}</span>`:'<span style="color:#4ade80">✓</span>'}</td>
+    </tr>`).join('')+'</tbody>';
+  document.getElementById('import-table').innerHTML = thead+tbody;
+  if(!valid.length) document.getElementById('import-confirm-btn').disabled=true;
+}
+
+async function confirmImport(type){
+  const valid = _importRows.filter(r=>!r.err);
+  if(!valid.length){ toast('Nenhum registro válido.','warn'); return; }
+  const btn = document.getElementById('import-confirm-btn');
+  btn.disabled=true; btn.textContent='Importando...';
+  let ok=0, fail=0;
+  for(const {obj} of valid){
+    try{ await DB.add(type, {...obj, id:uid()}); ok++; }
+    catch(e){ fail++; }
+  }
+  closeModal();
+  toast(`${ok} ${SCHEMAS[type].label} importados com sucesso!${fail?` (${fail} falharam)`:''}`, ok?'ok':'err');
+  render();
+}
 // ═══════ TOAST & MODAL ═══════
 function toast(msg,type='ok'){const c=document.getElementById('toasts');const t=document.createElement('div');t.className='toast '+type;t.innerHTML=`<span>${{ok:'✓',err:'✕',info:'ℹ',warn:'⚠'}[type]||'•'}</span><span>${esc(msg)}</span>`;c.appendChild(t);setTimeout(()=>{t.classList.add('toast-fade');setTimeout(()=>t.remove(),220)},3200)}
 function openModal(html){closeModal();const d=document.createElement('div');d.id='modal-overlay';d.className='overlay';d.innerHTML=html;d.addEventListener('click',e=>{if(e.target===d)closeModal()});document.body.appendChild(d)}
@@ -275,28 +852,277 @@ const UNIDADES = ['Tunica','Santo André II','Caregi','Reata','Sulinense'];
 // ═══════ APP STATE ═══════
 let APP={module:null,page:'dash',toolSearch:'',toolFilter:'todos',batSearch:'',libSelected:null,libOpenFolders:{},libSearchQ:'',unidade:localStorage.getItem('gi_unidade')||null};
 
-function render(){document.getElementById('root').innerHTML=buildApp();bindEvents()}
+async function render(){
+  const html = await buildApp();
+  document.getElementById('root').innerHTML = html;
+  bindEvents();
+}
 function bindEvents(){document.onkeydown=e=>{if(e.key==='Escape'){closeModal();document.getElementById('lib-ctx')?.remove()}}}
 
-function buildApp(){
+async function buildApp(){
+  if(!AUTH.isLogged()) return buildLogin();
   if(!APP.unidade) return buildUnidadeSelect();
   if(!APP.module)return buildCover();
   if(APP.module==='tools')return buildToolsShell();
   if(APP.module==='battery')return buildBatShell();
   if(APP.module==='library')return buildLibShell();
+  if(APP.module==='admin')return await buildAdminShell();
   return'';
+}
+
+
+// ═══════ LOGIN / REGISTRO ═══════
+function buildLogin(){
+  return`<div class="login-wrap">
+  <div class="login-grid"></div>
+  <div class="login-glow"></div>
+  <div class="login-box">
+    <div class="login-logo">PCM <span>GEST</span></div>
+    <div class="login-eye">Sistema de Gestão · PCM</div>
+    <div class="login-tabs">
+      <div class="login-tab act" id="tab-login" onclick="loginTab('login')">Entrar</div>
+      <div class="login-tab" id="tab-reg" onclick="loginTab('reg')">Criar conta</div>
+    </div>
+    <div id="login-err" class="login-err"></div>
+    <div id="login-info" class="login-info"></div>
+
+    <!-- FORM LOGIN -->
+    <div id="form-login">
+      <div class="login-field"><label>E-mail</label><input id="l-email" type="email" placeholder="seu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="login-field"><label>Senha</label><input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="login-btn" onclick="doLogin()">Entrar no sistema</button>
+    </div>
+
+    <!-- FORM REGISTRO -->
+    <div id="form-reg" style="display:none">
+      <div class="login-field"><label>Nome completo</label><input id="r-name" type="text" placeholder="Seu nome"/></div>
+      <div class="login-field"><label>E-mail</label><input id="r-email" type="email" placeholder="seu@email.com" autocomplete="email"/></div>
+      <div class="login-field"><label>Senha</label><input id="r-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/></div>
+      <div class="login-field"><label>Confirmar senha</label><input id="r-pass2" type="password" placeholder="Repita a senha"/></div>
+      <button class="login-btn b" onclick="doRegister()">Criar minha conta</button>
+    </div>
+
+    <!-- AGUARDANDO APROVAÇÃO -->
+    <div id="form-pending" style="display:none">
+      <div class="login-pending">
+        <div class="lp-ico">⏳</div>
+        <strong>Cadastro enviado!</strong><br/>
+        Aguardando aprovação do administrador.<br/>
+        <span style="font-size:11px;color:var(--muted);display:block;margin-top:8px">Você receberá acesso assim que for aprovado.</span>
+      </div>
+      <button class="login-btn" style="margin-top:14px;background:var(--s3);border:1px solid var(--border2);color:var(--muted2)" onclick="loginTab('login')">Voltar ao login</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function loginTab(tab){
+  const tabs=['login','reg','pending'];
+  tabs.forEach(t=>{
+    const el=document.getElementById('form-'+t);
+    if(el) el.style.display = t===tab ? '' : 'none';
+    const tb=document.getElementById('tab-'+t);
+    if(tb){ if(t===tab) tb.classList.add('act'); else tb.classList.remove('act'); }
+  });
+  setLoginMsg('','','');
+}
+
+function setLoginMsg(err='', info=''){
+  const e=document.getElementById('login-err'),i=document.getElementById('login-info');
+  if(e){ e.style.display=err?'block':'none'; e.textContent=err; }
+  if(i){ i.style.display=info?'block':'none'; i.textContent=info; }
+}
+
+async function doLogin(){
+  const email=document.getElementById('l-email')?.value||'';
+  const pass=document.getElementById('l-pass')?.value||'';
+  if(!email||!pass){setLoginMsg('Preencha e-mail e senha.');return;}
+  const btn=document.querySelector('#form-login .login-btn');
+  btn.disabled=true; btn.textContent='Verificando...';
+  const r=await AUTH.login(email,pass);
+  btn.disabled=false; btn.textContent='Entrar no sistema';
+  if(r.ok){ render(); return; }
+  if(r.msg==='pending'){
+    setLoginMsg('');
+    loginTab('pending');
+    return;
+  }
+  setLoginMsg(r.msg);
+}
+
+async function doRegister(){
+  const name=document.getElementById('r-name')?.value||'';
+  const email=document.getElementById('r-email')?.value||'';
+  const pass=document.getElementById('r-pass')?.value||'';
+  const pass2=document.getElementById('r-pass2')?.value||'';
+  if(pass!==pass2){setLoginMsg('As senhas não coincidem.');return;}
+  const btn=document.querySelector('#form-reg .login-btn');
+  btn.disabled=true; btn.textContent='Criando conta...';
+  const r=await AUTH.register(name,email,pass);
+  btn.disabled=false; btn.textContent='Criar minha conta';
+  if(!r.ok){setLoginMsg(r.msg);return;}
+  if(r.pending){ loginTab('pending'); return; }
+  render();
+}
+
+// ═══════ PAINEL ADMIN ═══════
+async function buildAdminShell(){
+  const users=await AUTH.listUsers();
+  const pending=users.filter(u=>u.status==='pending');
+  const active=users.filter(u=>u.status==='active');
+  const blocked=users.filter(u=>u.status==='blocked');
+  const me=AUTH.current();
+
+  function userCard(u){
+    const isMe=u.email===me.email;
+    const avCls=u.role==='admin'?'adm':u.status==='pending'?'pen':'usr';
+    const avLetter=(u.name||u.email||'?')[0].toUpperCase();
+    const statusBdg=u.status==='active'?`<span class="bdg ok">Ativo</span>`:u.status==='pending'?`<span class="bdg amr">Pendente</span>`:`<span class="bdg err">Bloqueado</span>`;
+    const roleBdg=u.role==='admin'?`<span class="bdg warn">Admin</span>`:`<span class="bdg info">Usuário</span>`;
+
+    // Chips de unidades (só para não-admin)
+    let unidChips='';
+    if(u.role!=='admin'){
+      const uPerms = u.unidades||[];
+      const temTodas = uPerms.length===0;
+      unidChips=`<div style="margin-top:8px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600">Unidades permitidas${temTodas?' · <span style=\'color:var(--muted)\'>nenhuma liberada</span>':''}</div>
+        <div class="unidades-grid">
+          ${UNIDADES.map(un=>{
+            const on=uPerms.includes(un);
+            return`<span class="unid-chip ${on?'on':'off'}" onclick="adminToggleUnidade('${esc(u.email)}','${esc(un)}')" title="${on?'Remover acesso':'Dar acesso'}">${on?'✓ ':'+'}${esc(un)}</span>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    let acts='';
+    if(!isMe){
+      if(u.status==='pending') acts+=`<button class="btn btn-b btn-sm" onclick="adminApprove('${esc(u.email)}')">✓ Aprovar</button>`;
+      if(u.status==='active') acts+=`<button class="btn btn-gh btn-sm" onclick="adminBlock('${esc(u.email)}')">Bloquear</button>`;
+      if(u.status==='blocked') acts+=`<button class="btn btn-b btn-sm" onclick="adminApprove('${esc(u.email)}')">Reativar</button>`;
+      acts+=`<button class="btn btn-d btn-sm" onclick="adminDelete('${esc(u.email)}')">✕</button>`;
+    } else {
+      acts=`<span style="font-size:11px;color:var(--muted)">Você</span>`;
+    }
+    return`<div class="user-row" style="flex-direction:column;align-items:stretch;gap:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="user-av ${avCls}">${avLetter}</div>
+        <div class="user-info">
+          <div class="user-name">${esc(u.name||'Sem nome')}</div>
+          <div class="user-meta">${esc(u.email)} · ${fmtDate(u.createdAt)}</div>
+          <div style="margin-top:4px;display:flex;gap:4px">${statusBdg}${roleBdg}</div>
+        </div>
+        <div class="user-acts">${acts}</div>
+      </div>
+      ${unidChips}
+    </div>`;
+  }
+
+  return`<div class="shell">
+    <div class="sidebar">
+      <div class="sb-hdr">
+        <div class="sb-name">PCM <span style="color:var(--gold)">GEST</span></div>
+        <div class="sb-sub">Gestão Integrada</div>
+        <div class="sb-bdg g">Administrador</div>
+      </div>
+      <div class="sb-sec">Navegação</div>
+      <div class="sb-item" onclick="APP.module=null;APP.unidade=null;render()">🏠 Início</div>
+      <div class="sb-item act" onclick="">👥 Usuários</div>
+      <div class="sb-foot">
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:6px">${esc(AUTH.current()?.name||'')} · Admin</div>
+        <button class="btn btn-gh btn-sm" style="width:100%" onclick="AUTH.logout()">Sair</button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div><div class="tb-title">GERENCIAR USUÁRIOS</div><div class="tb-sub">Aprovações e controle de acesso · PCM Gest</div></div>
+      </div>
+      <div class="content">
+        ${pending.length>0?`
+        <div class="card" style="border-color:#f59e0b44">
+          <div class="ctitle" style="color:var(--amber)">⏳ Aguardando Aprovação (${pending.length})</div>
+          ${pending.map(userCard).join('')}
+        </div>`:''}
+        <div class="card">
+          <div class="ctitle">✓ Usuários Ativos (${active.length})</div>
+          ${active.length?active.map(userCard).join(''):`<div class="empty"><div class="ei">👤</div><p>Nenhum usuário ativo.</p></div>`}
+        </div>
+        ${blocked.length>0?`
+        <div class="card">
+          <div class="ctitle" style="color:var(--red)">🚫 Bloqueados (${blocked.length})</div>
+          ${blocked.map(userCard).join('')}
+        </div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function adminApprove(email){
+  await AUTH.approveUser(email);
+  toast('Usuário aprovado!','ok');
+  const html=await buildAdminShell();
+  document.getElementById('root').innerHTML=html;
+}
+async function adminBlock(email){
+  if(!await customConfirm({title:'Bloquear Usuário',msg:'Este usuário não conseguirá mais acessar o sistema.',icon:'🚫',confirmLabel:'Bloquear',type:'warn'}))return;
+  await AUTH.blockUser(email);
+  toast('Usuário bloqueado.','warn');
+  const html=await buildAdminShell();
+  document.getElementById('root').innerHTML=html;
+}
+async function adminDelete(email){
+  if(!await customConfirm({title:'Excluir Usuário',msg:'Esta ação é permanente e não pode ser desfeita.',icon:'👤',confirmLabel:'Sim, excluir'}))return;
+  await AUTH.deleteUser(email);
+  toast('Usuário removido.','ok');
+  const html=await buildAdminShell();
+  document.getElementById('root').innerHTML=html;
+}
+
+async function adminToggleUnidade(email, unidade){
+  const u = await AUTH.findUser(email);
+  if(!u) return;
+  let perms = Array.isArray(u.unidades) ? [...u.unidades] : [];
+  if(perms.includes(unidade)){
+    perms = perms.filter(x=>x!==unidade);
+    toast(`Acesso à ${unidade} removido.`,'warn');
+  } else {
+    perms.push(unidade);
+    toast(`${unidade} liberada para ${u.name||u.email}!`,'ok');
+  }
+  await AUTH.setUnidades(email, perms);
+  // Atualizar só a sessão caso seja o próprio user logado (não é o caso aqui pois só admin acessa)
+  const html=await buildAdminShell();
+  document.getElementById('root').innerHTML=html;
 }
 
 // ═══════ SELEÇÃO DE UNIDADE ═══════
 function buildUnidadeSelect(){
+  const permitidas = AUTH.unidadesPermitidas(); // null = todas, [] = nenhuma, [...] = lista
+  const lista = permitidas === null ? UNIDADES : UNIDADES.filter(u => permitidas.includes(u));
+
+  // Se só tem 1 unidade, entra direto
+  if(lista.length === 0){
+    return`<div class="cover"><div class="cgrid"></div><div class="cglow"></div>
+    <div class="cinner" style="max-width:420px;text-align:center">
+      <div class="ctit" style="font-size:48px">⛔</div>
+      <div class="ctit" style="font-size:32px;margin-top:8px">Sem <span>Acesso</span></div>
+      <p class="csub">Você ainda não tem unidades liberadas.<br/>Aguarde o administrador configurar seu acesso.</p>
+      <button class="btn btn-gh" style="margin-top:12px" onclick="AUTH.logout()">🚪 Sair</button>
+    </div></div>`;
+  }
+
   return`<div class="cover">
   <div class="cgrid"></div><div class="cglow"></div>
+  <div style="position:fixed;top:14px;right:18px;z-index:10">
+    <button class="btn btn-gh btn-sm" onclick="AUTH.logout()">🚪 Sair</button>
+  </div>
   <div class="cinner" style="max-width:560px">
     <div class="ceye">Sistema de Gestão de Manutenção Agrícola</div>
     <div class="ctit">PCM<br/><span>GEST</span></div>
-    <p class="csub">Selecione sua unidade para continuar.</p>
+    <p class="csub">Olá, <strong style="color:var(--gold)">${esc(AUTH.current()?.name||'')}</strong>! Selecione a unidade.</p>
     <div style="display:flex;flex-direction:column;gap:10px;width:100%">
-      ${UNIDADES.map(u=>`
+      ${lista.map(u=>`
       <div onclick="selecionarUnidade('${esc(u)}')" style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:28px">🏭</span>
@@ -344,6 +1170,8 @@ function buildCover(){
     <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-gh" onclick="openRelatorioModal()">📊 Relatórios PDF</button>
       <button class="btn btn-gh" onclick="trocarUnidade()">🏭 Trocar Unidade</button>
+      ${AUTH.isAdmin()?`<button class="btn btn-gh" onclick="APP.module='admin';render()">👥 Usuários</button>`:''}
+      <button class="btn btn-gh" onclick="AUTH.logout()">🚪 Sair</button>
     </div>
   </div>
 </div>`}
@@ -376,6 +1204,9 @@ function buildToolsShell(){
       <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
       <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
       <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      ${AUTH.isAdmin()?`<div class="sb-item" onclick="APP.module='admin';render()" style="border-radius:6px"><span>👥</span><span style="font-size:11px">Usuários</span></div>`:''}
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
     </div>
   </div>
   <div class="main">
@@ -428,7 +1259,10 @@ function buildToolsList(tools){
         <option value="emprestada" ${f==='emprestada'?'selected':''}>Emprestadas</option>
       </select>
     </div>
-    <button class="btn btn-g" onclick="openToolModal()">+ Nova Ferramenta</button>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-gh btn-sm" onclick="openImportModal('tools')" title="Importar/Exportar">📥 Importar</button>
+      <button class="btn btn-g" onclick="openToolModal()">+ Nova Ferramenta</button>
+    </div>
   </div>
   <div class="card"><div class="tw"><table>
     <thead><tr><th>Ferramenta</th><th>Categoria</th><th>Valor</th><th>Série</th><th>Local</th><th>Status</th><th>Ações</th></tr></thead>
@@ -446,7 +1280,10 @@ function buildToolsList(tools){
     </tbody></table></div></div>`}
 
 function buildMechsList(mechs,tools,active){
-  return`<div class="shdr"><div class="stitle">Mecânicos (${mechs.length})</div><button class="btn btn-g" onclick="openMechModal()">+ Novo Mecânico</button></div>
+  return`<div class="shdr"><div class="stitle">Mecânicos (${mechs.length})</div><div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-gh btn-sm" onclick="openImportModal('mechs')" title="Importar/Exportar">📥 Importar</button>
+      <button class="btn btn-g" onclick="openMechModal()">+ Novo Mecânico</button>
+    </div></div>
   <div class="g3">${mechs.map(m=>{const ml=active.filter(l=>l.mechId===m.id);const v=ml.reduce((s,l)=>s+(tools.find(t=>t.id===l.toolId)?.value||0),0);return`<div class="card" style="cursor:pointer;margin-bottom:0" onclick="openMechDetail('${m.id}')">
     <div style="display:flex;gap:10px;align-items:center;margin-bottom:11px"><div class="avatar">${esc(m.name[0])}</div>
     <div><div style="font-weight:700;font-size:14px">${esc(m.name)}</div><div style="font-size:11px;color:var(--muted2)">Mat. ${esc(m.mat)}</div></div></div>
@@ -514,6 +1351,9 @@ function buildBatShell(){
       <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
       <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
       <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      ${AUTH.isAdmin()?`<div class="sb-item" onclick="APP.module='admin';render()" style="border-radius:6px"><span>👥</span><span style="font-size:11px">Usuários</span></div>`:''}
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
     </div>
   </div>
   <div class="main">
@@ -549,7 +1389,10 @@ function buildBatDash(machines,batteries){
   </div>`}
 
 function buildMachinesList(machines,batteries){
-  return`<div class="shdr"><div class="stitle">Máquinas (${machines.length})</div><button class="btn btn-b" onclick="openMachineModal()">+ Nova Máquina</button></div>
+  return`<div class="shdr"><div class="stitle">Máquinas (${machines.length})</div><div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-gh btn-sm" onclick="openImportModal('machines')">📥 Importar</button>
+      <button class="btn btn-b" onclick="openMachineModal()">+ Nova Máquina</button>
+    </div></div>
   <div class="card"><div class="tw"><table><thead><tr><th>Máquina</th><th>Placa</th><th>Ano</th><th>Setor</th><th>Bateria</th><th>Ações</th></tr></thead><tbody>
   ${machines.length===0?`<tr><td colspan="6"><div class="empty"><div class="ei">🚜</div><p>Nenhuma.</p></div></td></tr>`:''}
   ${machines.map(m=>{const b=batteries.find(x=>x.machineId===m.id);return`<tr>
@@ -562,7 +1405,10 @@ function buildMachinesList(machines,batteries){
 function buildBatteriesList(batteries,machines){
   const q=APP.batSearch||'';
   const filtered=batteries.filter(b=>[b.code,b.brand,b.model].some(s=>(s||'').toLowerCase().includes(q.toLowerCase())));
-  return`<div class="shdr"><input value="${esc(q)}" placeholder="Buscar..." style="width:240px" oninput="APP.batSearch=this.value;render()"/><button class="btn btn-b" onclick="openBatModal()">+ Nova Bateria</button></div>
+  return`<div class="shdr"><input value="${esc(q)}" placeholder="Buscar..." style="width:240px" oninput="APP.batSearch=this.value;render()"/><div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-gh btn-sm" onclick="openImportModal('batteries')">📥 Importar</button>
+      <button class="btn btn-b" onclick="openBatModal()">+ Nova Bateria</button>
+    </div></div>
   <div class="card"><div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Cap.</th><th>Valor</th><th>Garantia</th><th>Status</th><th>Ações</th></tr></thead><tbody>
   ${filtered.map(b=>{const m=machines.find(x=>x.id===b.machineId);return`<tr>
     <td><strong style="font-family:var(--mono)">${esc(b.code)}</strong></td>
@@ -627,6 +1473,9 @@ function buildLibShell(){
     <div class="sb-foot">
       <div class="sb-item" onclick="openRelatorioModal()" style="border-radius:6px"><span>📊</span><span>Relatórios PDF</span></div>
       <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      ${AUTH.isAdmin()?`<div class="sb-item" onclick="APP.module='admin';render()" style="border-radius:6px"><span>👥</span><span style="font-size:11px">Usuários</span></div>`:''}
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
     </div>
   </div>
   <div class="main">
@@ -646,7 +1495,8 @@ function libNodes(){return DB.get('libTree')}
 function libPath(nodeId){const nodes=libNodes();const path=[];let cur=nodeId;while(cur){const n=nodes.find(x=>x.id===cur);if(!n)break;path.unshift(n);cur=n.parentId}return path}
 function libCountChildren(id){const nodes=libNodes();let c=0;function r(fid){nodes.filter(n=>n.parentId===fid).forEach(n=>{c++;if(n.type==='folder')r(n.id)})}r(id);return c}
 function libSelectFolder(id){APP.libSelected=(id===null||id==='null')?null:id;APP.page='files';render()}
-function libToggleFolder(id){if(!APP.libOpenFolders)APP.libOpenFolders={};APP.libOpenFolders[id]=!APP.libOpenFolders[id];render()}
+function libToggleFolder(id){if(!APP.libOpenFolders)APP.libOpenFolders={};
+NET.init();APP.libOpenFolders[id]=!APP.libOpenFolders[id];render()}
 
 function buildLibTree(){
   const nodes=libNodes();
@@ -792,7 +1642,7 @@ async function libRenameFolder(id){
 
 async function libDelFolder(id){
   const count=libCountChildren(id);
-  if(count>0&&!confirm(`Contém ${count} item(ns). Excluir tudo?`))return;
+  if(count>0&&!await customConfirm({title:'Excluir Pasta',msg:`Esta pasta contém ${count} item(s). Tudo será excluído.`,icon:'📁',confirmLabel:'Excluir tudo',type:'danger'}))return;
   const nodes=libNodes();const toDelete=[];
   function collect(fid){nodes.filter(n=>n.parentId===fid).forEach(n=>{toDelete.push(n.id);if(n.type==='folder')collect(n.id)});}
   collect(id);toDelete.push(id);
@@ -828,7 +1678,11 @@ function libHandleFiles(fileList,parentId){
     reader.onload=async e=>{
       const node={id:uid(),name:file.name,type:'file',parentId:pid,size:file.size,uploadedAt:new Date().toISOString(),desc,ext:file.name.split('.').pop().toLowerCase(),data:e.target.result};
       const fresh=libNodes();fresh.push(node);
-      try{LOCAL.set('libTree',fresh);FB.set('libTree',node.id,node);added++;
+      try{LOCAL.set('libTree',fresh);
+        // Salva no Firestore sem o campo 'data' (base64 pode ultrapassar 1MB)
+        const {data:_omit,...nodeForFS}=node;
+        FB.set('libTree',node.id,nodeForFS);
+        added++;
         const prev=document.getElementById('upload-preview');
         if(prev)prev.innerHTML=`<div class="infobox" style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${added} arquivo${added>1?'s':''} adicionado${added>1?'s':''}</div>`;
         toast(`${file.name} adicionado!`);
@@ -861,7 +1715,7 @@ async function libEditFile(id){
 }
 
 async function libDelFile(id){
-  if(!confirm('Excluir?'))return;
+  if(!await customConfirm({title:'Excluir Registro',msg:'Esta ação não pode ser desfeita.',icon:'📋',confirmLabel:'Sim, excluir'}))return;
   LOCAL.set('libTree',libNodes().filter(n=>n.id!==id));FB.delete('libTree',id);
   toast('Excluído.');render();
 }
@@ -883,13 +1737,14 @@ async function saveTool(id){
   if(!name)return toast('Preencha o nome.','err');
   if(!value||value<=0)return toast('Valor inválido.','err');
   const existing=id?DB.find('tools',id):{};
-  await DB.add('tools',{id:id||uid(),name,value,category:qval('fc'),desc:qval('fd'),serial:qval('fs'),location:qval('fl'),notes:'',status:existing?.status||'disponivel'});
+  const data={id:id||uid(),name,value,category:qval('fc'),desc:qval('fd'),serial:qval('fs'),location:qval('fl'),notes:'',status:existing?.status||'disponivel'};
+  if(id){await DB.update('tools',id,data);}else{await DB.add('tools',data);}
   closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
 }
 
 async function delTool(id){
   if(DB.get('loans').some(l=>!l.returnDate&&l.toolId===id))return toast('Ferramenta emprestada.','err');
-  if(!confirm('Excluir?'))return;await DB.remove('tools',id);toast('Removida.');render();
+  if(!await customConfirm({title:'Excluir Ferramenta',msg:'Esta ação não pode ser desfeita.',icon:'🔧',confirmLabel:'Sim, excluir'}))return;await DB.remove('tools',id);toast('Removida.');render();
 }
 
 function openMechModal(id){
@@ -907,13 +1762,14 @@ async function saveMech(id){
   if(!name)return toast('Preencha o nome.','err');
   if(!mat)return toast('Preencha a matrícula.','err');
   if(!id&&DB.get('mechs').some(x=>x.mat===mat))return toast('Matrícula já existe.','err');
-  await DB.add('mechs',{id:id||uid(),name,mat,cpf:qval('fc'),phone:qval('fp'),dept:qval('fd')});
+  const data={id:id||uid(),name,mat,cpf:qval('fc'),phone:qval('fp'),dept:qval('fd')};
+  if(id){await DB.update('mechs',id,data);}else{await DB.add('mechs',data);}
   closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
 }
 
 async function delMech(id){
   if(DB.get('loans').filter(l=>!l.returnDate).some(l=>l.mechId===id))return toast('Mecânico com ferramentas.','err');
-  if(!confirm('Excluir?'))return;await DB.remove('mechs',id);toast('Removido.');render();
+  if(!await customConfirm({title:'Excluir Mecânico',msg:'Esta ação não pode ser desfeita.',icon:'👷',confirmLabel:'Sim, excluir'}))return;await DB.remove('mechs',id);toast('Removido.');render();
 }
 
 function openMechDetail(id){
@@ -990,13 +1846,14 @@ function openMachineModal(id){
 
 async function saveMachine(id){
   const name=qval('fn');if(!name)return toast('Preencha o nome.','err');
-  await DB.add('machines',{id:id||uid(),name,plate:qval('fp'),year:qval('fy'),type:qval('ft'),sector:qval('fs')});
+  const data={id:id||uid(),name,plate:qval('fp'),year:qval('fy'),type:qval('ft'),sector:qval('fs')};
+  if(id){await DB.update('machines',id,data);}else{await DB.add('machines',data);}
   closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
 }
 
 async function delMachine(id){
   if(DB.get('batteries').some(b=>b.machineId===id))return toast('Máquina com bateria.','err');
-  if(!confirm('Excluir?'))return;await DB.remove('machines',id);toast('Removida.');render();
+  if(!await customConfirm({title:'Excluir Máquina',msg:'Esta ação não pode ser desfeita.',icon:'🚜',confirmLabel:'Sim, excluir'}))return;await DB.remove('machines',id);toast('Removida.');render();
 }
 
 function openBatModal(id){
@@ -1013,13 +1870,14 @@ async function saveBat(id){
   const code=qval('fc');if(!code)return toast('Preencha o código.','err');
   if(!id&&DB.get('batteries').some(b=>b.code===code))return toast('Código já existe.','err');
   const existing=id?DB.find('batteries',id):{};
-  await DB.add('batteries',{id:id||uid(),code,brand:qval('fbr'),model:qval('fmo'),capacity:qval('fcap'),voltage:qval('fvolt'),purchaseDate:qval('fpd'),purchaseValue:qfloat('fpv'),warranty:qval('fw'),supplier:qval('fsup'),machineId:existing?.machineId||null});
+  const data={id:id||uid(),code,brand:qval('fbr'),model:qval('fmo'),capacity:qval('fcap'),voltage:qval('fvolt'),purchaseDate:qval('fpd'),purchaseValue:qfloat('fpv'),warranty:qval('fw'),supplier:qval('fsup'),machineId:existing?.machineId||null};
+  if(id){await DB.update('batteries',id,data);}else{await DB.add('batteries',data);}
   closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
 }
 
 async function delBat(id){
   if(DB.find('batteries',id)?.machineId)return toast('Bateria alocada.','err');
-  if(!confirm('Excluir?'))return;await DB.remove('batteries',id);toast('Removida.');render();
+  if(!await customConfirm({title:'Excluir Bateria',msg:'Esta ação não pode ser desfeita.',icon:'🔋',confirmLabel:'Sim, excluir'}))return;await DB.remove('batteries',id);toast('Removida.');render();
 }
 
 function openAllocModal(){
@@ -1046,7 +1904,7 @@ async function saveAlloc(){
 
 async function deallocBat(batId){
   const b=DB.find('batteries',batId);if(!b)return;
-  if(!confirm('Remover bateria?'))return;
+  if(!await customConfirm({title:'Remover Bateria',msg:'Desalocar esta bateria da máquina?',icon:'🔋',confirmLabel:'Remover',type:'warn'}))return;
   await DB.add('batHist',{id:uid(),batId,machId:b.machineId,action:'removida',date:nowDT()});
   await DB.update('batteries',batId,{machineId:null});
   toast('Desalocada.');render();
@@ -1084,6 +1942,15 @@ function printTermo(loanId){
 <div class="terms"><strong>Ao assinar, declara que:</strong><br/><br/>1. Recebeu a ferramenta em perfeito estado;<br/>2. Responsabiliza-se pelo uso correto e conservação;<br/>3. Devolverá nas mesmas condições, salvo desgaste normal;<br/>4. Em caso de dano ou perda, arcará com ${fmt(tool.value)};<br/>5. Devolverá assim que o serviço for concluído.</div></div>
 <div class="sigs"><div><div class="sig-line">Assinatura do Mecânico<br/><span style="font-size:10px">${esc(mech.name)} — Mat. ${esc(mech.mat)}</span></div></div><div><div class="sig-line">Assinatura do Responsável<br/><span style="font-size:10px">Ferramentaria / Supervisor</span></div></div></div>
 <div class="footer">PCM Gest · ${new Date().toLocaleString('pt-BR')} · ${num}</div>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(()=> console.log('SW registrado'))
+      .catch(e => console.warn('SW erro:', e));
+  });
+}
+</script>
 </body></html>`,`Termo — ${tool.name} / ${mech.name}`);
 }
 
@@ -1255,27 +2122,51 @@ ${relHeader('RELATÓRIO COMPLETO')}
 }
 
 // ═══════ SEED & INIT ═══════
-function seedIfEmpty(){
-  if(DB.get('tools').length)return;
+function seedFallback(){
+  // Só coloca exemplos se Firebase também não tiver nada
+  if(LOCAL.get('tools').length)return;
   LOCAL.set('tools',[{id:uid(),name:'Chave de Torque 3/4"',desc:'40–200 Nm',category:'Chaves',value:850,status:'disponivel',serial:'CT-2021-001',location:'Gaveta A1',notes:''},{id:uid(),name:'Multímetro Fluke 87V',desc:'True RMS',category:'Elétrico',value:1240,status:'disponivel',serial:'FL-2022-004',location:'Gaveta B2',notes:''},{id:uid(),name:'Pistola de Impacto 18V',desc:'Milwaukee 1/2"',category:'Pneumático',value:2100,status:'disponivel',serial:'MIL-2023-007',location:'Prateleira C',notes:''}]);
   LOCAL.set('mechs',[{id:uid(),name:'João Silva',mat:'M001',cpf:'123.456.789-00',phone:'(65) 98765-4321',dept:'Mecânica Pesada'},{id:uid(),name:'Pedro Santos',mat:'M002',cpf:'987.654.321-00',phone:'(65) 99876-5432',dept:'Elétrica'}]);
   LOCAL.set('machines',[{id:uid(),name:'Trator John Deere 8520',plate:'ABC-1234',year:'2020',sector:'Lavoura A',type:'Agrícola'},{id:uid(),name:'Colheitadeira New Holland',plate:'DEF-5678',year:'2019',sector:'Lavoura B',type:'Agrícola'}]);
-  LOCAL.set('batteries',[{id:uid(),code:'BAT-001',brand:'Moura',model:'60D',capacity:'60Ah',voltage:'12V',machineId:null,warranty:'2026-03-15',purchaseDate:'2024-03-15',purchaseValue:380,supplier:'Distribuidora Norte'},{id:uid(),code:'BAT-002',brand:'Heliar',model:'80TE',capacity:'80Ah',voltage:'12V',machineId:null,warranty:'2025-07-20',purchaseDate:'2023-07-20',purchaseValue:520,supplier:'AutoParts'}]);
+  LOCAL.set('batteries',[{id:uid(),code:'BAT-001',brand:'Moura',model:'60D',capacity:'60Ah',voltage:'12V',machineId:null,warranty:'2026-03-15',purchaseDate:'2024-03-15',purchaseValue:380,supplier:'Distribuidora Norte'},{id:uid(),code:'BAT-002',brand:'Heliar',model:'80TE',capacity:'80Ah',voltage:'12V',machineId:null,warranty:'2027-07-20',purchaseDate:'2025-07-20',purchaseValue:520,supplier:'AutoParts'}]);
   LOCAL.set('loans',[]);LOCAL.set('batHist',[]);LOCAL.set('libTree',[]);
 }
 
-// INIT — roda imediatamente
+// INIT — Firebase primeiro, seed só se não houver dados em lugar nenhum
 if(!APP.libOpenFolders)APP.libOpenFolders={};
-seedIfEmpty();
-render();
 
-// Firebase em background
-setTimeout(async()=>{
+(async()=>{
+  // Mostra tela de loading enquanto busca dados
+  document.getElementById('root').innerHTML=`
+    <div style="height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);gap:16px">
+      <div style="font-family:var(--disp);font-size:48px;letter-spacing:2px">PCM <span style="color:var(--gold)">GEST</span></div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--muted2);font-size:13px">
+        <div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>
+        Carregando dados...
+      </div>
+    </div>`;
+
+  // Tenta sincronizar Firebase com timeout de 6s
   try{
-    const total=await Promise.race([DB.syncAll(),new Promise((_,r)=>setTimeout(()=>r('timeout'),5000))]);
-    if(total>0){toast(`✓ Firebase · ${total} registros`,'info');render();}
-  }catch(e){}
-},100);
+    const total=await Promise.race([
+      DB.syncAll(),
+      new Promise((_,r)=>setTimeout(()=>r('timeout'),6000))
+    ]);
+    if(typeof total==='number' && total>0){
+      // Dados vieram do Firebase — não precisa de seed
+      console.log(`Firebase: ${total} registros carregados`);
+    } else {
+      // Firebase vazio ou timeout — usa localStorage ou seed de exemplo
+      seedFallback();
+    }
+  }catch(e){
+    // Falhou — usa localStorage existente ou seed
+    seedFallback();
+  }
+
+  // Renderiza agora com os dados corretos
+  render();
+})();
 </script>
 </body>
 </html>

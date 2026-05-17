@@ -1,0 +1,25 @@
+{
+  "name": "PCM Gest",
+  "short_name": "PCM Gest",
+  "description": "Sistema de Gestão de Manutenção Agrícola",
+  "start_url": "/pcmgest/",
+  "scope": "/pcmgest/",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#e8a000",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
