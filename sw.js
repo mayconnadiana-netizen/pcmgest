@@ -1,10 +1,10 @@
-const CACHE = 'pcmgest-v1';
+const CACHE = 'pcmgest-v2';
 const ASSETS = [
-  '/pcmgest/',
-  '/pcmgest/index.html',
-  '/pcmgest/manifest.json',
-  '/pcmgest/icon-192.png',
-  '/pcmgest/icon-512.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
