@@ -8,20 +8,7 @@ const HOP_BY_HOP = new Set([
   "te","trailers","transfer-encoding","upgrade","host","origin","referer","content-length",
 ]);
 
-export const config = {
-  api: { bodyParser: false, externalResolver: true },
-};
-
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on("data", (chunk) => chunks.push(chunk));
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
-  });
-}
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With");
@@ -42,7 +29,13 @@ export default async function handler(req, res) {
   }
   if (!forwardHeaders["accept"]) forwardHeaders["accept"] = "application/json, text/plain, */*";
 
-  const body = ["GET","HEAD","OPTIONS"].includes(req.method) ? undefined : await readBody(req);
+  const body = ["GET","HEAD","OPTIONS"].includes(req.method) ? undefined : 
+    await new Promise((resolve, reject) => {
+      const chunks = [];
+      req.on("data", c => chunks.push(c));
+      req.on("end", () => resolve(Buffer.concat(chunks)));
+      req.on("error", reject);
+    });
 
   try {
     const upstream = await fetch(targetUrl, {
@@ -58,10 +51,6 @@ export default async function handler(req, res) {
     const responseBody = Buffer.from(await upstream.arrayBuffer());
     res.status(upstream.status).send(responseBody);
   } catch (err) {
-    res.status(502).json({
-      erro: "Falha ao conectar à API S360",
-      detalhe: err.message,
-      destino: targetUrl,
-    });
+    res.status(502).json({ erro: "Falha ao conectar à API S360", detalhe: err.message, destino: targetUrl });
   }
 }
