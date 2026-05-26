@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/s360/[...path].js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/s360/[...path].js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/s360/(.*)",
