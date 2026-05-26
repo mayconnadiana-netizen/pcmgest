@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -2162,42 +2163,118 @@ function toggleOilPasso(planoId, passoId){
 
 // ── CONFIG ──
 // ═══════ S360 API ═══════
+// SOLUÇÃO CORS: as chamadas passam pelo proxy local em servidor.py.
+// O navegador acessa /api/s360/producao/... ou /api/s360/teste/... e o servidor encaminha para o ambiente S360 correspondente.
+// O arquivo DEVE ser aberto via servidor.py, não por file:// nem por servidor HTTP simples.
 const S360={
-  BASE:'https://api.s360web.com',
   _key:'oil_s360_cfg',
+  envs:{producao:{label:'Produção',basePath:'/api/s360/producao',host:'https://api.s360web.com'},teste:{label:'Teste',basePath:'/api/s360/teste',host:'https://integration.s360web.com'}},
+  getEnv(){const c=this.getCfg();return (c.environment==='teste'||c.environment==='producao')?c.environment:'producao'},
+  setEnv(env){const c=this.getCfg();const novo=(env==='teste')?'teste':'producao';this.saveCfg({...c,environment:novo});return novo},
+  getEnvInfo(){return this.envs[this.getEnv()]||this.envs.producao},
+  base(){return window.location.origin+this.getEnvInfo().basePath},
   getCfg(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch(e){return{}}},
   saveCfg(c){localStorage.setItem(this._key,JSON.stringify(c))},
   getToken(){return this.getCfg().access_token||null},
   isConfigured(){return!!this.getToken()},
-  async login(username,password){
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-    if(!r.ok)throw new Error('Login falhou: '+r.status);
-    const d=await r.json();
-    if(!d.access_token)throw new Error('Token não retornado');
-    this.saveCfg({...d,username,saved_at:Date.now()});
-    return d;
+
+  // Requisição com tratamento robusto de erros
+  async _req(url,options){
+    try{
+      const response=await fetch(url,{
+        ...options,
+        mode:'cors',
+        credentials:'include',
+        headers:{
+          'Content-Type':'application/json',
+          ...(options.headers||{})
+        }
+      });
+      
+      // Tratamento de status HTTP
+      if(response.status===401)throw new Error('Credenciais inválidas (401). Verifique usuário e senha.');
+      if(response.status===403)throw new Error('Acesso negado (403). Verifique as permissões da conta.');
+      if(response.status===404)throw new Error('Endpoint não encontrado (404): '+url);
+      if(response.status===500)throw new Error('Erro no servidor S360 (500). Tente novamente.');
+      if(!response.ok)throw new Error('Erro HTTP '+response.status+': '+response.statusText);
+      
+      const data=await response.json();
+      return data;
+    }catch(e){
+      // Melhor diagnóstico de erro
+      const msg=e.message||'';
+      if(msg.includes('Failed to fetch')){
+        throw new Error('Erro de conexão com a API S360. Verifique se as credenciais estão corretas e se a internet está conectada.');
+      }
+      if(msg.includes('NetworkError')||msg.includes('CORS')){
+        throw new Error('Erro de rede. Verifique sua conexão com a internet.');
+      }
+      throw e;
+    }
   },
+
+  async login(username,password){
+    if(!username||!password)throw new Error('Usuário e senha são obrigatórios');
+    
+    const data=await this._req(this.base()+'/api/login',{
+      method:'POST',
+      body:JSON.stringify({username,password})
+    });
+    
+    if(!data.access_token)throw new Error('Token não retornado pela API S360. Resposta: '+JSON.stringify(data));
+    
+    const environment=this.getEnv();
+    this.saveCfg({...data,username,environment,saved_at:Date.now()});
+    console.log('[S360] Login bem-sucedido para: '+username+' em '+environment);
+    return data;
+  },
+
   async authHeaders(){
     const cfg=this.getCfg();
     if(!cfg.access_token)throw new Error('Não autenticado — configure em Análise de Óleo → Configurações');
-    return{'Content-Type':'application/json','Authorization':'Bearer '+cfg.access_token};
+    return{
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+cfg.access_token
+    };
   },
+
   async getEquipamentos(filtro){
     const h=await this.authHeaders();
-    const r=await fetch('/api/equipamentos',{method:'POST',headers:h,body:JSON.stringify({ativo:true,maximoPorPagina:100,numeroPagina:1,...filtro})});
-    if(!r.ok)throw new Error('Equipamentos: '+r.status);
-    return r.json();
+    const data=await this._req(this.base()+'/api/v1/equipamento/list',{
+      method:'POST',
+      headers:h,
+      body:JSON.stringify({ativo:true,maximoPorPagina:100,numeroPagina:1,...(filtro||{})})
+    });
+    if(!data.resultados)throw new Error('Formato inesperado na resposta de equipamentos');
+    return data;
   },
+
   async getResultados(filtro){
     const h=await this.authHeaders();
     const hoje=new Date().toISOString().slice(0,10);
     const d30=new Date(Date.now()-30*24*60*60*1000).toISOString().slice(0,10);
-    const r=await fetch('/api/resultados',{method:'POST',headers:h,body:JSON.stringify({statusLeitura:'TODOS',maximoPorPagina:50,numeroPagina:1,dataDe:d30,dataAte:hoje,...filtro})});
-    if(!r.ok)throw new Error('Resultados: '+r.status);
-    return r.json();
+    const data=await this._req(this.base()+'/api/v3/resultadoAmostra/list',{
+      method:'POST',
+      headers:h,
+      body:JSON.stringify({statusLeitura:'TODOS',maximoPorPagina:50,numeroPagina:1,dataDe:d30,dataAte:hoje,...(filtro||{})})
+    });
+    if(!data.resultados)throw new Error('Formato inesperado na resposta de resultados');
+    return data;
   },
+
   statusColor(s){return{NORMAL:'#22c55e',ATENCAO:'#f59e0b',ANORMAL:'#f87171',CRITICO:'#ef4444',COLETADA:'#3b82f6',SEGREGADA:'#a855f7'}[s]||'#888';},
-  statusIco(s){return{NORMAL:'✅',ATENCAO:'⚡',ANORMAL:'⚠️',CRITICO:'🛑',COLETADA:'🧪',SEGREGADA:'🔬'}[s]||'•';}
+  statusIco(s){return{NORMAL:'✅',ATENCAO:'⚡',ANORMAL:'⚠️',CRITICO:'🛑',COLETADA:'🧪',SEGREGADA:'🔬'}[s]||'•';},
+  
+  // Teste de conectividade
+  async testConnection(){
+    try{
+      const response=await fetch(this.base()+'/api/login',{method:'OPTIONS',mode:'cors',credentials:'include'});
+      return response.ok;
+    }catch(e){
+      console.error('[S360] Teste de conexão falhou:',e.message);
+      return false;
+    }
+  }
 };
 
 function getS360Equipamentos(){try{return JSON.parse(localStorage.getItem('s360_equipamentos')||'[]')}catch(e){return[]}}
@@ -2207,32 +2284,54 @@ function hasS360Data(){return getS360Equipamentos().length>0}
 function buildOilConfig(){
   var cfg=S360.getCfg();
   var ok=!!cfg.access_token;
+  var env=S360.getEnv();
+  var envInfo=S360.getEnvInfo();
   var syncAt=localStorage.getItem('s360_sync_at');
   var html='<div class="card" style="margin-bottom:16px">';
-  html+='<div class="ctitle">⚙️ Configuração da API S360 · ALS</div>';
+  html+='<div class="ctitle">⚙️ Configuração da API S360 · ALS <span style="font-size:10px;color:#93c5fd;margin-left:8px">VERSÃO TESTE/PRODUÇÃO</span></div>';
   html+='<p style="font-size:12.5px;color:var(--muted2);margin:6px 0 16px">Autenticação JWT. Após login os dados reais substituem os demonstrativos.</p>';
   html+='<div style="background:'+(ok?'#22c55e15':'#ef444415')+';border:1px solid '+(ok?'#22c55e33':'#ef444433')+';border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">';
   html+='<div style="font-size:28px">'+(ok?'🟢':'🔴')+'</div>';
-  html+='<div><div style="font-weight:700;font-size:13px;color:'+(ok?'#4ade80':'#fca5a5')+'">'+(ok?'CONECTADO À API S360':'NÃO AUTENTICADO')+'</div>';
+  html+='<div><div style="font-weight:700;font-size:13px;color:'+(ok?'#4ade80':'#fca5a5')+'">'+( ok?'CONECTADO À API S360':'NÃO AUTENTICADO')+'</div>';
   if(ok){
     html+='<div style="font-size:11px;color:var(--muted2)">Usuário: '+esc(cfg.username||'')+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted2)">Ambiente: '+esc(envInfo.label)+' — '+esc(envInfo.host)+'</div>';
     html+='<div style="font-size:11px;color:var(--muted2)">Login: '+(cfg.saved_at?new Date(cfg.saved_at).toLocaleString('pt-BR'):'—')+'</div>';
     if(syncAt)html+='<div style="font-size:11px;color:var(--muted2)">Última sync: '+new Date(syncAt).toLocaleString('pt-BR')+'</div>';
   }else{
-    html+='<div style="font-size:11px;color:var(--muted2)">Digite a senha abaixo para conectar</div>';
+    
+    
   }
   html+='</div></div>';
   html+='<div class="frow c2">';
-  html+='<div class="fgroup"><label class="flbl">Usuário S360</label><input class="finput" id="s360-user" type="email" value="apialsnadiana@nadiana.com.br"/></div>';
+  html+='<div class="fgroup"><label class="flbl">Ambiente da API S360</label><select class="finput" id="s360-env" onchange="s360ChangeEnv()"><option value="producao" '+(env==='producao'?'selected':'')+'>Produção — api.s360web.com</option><option value="teste" '+(env==='teste'?'selected':'')+'>Teste — integration.s360web.com</option></select></div>';
+  html+='<div class="fgroup"><label class="flbl">Endpoint selecionado</label><input class="finput" value="'+esc(envInfo.host)+'" readonly/></div>';
+  html+='</div>';
+  html+='<div class="frow c2">';
+  html+='<div class="fgroup"><label class="flbl">Usuário S360</label><input class="finput" id="s360-user" type="email" value="'+esc(cfg.username||'apialsnadiana@nadiana.com.br')+'"/></div>';
   html+='<div class="fgroup"><label class="flbl">Senha</label><input class="finput" id="s360-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>';
   html+='</div>';
   html+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">';
   html+='<button class="btn btn-g" onclick="s360Login()">🔐 '+(ok?'Reconectar':'Conectar à API S360')+'</button>';
+  html+='<button class="btn btn-b btn-sm" onclick="s360TestConnection()">🔍 Testar Conexão</button>';
   if(ok){
     html+='<button class="btn btn-b" onclick="s360SincronizarTudo()">↺ Sincronizar Dados</button>';
     html+='<button class="btn btn-gh" onclick="s360Logout()">🚪 Desconectar</button>';
   }
-  html+='</div></div>';
+  html+='</div>';
+  html+='<div id="s360-conn-status"></div>';
+  if(!ok){
+    html+='<div style="margin-top:12px;background:#3b82f615;border:1px solid #3b82f633;border-radius:8px;padding:10px 14px">';
+    html+='<div style="font-size:11px;font-weight:700;color:#93c5fd;margin-bottom:4px">ℹ️ Como funciona a conexão</div>';
+    html+='<div style="font-size:11px;color:var(--muted2);line-height:1.6">';
+    
+    
+    html+='3. Escolha <strong>Teste</strong> ou <strong>Produção</strong> conforme suas credenciais<br>';
+    html+='4. Digite suas credenciais S360 (ALS Global)<br>';
+    html+='5. Dados sincronizam e ficam salvos no navegador';
+    html+='</div></div>';
+  }
+  html+='</div>';
   if(ok){
     var equips=getS360Equipamentos();
     var results=getS360Resultados();
@@ -2256,18 +2355,66 @@ function buildOilConfig(){
   return html;
 }
 
+function s360ChangeEnv(){
+  var env=document.getElementById('s360-env')?.value||'producao';
+  var old=S360.getEnv();
+  S360.setEnv(env);
+  if(old!==env){
+    localStorage.removeItem('s360_equipamentos');
+    localStorage.removeItem('s360_resultados');
+    localStorage.removeItem('s360_sync_at');
+    toast('Ambiente S360 alterado para '+S360.getEnvInfo().label+'. Faça login novamente se necessário.','warn');
+    APP.oilPage='config';render();
+  }
+}
+
+async function s360TestConnection(){
+  var statusEl=document.getElementById('s360-conn-status');
+  function setStatus(msg,color){if(statusEl){statusEl.innerHTML='<div style="font-size:12px;padding:8px 12px;border-radius:7px;background:'+color+'15;border:1px solid '+color+'33;color:'+color+';margin-top:10px">'+msg+'</div>';}}
+  var env=S360.getEnvInfo();
+  setStatus('🔍 Testando conexão com a API S360 em '+env.label+' ('+env.host+')...','#3b82f6');
+  try{
+    var isConnected=await S360.testConnection();
+    if(isConnected){
+      setStatus('✓ Conexão OK! Você pode fazer login agora.','#22c55e');
+      toast('Conexão com API S360 está funcionando!','ok');
+    }else{
+      setStatus('✕ Não foi possível conectar. Verifique sua conexão e tente novamente.','#ef4444');
+      toast('Erro de conexão. Veja as instruções acima.','err');
+    }
+  }catch(e){
+    setStatus('✕ Erro: '+e.message,'#ef4444');
+    toast('Erro ao testar conexão: '+e.message,'err');
+  }
+}
+
 async function s360Login(){
   var user=document.getElementById('s360-user')?.value?.trim();
   var pass=document.getElementById('s360-pass')?.value;
   if(!user||!pass){toast('Preencha usuário e senha.','warn');return;}
   var btn=document.querySelector('button[onclick="s360Login()"]');
+  var statusEl=document.getElementById('s360-conn-status');
+  function setStatus(msg,color){if(statusEl){statusEl.innerHTML='<div style="font-size:12px;padding:8px 12px;border-radius:7px;background:'+color+'15;border:1px solid '+color+'33;color:'+color+';margin-top:10px">'+msg+'</div>';}}
   if(btn){btn.disabled=true;btn.textContent='🔄 Conectando...';}
+  var envSel=document.getElementById('s360-env')?.value||S360.getEnv();
+  S360.setEnv(envSel);
+  var env=S360.getEnvInfo();
+  setStatus('⏳ Conectando à API S360 em '+env.label+' ('+env.host+')...','#3b82f6');
   try{
     await S360.login(user,pass);
+    setStatus('','transparent');
     toast('✓ Conectado à API S360!','ok');
     APP.oilPage='config';render();
   }catch(e){
-    toast('Erro: '+e.message,'err');
+    var msg=e.message||'';
+    var isCred=msg.includes('401')||msg.includes('403')||msg.includes('credencial')||msg.includes('senha')||msg.includes('inválidas');
+    var isHttp=msg.includes('HTTP')||msg.includes('Erro de conex');
+    var hint='';
+    if(isCred) hint='Verifique usuário, senha e ambiente selecionado. Credenciais de Teste normalmente não funcionam em Produção, e vice-versa.';
+    else if(isHttp) hint='Erro de conexão com a API S360. Verifique suas credenciais.';
+    else hint='Erro desconhecido. Verifique as instruções acima.';
+    setStatus('✕ '+msg+'<br><span style="opacity:.8;font-size:11px">'+hint+'</span>','#ef4444');
+    toast('Erro ao conectar: '+msg,'err');
     if(btn){btn.disabled=false;btn.textContent='🔐 Conectar à API S360';}
   }
 }
