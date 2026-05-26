@@ -1289,6 +1289,14 @@ function oilParamStatus(val, lim){
 
 // ── DASHBOARD ──
 function buildOilDash(criticos,anormais,atencao,normais){
+  // Se tiver dados reais da S360, usar eles para os KPIs
+  const s360res = getS360Resultados();
+  if(s360res.length > 0){
+    criticos = s360res.filter(r=>r.status==='CRITICO').length;
+    anormais = s360res.filter(r=>r.status==='ANORMAL').length;
+    atencao  = s360res.filter(r=>r.status==='ATENCAO').length;
+    normais  = s360res.filter(r=>r.status==='NORMAL').length;
+  }
   const total = OIL_MOTORES.length;
   const avgRul = Math.round(OIL_MOTORES.reduce((s,m)=>s+m.rul,0)/total);
   const custoEvitado = 285000;
@@ -1401,7 +1409,41 @@ function buildOilLista(status){
 }
 
 // ── TODOS OS MOTORES ──
+function buildOilMotoresReais(equips){
+  var s360res = getS360Resultados();
+  var syncAt = localStorage.getItem('s360_sync_at');
+  var html = '<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">';
+  html += '<div><div class="ctitle">🚜 Equipamentos S360 — Dados Reais</div>';
+  html += '<div style="font-size:11px;color:var(--muted2)">Sincronizado: '+(syncAt?new Date(syncAt).toLocaleString('pt-BR'):'—')+' · '+equips.length+' equipamentos</div></div>';
+  html += '<button class="btn btn-b btn-sm" onclick="s360SincronizarTudo()">↺ Atualizar</button></div>';
+  html += '<div style="display:flex;flex-direction:column;gap:8px">';
+  equips.forEach(function(eq){
+    // Buscar último resultado deste equipamento
+    var res = s360res.filter(function(r){ return r.idEquipamento===eq.id; });
+    var ultimo = res.sort(function(a,b){ return new Date(b.data)-new Date(a.data); })[0];
+    var status = ultimo ? ultimo.status : 'SEM_DADO';
+    var color = S360.statusColor(status);
+    var ico = S360.statusIco(status);
+    html += '<div style="background:var(--s2);border:1px solid '+color+'44;border-left:3px solid '+color+';border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+    html += '<div style="font-size:22px">'+ico+'</div>';
+    html += '<div style="flex:1;min-width:150px">';
+    html += '<div style="font-weight:600;font-size:13.5px">'+esc(eq.modelo||eq.tagFrota)+'</div>';
+    html += '<div style="font-size:11px;color:var(--muted2)">'+esc(eq.tagFrota)+' · '+esc(eq.chassiSerie)+'</div>';
+    html += '<div style="font-size:11px;color:var(--muted2)">'+esc(eq.setor||eq.area||'')+(eq.obra?(' · '+esc(eq.obra.nome)):'')+'</div>';
+    html += '<div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">';
+    html += '<span style="background:'+color+'15;color:'+color+';border:1px solid '+color+'33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">'+status.replace('_',' ')+'</span>';
+    html += '<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted2)">'+res.length+' análise(s)</span>';
+    if(ultimo) html += '<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted2)">'+new Date(ultimo.data).toLocaleDateString('pt-BR')+'</span>';
+    html += '</div></div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
 function buildOilMotores(){
+  const s360equips = getS360Equipamentos();
+  if(s360equips.length > 0) return buildOilMotoresReais(s360equips);
   return`
   <div class="card">
     <div class="ctitle">🚜 Todos os Motores Monitorados</div>
@@ -2119,38 +2161,177 @@ function toggleOilPasso(planoId, passoId){
 }
 
 // ── CONFIG ──
+// ═══════ S360 API ═══════
+const S360={
+  BASE:'https://api.s360web.com',
+  _key:'oil_s360_cfg',
+  getCfg(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch(e){return{}}},
+  saveCfg(c){localStorage.setItem(this._key,JSON.stringify(c))},
+  getToken(){return this.getCfg().access_token||null},
+  isConfigured(){return!!this.getToken()},
+  async login(username,password){
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    if(!r.ok)throw new Error('Login falhou: '+r.status);
+    const d=await r.json();
+    if(!d.access_token)throw new Error('Token não retornado');
+    this.saveCfg({...d,username,saved_at:Date.now()});
+    return d;
+  },
+  async authHeaders(){
+    const cfg=this.getCfg();
+    if(!cfg.access_token)throw new Error('Não autenticado — configure em Análise de Óleo → Configurações');
+    return{'Content-Type':'application/json','Authorization':'Bearer '+cfg.access_token};
+  },
+  async getEquipamentos(filtro){
+    const h=await this.authHeaders();
+    const r=await fetch('/api/equipamentos',{method:'POST',headers:h,body:JSON.stringify({ativo:true,maximoPorPagina:100,numeroPagina:1,...filtro})});
+    if(!r.ok)throw new Error('Equipamentos: '+r.status);
+    return r.json();
+  },
+  async getResultados(filtro){
+    const h=await this.authHeaders();
+    const hoje=new Date().toISOString().slice(0,10);
+    const d30=new Date(Date.now()-30*24*60*60*1000).toISOString().slice(0,10);
+    const r=await fetch('/api/resultados',{method:'POST',headers:h,body:JSON.stringify({statusLeitura:'TODOS',maximoPorPagina:50,numeroPagina:1,dataDe:d30,dataAte:hoje,...filtro})});
+    if(!r.ok)throw new Error('Resultados: '+r.status);
+    return r.json();
+  },
+  statusColor(s){return{NORMAL:'#22c55e',ATENCAO:'#f59e0b',ANORMAL:'#f87171',CRITICO:'#ef4444',COLETADA:'#3b82f6',SEGREGADA:'#a855f7'}[s]||'#888';},
+  statusIco(s){return{NORMAL:'✅',ATENCAO:'⚡',ANORMAL:'⚠️',CRITICO:'🛑',COLETADA:'🧪',SEGREGADA:'🔬'}[s]||'•';}
+};
+
+function getS360Equipamentos(){try{return JSON.parse(localStorage.getItem('s360_equipamentos')||'[]')}catch(e){return[]}}
+function getS360Resultados(){try{return JSON.parse(localStorage.getItem('s360_resultados')||'[]')}catch(e){return[]}}
+function hasS360Data(){return getS360Equipamentos().length>0}
+
 function buildOilConfig(){
-  return`
-  <div class="card">
-    <div class="ctitle">⚙️ Configuração da API S360</div>
-    <p style="font-size:12.5px;color:var(--muted2);margin-bottom:20px">Configure o token de acesso para integrar com a plataforma ALS S360 e substituir os dados demonstrativos por dados reais.</p>
-    <div class="frow c2">
-      <div class="fgroup"><label class="flbl">URL Base</label><input class="finput" type="text" value="https://s360web.com/mobile"/></div>
-      <div class="fgroup"><label class="flbl">Versão</label><input class="finput" type="text" value="v3"/></div>
-    </div>
-    <div class="fgroup" style="margin-top:12px">
-      <label class="flbl">Token de Autenticação (Bearer)</label>
-      <input class="finput" type="password" placeholder="Cole aqui o token da ALS S360"/>
-    </div>
-    <div class="frow c2" style="margin-top:12px">
-      <div class="fgroup"><label class="flbl">E-mail S360</label><input class="finput" type="email" value="Pcmals@nadiana.com.br"/></div>
-      <div class="fgroup"><label class="flbl">IDs dos Clientes</label><input class="finput" type="text" value="8346, 9939, 9940"/></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-g" onclick="toast('Configurações salvas!','ok')">💾 Salvar</button>
-      <button class="btn btn-gh" onclick="toast('Testando...','info')">🔌 Testar Conexão</button>
-    </div>
-    <div style="margin-top:20px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Como obter o token</div>
-      <ol style="font-size:12.5px;color:var(--muted2);line-height:2;padding-left:18px">
-        <li>Portal S360 → Configurações → Integrações → Parâmetro Integração Sistema</li>
-        <li>Copie o token e cole acima</li>
-        <li>Clique em "Testar Conexão" para validar</li>
-        <li>Após validação, os dados reais substituirão os demonstrativos</li>
-      </ol>
-    </div>
-  </div>`;
+  var cfg=S360.getCfg();
+  var ok=!!cfg.access_token;
+  var syncAt=localStorage.getItem('s360_sync_at');
+  var html='<div class="card" style="margin-bottom:16px">';
+  html+='<div class="ctitle">⚙️ Configuração da API S360 · ALS</div>';
+  html+='<p style="font-size:12.5px;color:var(--muted2);margin:6px 0 16px">Autenticação JWT. Após login os dados reais substituem os demonstrativos.</p>';
+  html+='<div style="background:'+(ok?'#22c55e15':'#ef444415')+';border:1px solid '+(ok?'#22c55e33':'#ef444433')+';border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">';
+  html+='<div style="font-size:28px">'+(ok?'🟢':'🔴')+'</div>';
+  html+='<div><div style="font-weight:700;font-size:13px;color:'+(ok?'#4ade80':'#fca5a5')+'">'+(ok?'CONECTADO À API S360':'NÃO AUTENTICADO')+'</div>';
+  if(ok){
+    html+='<div style="font-size:11px;color:var(--muted2)">Usuário: '+esc(cfg.username||'')+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted2)">Login: '+(cfg.saved_at?new Date(cfg.saved_at).toLocaleString('pt-BR'):'—')+'</div>';
+    if(syncAt)html+='<div style="font-size:11px;color:var(--muted2)">Última sync: '+new Date(syncAt).toLocaleString('pt-BR')+'</div>';
+  }else{
+    html+='<div style="font-size:11px;color:var(--muted2)">Digite a senha abaixo para conectar</div>';
+  }
+  html+='</div></div>';
+  html+='<div class="frow c2">';
+  html+='<div class="fgroup"><label class="flbl">Usuário S360</label><input class="finput" id="s360-user" type="email" value="apialsnadiana@nadiana.com.br"/></div>';
+  html+='<div class="fgroup"><label class="flbl">Senha</label><input class="finput" id="s360-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>';
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">';
+  html+='<button class="btn btn-g" onclick="s360Login()">🔐 '+(ok?'Reconectar':'Conectar à API S360')+'</button>';
+  if(ok){
+    html+='<button class="btn btn-b" onclick="s360SincronizarTudo()">↺ Sincronizar Dados</button>';
+    html+='<button class="btn btn-gh" onclick="s360Logout()">🚪 Desconectar</button>';
+  }
+  html+='</div></div>';
+  if(ok){
+    var equips=getS360Equipamentos();
+    var results=getS360Resultados();
+    html+='<div class="card"><div class="ctitle">📊 Dados Carregados</div>';
+    html+='<div id="s360-sync-status" style="margin-top:10px">';
+    if(equips.length||results.length){
+      html+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">';
+      html+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#14b8a6">'+equips.length+'</div><div style="font-size:11px;color:var(--muted2)">Equipamentos</div></div>';
+      html+='<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--gold)">'+results.length+'</div><div style="font-size:11px;color:var(--muted2)">Resultados</div></div>';
+      var criticos=results.filter(function(r){return r.status==='CRITICO';}).length;
+      var anormais=results.filter(function(r){return r.status==='ANORMAL';}).length;
+      if(criticos)html+='<div style="background:#ef444415;border:1px solid #ef444433;border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">'+criticos+'</div><div style="font-size:11px;color:var(--muted2)">Críticos</div></div>';
+      if(anormais)html+='<div style="background:#f8717115;border:1px solid #f8717133;border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f87171">'+anormais+'</div><div style="font-size:11px;color:var(--muted2)">Anormais</div></div>';
+      html+='</div>';
+      html+='<button class="btn btn-b btn-sm" data-oa="go-motores">→ Ver Equipamentos</button>';
+    }else{
+      html+='<div style="color:var(--muted2);font-size:13px">Nenhum dado carregado. Clique em "Sincronizar Dados".</div>';
+    }
+    html+='</div></div>';
+  }
+  return html;
 }
+
+async function s360Login(){
+  var user=document.getElementById('s360-user')?.value?.trim();
+  var pass=document.getElementById('s360-pass')?.value;
+  if(!user||!pass){toast('Preencha usuário e senha.','warn');return;}
+  var btn=document.querySelector('button[onclick="s360Login()"]');
+  if(btn){btn.disabled=true;btn.textContent='🔄 Conectando...';}
+  try{
+    await S360.login(user,pass);
+    toast('✓ Conectado à API S360!','ok');
+    APP.oilPage='config';render();
+  }catch(e){
+    toast('Erro: '+e.message,'err');
+    if(btn){btn.disabled=false;btn.textContent='🔐 Conectar à API S360';}
+  }
+}
+
+function s360Logout(){
+  localStorage.removeItem('oil_s360_cfg');
+  localStorage.removeItem('s360_equipamentos');
+  localStorage.removeItem('s360_resultados');
+  localStorage.removeItem('s360_sync_at');
+  toast('Desconectado da API S360.','warn');
+  APP.oilPage='config';render();
+}
+
+async function s360SincronizarTudo(){
+  var el=document.getElementById('s360-sync-status');
+  var spin='<div style="display:flex;align-items:center;gap:8px;color:var(--muted2);font-size:13px"><div style="width:16px;height:16px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>';
+  if(el)el.innerHTML=spin+'Buscando equipamentos...</div>';
+  try{
+    var eqData=await S360.getEquipamentos({ativo:true});
+    var equips=eqData.resultados||[];
+    localStorage.setItem('s360_equipamentos',JSON.stringify(equips));
+    if(el)el.innerHTML=spin+'Buscando resultados ('+equips.length+' equip. carregados)...</div>';
+    var resData=await S360.getResultados({statusLeitura:'TODOS',maximoPorPagina:50});
+    var resultados=resData.resultados||[];
+    localStorage.setItem('s360_resultados',JSON.stringify(resultados));
+    localStorage.setItem('s360_sync_at',new Date().toISOString());
+    toast('Sincronizado! '+equips.length+' equip. · '+resultados.length+' resultados','ok');
+    APP.oilPage='config';render();
+  }catch(e){
+    if(el)el.innerHTML='<div style="color:#fca5a5">✕ Erro: '+e.message+'</div>';
+    toast('Erro: '+e.message,'err');
+  }
+}
+
+function buildOilMotoresReais(equips){
+  var s360res=getS360Resultados();
+  var syncAt=localStorage.getItem('s360_sync_at');
+  var html='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">';
+  html+='<div><div class="ctitle">🚜 Equipamentos S360 — Dados Reais</div>';
+  html+='<div style="font-size:11px;color:var(--muted2)">Sync: '+(syncAt?new Date(syncAt).toLocaleString('pt-BR'):'—')+' · '+equips.length+' equip.</div></div>';
+  html+='<button class="btn btn-b btn-sm" onclick="s360SincronizarTudo()">↺ Atualizar</button></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:8px">';
+  equips.forEach(function(eq){
+    var res=s360res.filter(function(r){return r.idEquipamento===eq.id;});
+    var ultimo=res.sort(function(a,b){return new Date(b.data)-new Date(a.data);})[0];
+    var status=ultimo?ultimo.status:'SEM_DADO';
+    var color=S360.statusColor(status);
+    var ico=S360.statusIco(status);
+    html+='<div style="background:var(--s2);border:1px solid '+color+'44;border-left:3px solid '+color+';border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+    html+='<div style="font-size:22px">'+ico+'</div>';
+    html+='<div style="flex:1;min-width:150px">';
+    html+='<div style="font-weight:600;font-size:13.5px">'+esc(eq.modelo||eq.tagFrota||'')+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted2)">'+esc(eq.tagFrota||'')+' · '+esc(eq.chassiSerie||'')+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted2)">'+(eq.setor?esc(eq.setor):'')+(eq.obra?(' · '+esc(eq.obra.nome)):'')+'</div>';
+    html+='<div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">';
+    html+='<span style="background:'+color+'15;color:'+color+';border:1px solid '+color+'33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">'+status.replace('_',' ')+'</span>';
+    html+='<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted2)">'+res.length+' análise(s)</span>';
+    if(ultimo)html+='<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted2)">'+new Date(ultimo.data).toLocaleDateString('pt-BR')+'</span>';
+    html+='</div></div></div>';
+  });
+  html+='</div></div>';
+  return html;
+}
+
 
 // ═══════ SELEÇÃO DE UNIDADE ═══════
 function buildUnidadeSelect(){
