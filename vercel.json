@@ -1,9 +1,10 @@
 {
+  "functions": {
+    "api/s360/[...path].js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
-    {
-      "source": "/api/s360/:path*",
-      "destination": "/api/s360/:path*"
-    },
     {
       "source": "/",
       "destination": "/index.html"
