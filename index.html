@@ -2210,7 +2210,7 @@ const S360={
   async login(username,password){
     if(!username||!password)throw new Error('Usuário e senha são obrigatórios');
     
-    const data=await this._req(this.base()+'/api/login',{
+    const data=await this._req(this.base()+'/login',{
       method:'POST',
       body:JSON.stringify({username,password})
     });
@@ -2234,7 +2234,7 @@ const S360={
 
   async getEquipamentos(filtro){
     const h=await this.authHeaders();
-    const data=await this._req(this.base()+'/api/v1/equipamento/list',{
+    const data=await this._req(this.base()+'/v1/equipamento/list',{
       method:'POST',
       headers:h,
       body:JSON.stringify({ativo:true,maximoPorPagina:100,numeroPagina:1,...(filtro||{})})
@@ -2247,7 +2247,7 @@ const S360={
     const h=await this.authHeaders();
     const hoje=new Date().toISOString().slice(0,10);
     const d30=new Date(Date.now()-30*24*60*60*1000).toISOString().slice(0,10);
-    const data=await this._req(this.base()+'/api/v3/resultadoAmostra/list',{
+    const data=await this._req(this.base()+'/v3/resultadoAmostra/list',{
       method:'POST',
       headers:h,
       body:JSON.stringify({statusLeitura:'TODOS',maximoPorPagina:50,numeroPagina:1,dataDe:d30,dataAte:hoje,...(filtro||{})})
@@ -2262,7 +2262,7 @@ const S360={
   // Teste de conectividade
   async testConnection(){
     try{
-      const response=await fetch(this.base()+'/api/login',{
+      const response=await fetch(this.base()+'/login',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({username:'__test__',password:'__test__'})
