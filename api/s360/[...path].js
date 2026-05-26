@@ -2,19 +2,16 @@ const S360_ENVIRONMENTS = {
   producao: "https://api.s360web.com",
   teste: "https://integration.s360web.com",
 };
-
 const HOP_BY_HOP = new Set([
   "connection","keep-alive","proxy-authenticate","proxy-authorization",
   "te","trailers","transfer-encoding","upgrade","host","origin","referer","content-length",
 ]);
-
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With");
-
+  res.setHeader("Access-Control-Allow-Credentials", "false");
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
-
   const parts = (req.query.path || []);
   const env = S360_ENVIRONMENTS[parts[0]] ? parts[0] : "producao";
   const restParts = S360_ENVIRONMENTS[parts[0]] ? parts.slice(1) : parts;
@@ -22,13 +19,13 @@ module.exports = async function handler(req, res) {
   const baseUrl = S360_ENVIRONMENTS[env];
   const query = req.url.includes("?") ? "?" + req.url.split("?")[1] : "";
   const targetUrl = baseUrl + rest + query;
-
   const forwardHeaders = {};
   for (const [key, value] of Object.entries(req.headers)) {
     if (!HOP_BY_HOP.has(key.toLowerCase())) forwardHeaders[key] = value;
   }
   if (!forwardHeaders["accept"]) forwardHeaders["accept"] = "application/json, text/plain, */*";
-
+  // Remove credentials header para evitar problemas CORS
+  delete forwardHeaders["cookie"];
   const body = ["GET","HEAD","OPTIONS"].includes(req.method) ? undefined : 
     await new Promise((resolve, reject) => {
       const chunks = [];
@@ -36,7 +33,6 @@ module.exports = async function handler(req, res) {
       req.on("end", () => resolve(Buffer.concat(chunks)));
       req.on("error", reject);
     });
-
   try {
     const upstream = await fetch(targetUrl, {
       method: req.method,
