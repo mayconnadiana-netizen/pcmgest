@@ -2182,8 +2182,6 @@ const S360={
     try{
       const response=await fetch(url,{
         ...options,
-        mode:'cors',
-        credentials:'include',
         headers:{
           'Content-Type':'application/json',
           ...(options.headers||{})
@@ -2202,11 +2200,8 @@ const S360={
     }catch(e){
       // Melhor diagnóstico de erro
       const msg=e.message||'';
-      if(msg.includes('Failed to fetch')){
-        throw new Error('Erro de conexão com a API S360. Verifique se as credenciais estão corretas e se a internet está conectada.');
-      }
-      if(msg.includes('NetworkError')||msg.includes('CORS')){
-        throw new Error('Erro de rede. Verifique sua conexão com a internet.');
+      if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('CORS')){
+        throw new Error('Erro de conexão. Verifique sua internet e tente novamente.');
       }
       throw e;
     }
@@ -2267,8 +2262,12 @@ const S360={
   // Teste de conectividade
   async testConnection(){
     try{
-      const response=await fetch(this.base()+'/api/login',{method:'OPTIONS',mode:'cors',credentials:'include'});
-      return response.ok;
+      const response=await fetch(this.base()+'/api/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username:'__test__',password:'__test__'})
+      });
+      return response.status!==502&&response.status!==0;
     }catch(e){
       console.error('[S360] Teste de conexão falhou:',e.message);
       return false;
