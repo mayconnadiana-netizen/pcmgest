@@ -14,7 +14,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") { res.status(204).end(); return; }
   const parts = (req.query.path || []);
   const env = S360_ENVIRONMENTS[parts[0]] ? parts[0] : "producao";
-  const restParts = S360_ENVIRONMENTS[parts[0]] ? parts.slice(1) : parts;
+  let restParts = S360_ENVIRONMENTS[parts[0]] ? parts.slice(1) : parts;
   const rest = restParts.length > 0 ? "/" + restParts.join("/") : "/";
   const baseUrl = S360_ENVIRONMENTS[env];
   const query = req.url.includes("?") ? "?" + req.url.split("?")[1] : "";
