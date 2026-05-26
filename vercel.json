@@ -1,12 +1,19 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/s360/:path*",
-      "destination": "/api/s360/:path*"
+      "src": "api/s360/[...path].js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/s360/(.*)",
+      "dest": "/api/s360/[...path].js"
     },
     {
-      "source": "/",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [
