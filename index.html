@@ -8,15 +8,16 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0c0f;--s1:#111417;--s2:#181c22;--s3:#1f242d;
-  --border:#252c38;--border2:#2e3848;
+  --bg:#e9ebef;--s1:#f7f8fa;--s2:#fbfcfd;--s3:#eef0f4;
+  --border:#d8dce4;--border2:#c2c8d3;
   --gold:#e8a000;--gold2:#fbbf24;--goldl:#e8a00022;
   --blue:#3b82f6;--bluel:#3b82f622;
   --green:#22c55e;--greenl:#22c55e22;
   --red:#ef4444;--redl:#ef444422;
   --amber:#f59e0b;--amberl:#f59e0b22;
   --purple:#a855f7;--purplel:#a855f722;
-  --text:#dde3ef;--muted:#5a6478;--muted2:#8896af;
+  --text:#242a35;--muted:#767f8e;--muted2:#4d5665;
+  --goldt:#8a5a00;--bluet:#1d4ed8;--purplet:#7e22ce;--greent:#15803d;--redt:#b91c1c;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--disp:'Bebas Neue',cursive;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden;-webkit-text-size-adjust:100%}
@@ -66,20 +67,20 @@ td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#ffffff04}
 .bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;white-space:nowrap;border:1px solid}
-.bdg.ok{background:var(--greenl);color:#4ade80;border-color:#22c55e44}
+.bdg.ok{background:var(--greenl);color:#15803d;border-color:#22c55e44}
 .bdg.warn{background:var(--goldl);color:var(--gold2);border-color:#e8a00044}
-.bdg.err{background:var(--redl);color:#fca5a5;border-color:#ef444444}
-.bdg.info{background:var(--bluel);color:#93c5fd;border-color:#3b82f644}
-.bdg.amr{background:var(--amberl);color:#fcd34d;border-color:#f59e0b44}
+.bdg.err{background:var(--redl);color:#b91c1c;border-color:#ef444444}
+.bdg.info{background:var(--bluel);color:#1d4ed8;border-color:#3b82f644}
+.bdg.amr{background:var(--amberl);color:#92400e;border-color:#f59e0b44}
 .bdg.neu{background:var(--s3);color:var(--muted2);border-color:var(--border)}
-.bdg.pur{background:var(--purplel);color:#d8b4fe;border-color:#a855f744}
+.bdg.pur{background:var(--purplel);color:#7e22ce;border-color:#a855f744}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:none;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .13s;white-space:nowrap;font-family:var(--font);line-height:1}
 .btn:active{transform:scale(.97)}
 .btn-g{background:var(--gold);color:#000}.btn-g:hover{background:var(--gold2)}
 .btn-b{background:var(--blue);color:#fff}.btn-b:hover{filter:brightness(1.15)}
 .btn-p{background:var(--purple);color:#fff}.btn-p:hover{filter:brightness(1.15)}
 .btn-gh{background:var(--s3);border:1px solid var(--border);color:var(--muted2)}.btn-gh:hover{border-color:var(--border2);color:var(--text)}
-.btn-d{background:var(--redl);border:1px solid #ef444444;color:#fca5a5}.btn-d:hover{background:#ef444430}
+.btn-d{background:var(--redl);border:1px solid #ef444444;color:#b91c1c}.btn-d:hover{background:#ef444430}
 .btn-sm{padding:4px 9px;font-size:11.5px}
 .frow{display:grid;gap:11px;margin-bottom:11px}
 .c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:1fr 1fr 1fr 1fr}
@@ -90,7 +91,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 .fp input:focus,.fp select:focus{border-color:var(--purple);box-shadow:0 0 0 2px #a855f718}
 select option{background:var(--s1)}
 textarea{resize:vertical;min-height:60px}
-.herr{font-size:11px;color:#fca5a5;margin-top:2px}
+.herr{font-size:11px;color:#b91c1c;margin-top:2px}
 .overlay{position:fixed;inset:0;background:#000c;display:flex;align-items:center;justify-content:center;z-index:500;padding:20px}
 .modal{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:22px;width:min(600px,96vw);max-height:90vh;overflow-y:auto;animation:fu .18s}
 .mtitle{font-family:var(--disp);font-size:19px;letter-spacing:.5px;margin-bottom:16px;color:var(--gold)}
@@ -100,8 +101,8 @@ textarea{resize:vertical;min-height:60px}
 .stitle{font-family:var(--disp);font-size:16px;letter-spacing:.5px}
 .toast-wrap{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
 .toast{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 15px;font-size:12.5px;color:var(--text);display:flex;align-items:center;gap:7px;pointer-events:all;max-width:300px;animation:si .2s ease}
-.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red);color:#fca5a5}
-.toast.info{border-left:3px solid var(--blue);color:#93c5fd}.toast.warn{border-left:3px solid var(--amber);color:#fcd34d}
+.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red);color:#b91c1c}
+.toast.info{border-left:3px solid var(--blue);color:#1d4ed8}.toast.warn{border-left:3px solid var(--amber);color:#92400e}
 .toast-fade{opacity:0;transition:opacity .2s}
 .infobox{background:var(--s3);border:1px solid var(--border2);border-radius:7px;padding:12px 14px;margin-bottom:12px;font-size:12.5px}
 .empty{text-align:center;padding:36px 20px;color:var(--muted)}
@@ -128,8 +129,8 @@ textarea{resize:vertical;min-height:60px}
 .ctags{display:flex;flex-wrap:wrap;gap:5px}
 .ctag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid}
 .ctag.g{background:var(--goldl);color:var(--gold2);border-color:#e8a00044}
-.ctag.b{background:var(--bluel);color:#93c5fd;border-color:#3b82f644}
-.ctag.p{background:var(--purplel);color:#d8b4fe;border-color:#a855f744}
+.ctag.b{background:var(--bluel);color:#1d4ed8;border-color:#3b82f644}
+.ctag.p{background:var(--purplel);color:#7e22ce;border-color:#a855f744}
 /* BIBLIOTECA */
 .lib-wrap{display:flex;height:calc(100vh - 97px);overflow:hidden}
 .lib-tree{width:260px;min-width:260px;border-right:1px solid var(--border);overflow-y:auto;padding:12px 0;flex-shrink:0}
@@ -155,7 +156,7 @@ textarea{resize:vertical;min-height:60px}
 .drop-zone .dz-ico{font-size:28px;margin-bottom:7px}.drop-zone p{font-size:12.5px;color:var(--muted2)}
 .ctx-menu{position:fixed;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px;z-index:600;min-width:160px;box-shadow:0 8px 24px #0006;animation:fu .12s}
 .ctx-item{padding:7px 12px;font-size:12.5px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:7px;color:var(--text)}
-.ctx-item:hover{background:var(--s3)}.ctx-item.danger{color:#fca5a5}.ctx-item.danger:hover{background:var(--redl)}
+.ctx-item:hover{background:var(--s3)}.ctx-item.danger{color:#b91c1c}.ctx-item.danger:hover{background:var(--redl)}
 .ctx-sep{height:1px;background:var(--border);margin:4px 0}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -255,9 +256,9 @@ textarea{resize:vertical;min-height:60px}
 .login-btn{width:100%;padding:11px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.5px;transition:all .15s;margin-top:6px}
 .login-btn:hover{background:var(--gold2)}.login-btn:active{transform:scale(.98)}
 .login-btn.b{background:var(--blue);color:#fff}.login-btn.b:hover{filter:brightness(1.15)}
-.login-err{background:var(--redl);border:1px solid #ef444444;border-radius:7px;padding:9px 12px;font-size:12px;color:#fca5a5;margin-bottom:12px;display:none}
-.login-info{background:var(--bluel);border:1px solid #3b82f644;border-radius:7px;padding:9px 12px;font-size:12px;color:#93c5fd;margin-bottom:12px;display:none}
-.login-pending{text-align:center;padding:16px;background:var(--amberl);border:1px solid #f59e0b44;border-radius:10px;color:#fcd34d;font-size:13px}
+.login-err{background:var(--redl);border:1px solid #ef444444;border-radius:7px;padding:9px 12px;font-size:12px;color:#b91c1c;margin-bottom:12px;display:none}
+.login-info{background:var(--bluel);border:1px solid #3b82f644;border-radius:7px;padding:9px 12px;font-size:12px;color:#1d4ed8;margin-bottom:12px;display:none}
+.login-pending{text-align:center;padding:16px;background:var(--amberl);border:1px solid #f59e0b44;border-radius:10px;color:#92400e;font-size:13px}
 .login-pending .lp-ico{font-size:36px;margin-bottom:8px}
 /* ADMIN USERS */
 .user-row{display:flex;align-items:center;gap:12px;padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
@@ -296,15 +297,15 @@ textarea{resize:vertical;min-height:60px}
 /* STATUS DE CONEXÃO */
 .net-bar{position:fixed;top:0;left:0;right:0;z-index:9998;padding:7px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;transition:all .4s;pointer-events:none;opacity:0}
 .net-bar.show{opacity:1;pointer-events:all}
-.net-bar.offline{background:#1a0f00;border-bottom:1px solid #f59e0b55;color:#fcd34d}
-.net-bar.syncing{background:#0a1628;border-bottom:1px solid #3b82f655;color:#93c5fd}
-.net-bar.synced{background:#0a1a0f;border-bottom:1px solid #22c55e55;color:#4ade80}
+.net-bar.offline{background:#fdf4e7;border-bottom:1px solid #f59e0b55;color:#92400e}
+.net-bar.syncing{background:#eaf1fb;border-bottom:1px solid #3b82f655;color:#1d4ed8}
+.net-bar.synced{background:#eaf6ee;border-bottom:1px solid #22c55e55;color:#15803d}
 .net-bar-left{display:flex;align-items:center;gap:8px}
 .net-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .net-bar.offline .net-dot{background:#f59e0b;box-shadow:0 0 6px #f59e0b}
 .net-bar.syncing .net-dot{background:#3b82f6;box-shadow:0 0 6px #3b82f6;animation:pulse .8s infinite}
 .net-bar.synced .net-dot{background:#22c55e;box-shadow:0 0 6px #22c55e}
-.net-pending{background:#f59e0b22;border:1px solid #f59e0b44;border-radius:20px;padding:1px 9px;font-size:10px;color:#fcd34d}
+.net-pending{background:#f59e0b22;border:1px solid #f59e0b44;border-radius:20px;padding:1px 9px;font-size:10px;color:#92400e}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* IMPORTAÇÃO */
@@ -321,9 +322,9 @@ textarea{resize:vertical;min-height:60px}
 .import-row-err td{background:#ef444408}
 .import-stats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .import-stat{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600}
-.import-stat.ok{background:#22c55e15;color:#4ade80;border:1px solid #22c55e33}
-.import-stat.err{background:#ef444415;color:#fca5a5;border:1px solid #ef444433}
-.import-stat.info{background:var(--bluel);color:#93c5fd;border:1px solid #3b82f633}
+.import-stat.ok{background:#22c55e15;color:#15803d;border:1px solid #22c55e33}
+.import-stat.err{background:#ef444415;color:#b91c1c;border:1px solid #ef444433}
+.import-stat.info{background:var(--bluel);color:#1d4ed8;border:1px solid #3b82f633}
 
 /* ANÁLISE DE ÓLEO */
 .ccard.co:hover{border-color:#14b8a660;transform:translateY(-4px)}
@@ -353,10 +354,10 @@ textarea{resize:vertical;min-height:60px}
 
 /* ÓLEO MODULE */
 .oil-status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.oil-status-badge.normal{background:#22c55e15;color:#4ade80;border:1px solid #22c55e33}
-.oil-status-badge.atencao{background:#f59e0b15;color:#fcd34d;border:1px solid #f59e0b33}
-.oil-status-badge.anormal{background:#ef444415;color:#fca5a5;border:1px solid #ef444433}
-.oil-status-badge.critico{background:#ef444430;color:#ff6b6b;border:1px solid #ef444466;animation:pulse .8s infinite}
+.oil-status-badge.normal{background:#22c55e15;color:#15803d;border:1px solid #22c55e33}
+.oil-status-badge.atencao{background:#f59e0b15;color:#92400e;border:1px solid #f59e0b33}
+.oil-status-badge.anormal{background:#ef444415;color:#b91c1c;border:1px solid #ef444433}
+.oil-status-badge.critico{background:#ef444430;color:#991b1b;border:1px solid #ef444466;animation:pulse .8s infinite}
 .oil-gauge{width:100%;height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-top:6px}
 .oil-gauge-fill{height:100%;border-radius:4px;transition:width .5s}
 .oil-gauge-fill.normal{background:var(--green)}
@@ -374,6 +375,40 @@ textarea{resize:vertical;min-height:60px}
 .oil-coming-sub{font-size:13px;color:var(--muted2);max-width:400px;line-height:1.7}
 .oil-api-badge{display:inline-flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--muted2);margin-top:8px}
 .oil-api-dot{width:7px;height:7px;border-radius:50%;background:#14b8a6;box-shadow:0 0 6px #14b8a6}
+
+/* ═══ MEIO-TERMO CLARO ═══ */
+body{-webkit-font-smoothing:antialiased}
+tr:hover td{background:rgba(0,0,0,.03)}
+input,select,textarea,.login-field input{background:#fff}
+select option{background:#fff;color:var(--text)}
+.overlay{background:rgba(18,22,30,.5)}.confirm-overlay{background:rgba(18,22,30,.45)}
+.ctx-menu,.modal,.confirm-box{box-shadow:0 14px 40px rgba(24,30,42,.13)}
+.toast{box-shadow:0 6px 18px rgba(24,30,42,.11)}
+.card,.kpi,.user-row,.file-card,.oil-sample-card{box-shadow:0 1px 2px rgba(24,30,42,.05)}
+.cgrid,.login-grid{opacity:.45}.cglow,.login-glow{opacity:.6}
+.ctitle,.mtitle,.confirm-title{color:var(--goldt)}
+.ctitle.b,.mtitle.b{color:var(--bluet)}.ctitle.p,.mtitle.p{color:var(--purplet)}
+.ccard-name.g,.oil-card-name.g,.login-logo span,.ctit span{color:var(--goldt)}
+.ccard-name.b,.oil-card-name.b{color:var(--bluet)}.ccard-name.p,.oil-card-name.p{color:var(--purplet)}
+.tree-item.selected,.breadcrumb span:hover{color:var(--purplet)}
+.sb-bdg.g{color:var(--goldt)}.sb-bdg.b{color:var(--bluet)}.sb-bdg.p{color:var(--purplet)}
+.ctag.g,.unid-chip.on,.bdg.warn{color:var(--goldt)}
+.ctag.b{color:var(--bluet)}.ctag.p{color:var(--purplet)}
+.oil-coming-title,.oil-header-title span,.ccard-name.o,.ctag.o{color:#0f766e}
+.oil-status-badge.normal{color:var(--greent)}.oil-status-badge.atencao{color:#92400e}
+.oil-status-badge.anormal,.oil-status-badge.critico{color:var(--redt)}
+.import-stat.ok{color:var(--greent)}.import-stat.err{color:var(--redt)}.import-stat.info{color:var(--bluet)}
+.bdg.ok{color:var(--greent)}.bdg.err{color:var(--redt)}.bdg.info{color:var(--bluet)}
+.bdg.amr{color:#92400e}.bdg.pur{color:var(--purplet)}
+.toast.err{color:var(--redt)}.toast.info{color:var(--bluet)}.toast.warn{color:#92400e}
+.btn-d,.login-err,.herr,.ctx-item.danger{color:var(--redt)}
+.login-info{color:var(--bluet)}.login-pending{color:#92400e}
+.user-av.pen{color:var(--muted2)}
+table{font-size:13.5px}th{font-size:11px;letter-spacing:.7px;color:var(--muted2)}td{padding:10px 11px}
+.klbl{font-size:11px;letter-spacing:.7px;color:var(--muted2)}.ksub{font-size:12px}
+label,.login-field label{font-size:11px;letter-spacing:.4px;color:var(--muted2)}
+.sb-sec{font-size:11px;letter-spacing:1.2px}.sb-item{font-size:13.5px}.tb-sub{font-size:12px}
+.sb-item.act{background:#e8a00018}.sb-item.act-b{background:#3b82f614}.sb-item.act-p{background:#a855f714}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -862,7 +897,7 @@ function renderImportPreview(type, s){
     <tr class="${r.err?'import-row-err':'import-row-ok'}">
       <td>${i+1}</td>
       ${r.row.slice(0,s.headers.length).map(c=>`<td>${esc(String(c??''))}</td>`).join('')}
-      <td>${r.err?`<span style="color:#fca5a5">✕ ${esc(r.err)}</span>`:'<span style="color:#4ade80">✓</span>'}</td>
+      <td>${r.err?`<span style="color:#b91c1c">✕ ${esc(r.err)}</span>`:'<span style="color:#15803d">✓</span>'}</td>
     </tr>`).join('')+'</tbody>';
   document.getElementById('import-table').innerHTML = thead+tbody;
   if(!valid.length) document.getElementById('import-confirm-btn').disabled=true;
@@ -1275,10 +1310,10 @@ function buildOilShell(){
 }
 
 // ── STATUS HELPERS ──
-function oilStatusColor(s){ return {critico:'#ef4444',anormal:'#f87171',atencao:'#f59e0b',normal:'#22c55e'}[s]||'#888'; }
+function oilStatusColor(s){ return {critico:'#ef4444',anormal:'#dc2626',atencao:'#f59e0b',normal:'#22c55e'}[s]||'#888'; }
 function oilStatusLabel(s){ return {critico:'CRÍTICO',anormal:'ANORMAL',atencao:'ATENÇÃO',normal:'NORMAL'}[s]||s; }
 function oilStatusIco(s)  { return {critico:'🛑',anormal:'⚠️',atencao:'⚡',normal:'✅'}[s]||'•'; }
-function oilRulColor(v)   { return v<=20?'#ef4444':v<=40?'#f87171':v<=60?'#f59e0b':'#22c55e'; }
+function oilRulColor(v)   { return v<=20?'#ef4444':v<=40?'#dc2626':v<=60?'#f59e0b':'#22c55e'; }
 
 function oilParamStatus(val, lim){
   if(val > lim[1]*1.5 || val < lim[0]*0.5) return 'critico';
@@ -1305,7 +1340,7 @@ function buildOilDash(criticos,anormais,atencao,normais){
   return`
   <div class="kgrid k4">
     <div class="kpi"><div class="kbar" style="background:#ef4444"></div><div class="klbl">Críticos</div><div class="kval" style="color:#ef4444">${criticos}</div><div class="ksub">Ação imediata</div></div>
-    <div class="kpi"><div class="kbar" style="background:#f87171"></div><div class="klbl">Anormais</div><div class="kval" style="color:#f87171">${anormais}</div><div class="ksub">Monitorar</div></div>
+    <div class="kpi"><div class="kbar" style="background:#dc2626"></div><div class="klbl">Anormais</div><div class="kval" style="color:#dc2626">${anormais}</div><div class="ksub">Monitorar</div></div>
     <div class="kpi"><div class="kbar" style="background:#f59e0b"></div><div class="klbl">Atenção</div><div class="kval" style="color:#f59e0b">${atencao}</div><div class="ksub">Verificar</div></div>
     <div class="kpi"><div class="kbar" style="background:#22c55e"></div><div class="klbl">Normais</div><div class="kval" style="color:#22c55e">${normais}</div><div class="ksub">OK</div></div>
   </div>
@@ -1488,7 +1523,7 @@ function buildOilMaquinasRel(){
     html += '<span class="oil-status-badge '+m.status+'">'+oilStatusLabel(m.status)+'</span>';
     html += '<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:'+oilRulColor(m.rul)+'">RUL '+m.rul+'%</span>';
     html += '<span style="background:var(--s3);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:10px;color:var(--muted2)">'+m.ultimaAnalise+'</span>';
-    if(pend>0) html += '<span style="background:#f59e0b15;color:#fcd34d;border:1px solid #f59e0b33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">'+pend+' plano(s)</span>';
+    if(pend>0) html += '<span style="background:#f59e0b15;color:#92400e;border:1px solid #f59e0b33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">'+pend+' plano(s)</span>';
     html += '</div></div>';
     html += '<button onclick="APP.oilPage=\'rel_'+m.id+'\';render()" style="background:'+color+';color:#000;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">📋 Ver Relatório & Plano</button>';
     html += '</div>';
@@ -1746,7 +1781,7 @@ function buildOilMotorDetalhe(id){
           <div style="font-size:11px;color:var(--muted2);margin-top:2px">👤 ${esc(p.responsavel)} · 📅 ${p.prazo}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          <span style="background:${{pendente:'#f59e0b15',execucao:'#3b82f615',concluido:'#22c55e15'}[p.status]};color:${{pendente:'#fcd34d',execucao:'#93c5fd',concluido:'#4ade80'}[p.status]};border:1px solid ${{pendente:'#f59e0b33',execucao:'#3b82f633',concluido:'#22c55e33'}[p.status]};border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">
+          <span style="background:${{pendente:'#f59e0b15',execucao:'#3b82f615',concluido:'#22c55e15'}[p.status]};color:${{pendente:'#92400e',execucao:'#1d4ed8',concluido:'#15803d'}[p.status]};border:1px solid ${{pendente:'#f59e0b33',execucao:'#3b82f633',concluido:'#22c55e33'}[p.status]};border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">
             ${{pendente:'⏳ Pendente',execucao:'🔄 Em Execução',concluido:'✅ Concluído'}[p.status]}
           </span>
           ${p.status!=='concluido'?`<button class="btn btn-g btn-sm" onclick="updateOilPlanoStatus('${p.id}','${p.status==='pendente'?'execucao':'concluido'}')">
@@ -2063,7 +2098,7 @@ Seja específico, técnico e objetivo. Use dados concretos do laudo.`;
         ${formatted}
       </div>`;
   }catch(e){
-    out.innerHTML=`<div style="padding:20px;text-align:center;color:#fca5a5">Erro ao conectar com a IA. Verifique sua conexão.</div>`;
+    out.innerHTML=`<div style="padding:20px;text-align:center;color:#b91c1c">Erro ao conectar com a IA. Verifique sua conexão.</div>`;
   }
 }
 
@@ -2256,7 +2291,7 @@ const S360={
     return data;
   },
 
-  statusColor(s){return{NORMAL:'#22c55e',ATENCAO:'#f59e0b',ANORMAL:'#f87171',CRITICO:'#ef4444',COLETADA:'#3b82f6',SEGREGADA:'#a855f7'}[s]||'#888';},
+  statusColor(s){return{NORMAL:'#22c55e',ATENCAO:'#f59e0b',ANORMAL:'#dc2626',CRITICO:'#ef4444',COLETADA:'#3b82f6',SEGREGADA:'#a855f7'}[s]||'#888';},
   statusIco(s){return{NORMAL:'✅',ATENCAO:'⚡',ANORMAL:'⚠️',CRITICO:'🛑',COLETADA:'🧪',SEGREGADA:'🔬'}[s]||'•';},
   
   // Teste de conectividade
@@ -2286,11 +2321,11 @@ function buildOilConfig(){
   var envInfo=S360.getEnvInfo();
   var syncAt=localStorage.getItem('s360_sync_at');
   var html='<div class="card" style="margin-bottom:16px">';
-  html+='<div class="ctitle">⚙️ Configuração da API S360 · ALS <span style="font-size:10px;color:#93c5fd;margin-left:8px">VERSÃO TESTE/PRODUÇÃO</span></div>';
+  html+='<div class="ctitle">⚙️ Configuração da API S360 · ALS <span style="font-size:10px;color:#1d4ed8;margin-left:8px">VERSÃO TESTE/PRODUÇÃO</span></div>';
   html+='<p style="font-size:12.5px;color:var(--muted2);margin:6px 0 16px">Autenticação JWT. Após login os dados reais substituem os demonstrativos.</p>';
   html+='<div style="background:'+(ok?'#22c55e15':'#ef444415')+';border:1px solid '+(ok?'#22c55e33':'#ef444433')+';border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">';
   html+='<div style="font-size:28px">'+(ok?'🟢':'🔴')+'</div>';
-  html+='<div><div style="font-weight:700;font-size:13px;color:'+(ok?'#4ade80':'#fca5a5')+'">'+( ok?'CONECTADO À API S360':'NÃO AUTENTICADO')+'</div>';
+  html+='<div><div style="font-weight:700;font-size:13px;color:'+(ok?'#15803d':'#b91c1c')+'">'+( ok?'CONECTADO À API S360':'NÃO AUTENTICADO')+'</div>';
   if(ok){
     html+='<div style="font-size:11px;color:var(--muted2)">Usuário: '+esc(cfg.username||'')+'</div>';
     html+='<div style="font-size:11px;color:var(--muted2)">Ambiente: '+esc(envInfo.label)+' — '+esc(envInfo.host)+'</div>';
@@ -2320,7 +2355,7 @@ function buildOilConfig(){
   html+='<div id="s360-conn-status"></div>';
   if(!ok){
     html+='<div style="margin-top:12px;background:#3b82f615;border:1px solid #3b82f633;border-radius:8px;padding:10px 14px">';
-    html+='<div style="font-size:11px;font-weight:700;color:#93c5fd;margin-bottom:4px">ℹ️ Como funciona a conexão</div>';
+    html+='<div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:4px">ℹ️ Como funciona a conexão</div>';
     html+='<div style="font-size:11px;color:var(--muted2);line-height:1.6">';
     
     
@@ -2342,7 +2377,7 @@ function buildOilConfig(){
       var criticos=results.filter(function(r){return r.status==='CRITICO';}).length;
       var anormais=results.filter(function(r){return r.status==='ANORMAL';}).length;
       if(criticos)html+='<div style="background:#ef444415;border:1px solid #ef444433;border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">'+criticos+'</div><div style="font-size:11px;color:var(--muted2)">Críticos</div></div>';
-      if(anormais)html+='<div style="background:#f8717115;border:1px solid #f8717133;border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f87171">'+anormais+'</div><div style="font-size:11px;color:var(--muted2)">Anormais</div></div>';
+      if(anormais)html+='<div style="background:#dc262615;border:1px solid #dc262633;border-radius:8px;padding:12px 18px;text-align:center"><div style="font-size:22px;font-weight:700;color:#dc2626">'+anormais+'</div><div style="font-size:11px;color:var(--muted2)">Anormais</div></div>';
       html+='</div>';
       html+='<button class="btn btn-b btn-sm" data-oa="go-motores">→ Ver Equipamentos</button>';
     }else{
@@ -2442,7 +2477,7 @@ async function s360SincronizarTudo(){
     toast('Sincronizado! '+equips.length+' equip. · '+resultados.length+' resultados','ok');
     APP.oilPage='config';render();
   }catch(e){
-    if(el)el.innerHTML='<div style="color:#fca5a5">✕ Erro: '+e.message+'</div>';
+    if(el)el.innerHTML='<div style="color:#b91c1c">✕ Erro: '+e.message+'</div>';
     toast('Erro: '+e.message,'err');
   }
 }
@@ -3670,7 +3705,7 @@ const OIL_FALHAS = [
 function buildOilAnalyseFalha(){
   return '<div class="card" style="margin-bottom:16px"><div class="ctitle">🔍 Análise de Falha com Literatura Técnica</div><p style="font-size:12.5px;color:var(--muted2);margin-top:4px;margin-bottom:16px">Diagnóstico técnico baseado em normas ISO/ASTM e literatura científica especializada.</p>' +
   OIL_FALHAS.map(function(f){
-    var sc = {critico:'#ef4444',anormal:'#f87171',atencao:'#f59e0b',normal:'#22c55e'}[f.severidade]||'#888';
+    var sc = {critico:'#ef4444',anormal:'#dc2626',atencao:'#f59e0b',normal:'#22c55e'}[f.severidade]||'#888';
     return '<div style="background:var(--s2);border:1px solid '+sc+'33;border-left:4px solid '+sc+';border-radius:10px;padding:18px;margin-bottom:14px">' +
       '<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">' +
         '<div>' +
@@ -3778,7 +3813,7 @@ function buildOilCausaRaiz(){
 function buildOilPareto(){
   var dados = [
     {causa:'Intervalo troca óleo ultrapassado',ocorrencias:18,pct:32,acumulado:32,cor:'#ef4444'},
-    {causa:'Filtro ar danificado/vencido',ocorrencias:12,pct:21,acumulado:53,cor:'#f87171'},
+    {causa:'Filtro ar danificado/vencido',ocorrencias:12,pct:21,acumulado:53,cor:'#dc2626'},
     {causa:'Contaminação por silício',ocorrencias:9,pct:16,acumulado:69,cor:'#f59e0b'},
     {causa:'Superaquecimento do motor',ocorrencias:7,pct:12,acumulado:81,cor:'#fbbf24'},
     {causa:'Diluição por combustível',ocorrencias:5,pct:9,acumulado:90,cor:'#22c55e'},
@@ -3811,7 +3846,7 @@ function buildOilPareto(){
   html += '<thead><tr><th>#</th><th>Causa</th><th>Ocorrências</th><th>%</th><th>% Acumulado</th><th>Prioridade</th></tr></thead><tbody>';
   dados.forEach(function(d, i){
     var prior = d.acumulado <= 80 ? '<span style="background:#ef444415;color:#ef4444;border:1px solid #ef444433;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">ALTA</span>' :
-                d.acumulado <= 95 ? '<span style="background:#f59e0b15;color:#fcd34d;border:1px solid #f59e0b33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">MÉDIA</span>' :
+                d.acumulado <= 95 ? '<span style="background:#f59e0b15;color:#92400e;border:1px solid #f59e0b33;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">MÉDIA</span>' :
                 '<span style="background:#6b728015;color:#9ca3af;border:1px solid #6b728033;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700">BAIXA</span>';
     html += '<tr>';
     html += '<td style="font-weight:700;color:'+d.cor+'">'+(i+1)+'</td>';
@@ -3837,7 +3872,7 @@ function buildOilPareto(){
     {motor:'Trator Massey Ferguson',causa:'Monitoramento preventivo',occ:2,status:'normal'},
   ];
   motoresDados.forEach(function(m){
-    var sc = {critico:'#ef4444',anormal:'#f87171',atencao:'#f59e0b',normal:'#22c55e'}[m.status]||'#888';
+    var sc = {critico:'#ef4444',anormal:'#dc2626',atencao:'#f59e0b',normal:'#22c55e'}[m.status]||'#888';
     html += '<tr>';
     html += '<td><strong>'+m.motor+'</strong></td>';
     html += '<td style="color:var(--muted2)">'+m.causa+'</td>';
