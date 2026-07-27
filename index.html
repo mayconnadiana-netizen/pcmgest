@@ -109,10 +109,10 @@ textarea{resize:vertical;min-height:60px}
 .empty .ei{font-size:32px;margin-bottom:8px}.empty p{font-size:13px}
 .avatar{width:42px;height:42px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#000;flex-shrink:0;font-family:var(--disp)}
 /* COVER */
-.cover{height:100vh;max-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;position:relative;overflow:hidden}
+.cover{height:100vh;max-height:100vh;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 20px;position:relative;overflow-y:auto;overflow-x:hidden}
 .cgrid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:44px 44px;opacity:.18;pointer-events:none}
 .cglow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(#e8a00012,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%)}
-.cinner{position:relative;z-index:1;text-align:center;max-width:900px;width:100%;animation:fu .4s}
+.cinner{position:relative;z-index:1;text-align:center;max-width:900px;width:100%;margin-top:auto;margin-bottom:auto;animation:fu .4s}
 .ceye{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:4px;margin-bottom:14px;font-weight:600}
 .ctit{font-family:var(--disp);font-size:clamp(44px,7vw,80px);letter-spacing:2px;line-height:.92;margin-bottom:10px}
 .ctit span{color:var(--gold)}
@@ -483,8 +483,185 @@ label,.login-field label{font-size:11px;letter-spacing:.4px;color:var(--muted2)}
 .lub-mbox .ft{padding:13px 20px;display:flex;gap:9px;justify-content:flex-end;border-top:1px solid var(--border)}
 .lub-saveinfo{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .lub-saveinfo.ok{color:var(--greent)}
+/* ═══ MÓDULO PROGRAMAÇÃO DE OS ═══ */
+.prog-ctrl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.prog-ctrl .plbl{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+.prog-num{width:66px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:15px;font-weight:700;text-align:center;color:var(--text);font-family:var(--disp);letter-spacing:1px}
+.prog-num:focus{outline:none;border-color:var(--blue)}
+.prog-num.yr{width:80px}
+.prog-topo{display:flex;gap:14px;align-items:stretch;margin-bottom:14px;flex-wrap:wrap}
+.prog-week{background:var(--blue);color:#fff;border-radius:10px;padding:14px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:148px}
+.prog-week .pw-l{font-size:11px;letter-spacing:2px;opacity:.85;font-weight:600}
+.prog-week .pw-n{font-family:var(--disp);font-size:44px;line-height:1;letter-spacing:1px}
+.prog-cal{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;flex-shrink:0}
+.prog-cal-mes{background:var(--blue);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:5px 0;letter-spacing:1px}
+.pmc{border-collapse:collapse}
+.pmc th{color:var(--muted);font-size:9px;font-weight:700;padding:3px 6px;text-align:center;width:28px}
+.pmc td{text-align:center;font-size:10px;color:var(--muted2);padding:3px 5px;width:28px;height:22px;border:.5px solid var(--border);position:relative}
+.pmc td.sw{background:var(--bluel);color:var(--bluet);font-weight:700}
+.pmc td .pdot{display:block;width:4px;height:4px;border-radius:50%;background:var(--blue);margin:1px auto 0}
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px;margin-bottom:9px;align-items:start}
+.prog-day{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;min-width:0;min-height:118px;display:flex;flex-direction:column}
+.prog-day-hdr{background:var(--bluel);color:var(--bluet);font-size:12px;font-weight:700;padding:7px 11px;display:flex;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.prog-day-body{padding:8px;flex:1}
+.prog-empty{font-size:11px;color:var(--muted);text-align:center;padding:16px 0;font-style:italic}
+.prog-card{border:1px solid var(--border);border-radius:8px;margin-bottom:7px;overflow:hidden;background:var(--bg)}
+.prog-card-hdr{background:var(--s2);display:flex;align-items:center;justify-content:space-between;padding:5px 9px;gap:6px;border-bottom:1px solid var(--border)}
+.prog-card-lbl{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.prog-card-btns{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.prog-form{padding:8px 9px;display:none}
+.prog-form.open{display:block}
+.prog-form .pfi{width:100%;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-family:var(--font);background:var(--s2);color:var(--text);margin-bottom:5px}
+.prog-form .pfi:focus{outline:none;border-color:var(--blue)}
+.prog-form .pfi::placeholder{color:var(--muted)}
+.prog-view{padding:6px 9px;display:none;font-size:11px;line-height:1.7}
+.prog-view.show{display:block}
+.prog-view .pvl{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+.prog-view .pvv{color:var(--text);font-weight:700}
+.prog-view .pvs{color:var(--bluet);font-size:11px;font-weight:600;margin-top:2px}
+.prog-badd{background:transparent;border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0}
+.prog-badd:hover{background:var(--blue);color:#fff}
+.prog-bedit{background:transparent;border:1px solid var(--border);color:var(--muted2);border-radius:5px;font-size:10px;padding:2px 8px;cursor:pointer}
+.prog-bedit:hover{border-color:var(--blue);color:var(--blue)}
+.prog-bdel{background:transparent;border:none;color:#c0392b;cursor:pointer;font-size:14px;font-weight:700;padding:0 3px;line-height:1}
+.prog-bdel:hover{color:#a02318}
+.prog-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.prog-bar-lbl{font-size:12px;color:var(--muted2);min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-bar-track{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;height:14px;overflow:hidden}
+.prog-bar-fill{height:100%;background:var(--blue);border-radius:20px;min-width:2px}
+.prog-bar-fill.g{background:var(--gold)}
+.prog-bar-val{font-size:12px;font-weight:700;color:var(--text);min-width:24px;text-align:right}
+.prog-day-hdr>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ═══ MÓDULO QUADRO PCM (OFICINA) ═══ */
+/* acento vermelho/rosé */
+.ccard.cr:hover{border-color:#e11d4866;transform:translateY(-4px)}
+.ccard-name.r{color:#be123c}
+.ctag.r{background:#e11d4818;color:#be123c;border-color:#e11d4844}
+.sb-item.act-r{background:#e11d4814;color:#be123c;font-weight:600;box-shadow:inset 3px 0 0 #e11d48}
+.sb-cnt{margin-left:auto;background:#e11d48;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 8px;min-width:18px;text-align:center}
+
+/* inputs dos modais deste módulo */
+.ipt{width:100%;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;box-sizing:border-box}
+.ipt:focus{border-color:#e11d48}
+textarea.ipt{resize:vertical;min-height:44px}
+
+/* barra de ferramentas */
+.qd-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.qd-sel{padding:7px 9px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:var(--font);cursor:pointer}
+.qd-q{flex:1;min-width:160px;padding:7px 11px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
+.qd-q:focus{border-color:#e11d48}
+.qd-lbl{font-size:12px;color:var(--muted2);font-weight:600}
+
+/* colunas kanban */
+.qd-lanes{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+.qd-lane{flex:0 0 250px;background:var(--bg);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;max-height:calc(100vh - 220px)}
+.qd-lane.over{border-color:#e11d48;box-shadow:0 0 0 2px #e11d4833}
+.qd-lane-hd{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:12px;font-weight:700;color:var(--text);border-bottom:2px solid var(--border);border-radius:10px 10px 0 0}
+.qd-lane-ct{background:var(--muted);color:#fff;border-radius:20px;font-size:11px;padding:1px 8px;min-width:20px;text-align:center}
+.qd-lane-body{padding:8px;overflow-y:auto;flex:1;min-height:60px}
+.qd-empty{font-size:11px;color:var(--muted);text-align:center;padding:14px 0;font-style:italic}
+/* cores por status */
+.qdl-entrada .qd-lane-hd{border-bottom-color:#94a3b8;color:#475569}
+.qdl-entrada .qd-lane-ct{background:#64748b}
+.qdl-diagnostico .qd-lane-hd{border-bottom-color:#3b82f6;color:#1d4ed8}
+.qdl-diagnostico .qd-lane-ct{background:#3b82f6}
+.qdl-ag-pecas .qd-lane-hd{border-bottom-color:#f59e0b;color:#b45309}
+.qdl-ag-pecas .qd-lane-ct{background:#f59e0b}
+.qdl-em-reparo .qd-lane-hd{border-bottom-color:#e11d48;color:#be123c}
+.qdl-em-reparo .qd-lane-ct{background:#e11d48}
+.qdl-inspecao .qd-lane-hd{border-bottom-color:#a855f7;color:#7e22ce}
+.qdl-inspecao .qd-lane-ct{background:#a855f7}
+.qdl-pronto .qd-lane-hd{border-bottom-color:#22c55e;color:#15803d}
+.qdl-pronto .qd-lane-ct{background:#22c55e}
+
+/* cartão de máquina */
+.qd-card{position:relative;background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:8px;padding:9px 10px;margin-bottom:8px;cursor:grab}
+.qd-card:active{cursor:grabbing}
+.qd-card.urg{border-left-color:#e11d48}
+.qd-card.alt{border-left-color:#f59e0b}
+.qd-c-acts{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:.55}
+.qd-card:hover .qd-c-acts{opacity:1}
+.qd-ic{background:transparent;border:1px solid var(--border);border-radius:5px;font-size:11px;padding:1px 6px;cursor:pointer;color:var(--muted2);line-height:1.3}
+.qd-ic:hover{border-color:#e11d48;color:#e11d48}
+.qd-ic.rm:hover{border-color:#c0392b;color:#c0392b}
+.qd-c-hd{display:flex;gap:8px;align-items:flex-start;padding-right:46px;margin-bottom:5px}
+.qd-c-pat{font-family:var(--disp);font-size:15px;letter-spacing:.5px;color:var(--text);flex-shrink:0}
+.qd-c-info{min-width:0}
+.qd-c-desc{font-size:11px;font-weight:600;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qd-c-tag{font-size:10px;color:var(--muted)}
+.qd-c-grp{font-size:9.5px;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qd-c-pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+.qd-pill{font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:20px;white-space:nowrap}
+.qd-pill.fab{background:var(--bg);color:var(--muted2);border:1px solid var(--border)}
+.qd-pill.prio{background:#f59e0b1e;color:#b45309}
+.qd-pill.os{background:#22c55e1e;color:#15803d}
+.qd-pill.nos{background:#e11d481e;color:#be123c}
+.qd-c-mot{font-size:10.5px;color:#be123c;margin-bottom:3px}
+.qd-c-obs{font-size:10.5px;color:var(--muted2);margin-bottom:3px;line-height:1.3}
+.qd-c-ft{display:flex;justify-content:space-between;gap:6px;font-size:10px;color:var(--muted);border-top:1px dashed var(--border);padding-top:5px;margin-top:3px}
+
+/* modal adicionar */
+.qd-add-tabs{display:flex;gap:6px;margin-bottom:12px}
+.qd-tab{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer}
+.qd-tab.on{background:#e11d4814;border-color:#e11d48;color:#be123c}
+.qd-add-wrap{display:grid;grid-template-columns:180px 1fr;gap:10px;height:320px}
+.qd-glist{overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px}
+.qd-gi{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;font-size:11px;color:var(--muted2);cursor:pointer}
+.qd-gi:hover{background:var(--bg)}
+.qd-gi.on{background:#e11d4814;color:#be123c;font-weight:700}
+.qd-gc{background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:9px;padding:0 6px;color:var(--muted)}
+.qd-gi.on .qd-gc{background:#fff}
+.qd-mlist{overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:5px}
+.qd-mi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;border-bottom:1px solid var(--border)}
+.qd-mi:last-child{border-bottom:none}
+.qd-mi:hover{background:#e11d480d}
+.qd-mi.dim{opacity:.5;cursor:default}
+.qd-mi.dim:hover{background:transparent}
+.qd-mi-id{font-family:var(--disp);font-size:14px;color:var(--text)}
+.qd-mi-in{font-family:var(--font);font-size:9px;background:#22c55e1e;color:#15803d;border-radius:20px;padding:1px 6px;letter-spacing:0;vertical-align:middle}
+.qd-mi-desc{font-size:11px;color:var(--muted2);line-height:1.25}
+.qd-mi-grp{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.qd-mi-add{font-size:18px;color:#e11d48;font-weight:700;flex-shrink:0}
+@media(max-width:560px){.qd-add-wrap{grid-template-columns:1fr;height:auto}.qd-glist{max-height:120px}.qd-mlist{max-height:280px}}
+
+/* ═══ IMPRESSÃO — Relatório de Oficina ═══ */
+#quadro-print{display:none}
+@media print{
+  @page{size:A4;margin:10mm}
+  #root>.shell{display:none!important}
+  #net-bar,.net-bar{display:none!important}
+  #quadro-print.on{display:block!important}
+  body{overflow:visible!important;background:#fff!important}
+}
+.qp-doc{font-family:Arial,sans-serif;color:#1a1a1a;font-size:11px;padding:4px}
+.qp-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #2e5496;padding-bottom:8px;margin-bottom:10px}
+.qp-h1{font-size:13px;font-weight:800;color:#2e5496;letter-spacing:.5px}
+.qp-h2{font-size:16px;font-weight:800;color:#111}
+.qp-h3{font-size:9px;color:#555;margin-top:2px}
+.qp-meta{font-size:9px;color:#555;text-align:right;line-height:1.5}
+.qp-sum{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px}
+.qp-card{border:1px solid #cbd5e1;border-radius:6px;padding:6px 4px;text-align:center;background:#f8fafc}
+.qp-card.tot{background:#2e5496;color:#fff;border-color:#2e5496}
+.qp-card.ag{background:#fff7ed;border-color:#f59e0b}
+.qp-card.rep{background:#fef2f2;border-color:#e11d48}
+.qp-card.ok{background:#f0fdf4;border-color:#22c55e}
+.qp-n{font-size:20px;font-weight:800;line-height:1}
+.qp-l{font-size:8px;text-transform:uppercase;letter-spacing:.3px;margin-top:3px}
+.qp-sec{margin-bottom:12px;break-inside:avoid}
+.qp-sec-t{background:#2e5496;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:4px 4px 0 0}
+.qp-tbl{width:100%;border-collapse:collapse;font-size:9px}
+.qp-tbl th{background:#e2e8f0;text-align:left;padding:4px 5px;border:1px solid #cbd5e1;font-size:8px;text-transform:uppercase;letter-spacing:.3px}
+.qp-tbl td{padding:4px 5px;border:1px solid #e2e8f0;vertical-align:top}
+.qp-tbl tr:nth-child(even) td{background:#f8fafc}
+.qp-ass{display:flex;gap:40px;margin-top:26px;justify-content:space-around}
+.qp-ass-b{flex:1;max-width:280px}
+.qp-ass-l{border-top:1px solid #333;padding-top:4px;text-align:center;font-size:9px;color:#333;margin-top:34px}
+.qp-ft{display:flex;justify-content:space-between;font-size:8px;color:#888;border-top:1px solid #ddd;margin-top:18px;padding-top:5px}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div id="net-bar" class="net-bar"></div>
@@ -626,7 +803,7 @@ const FB={
 };
 
 // ═══════ LOCAL CACHE ═══════
-const KEYS={tools:'gi_tools',mechs:'gi_mechs',loans:'gi_loans',machines:'gi_machines',batteries:'gi_batteries',batHist:'gi_bathist',libTree:'gi_libtree',lubFrota:'gi_lubfrota',lubExec:'gi_lubexec'};
+const KEYS={tools:'gi_tools',mechs:'gi_mechs',loans:'gi_loans',machines:'gi_machines',batteries:'gi_batteries',batHist:'gi_bathist',libTree:'gi_libtree',lubFrota:'gi_lubfrota',lubExec:'gi_lubexec',progOS:'gi_progos',quadroBoard:'gi_quadroboard',quadroCat:'gi_quadrocat'};
 const LOCAL={
   get(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]')}catch(e){return[]}},
   set(k,v){try{localStorage.setItem(KEYS[k],JSON.stringify(v))}catch(e){}},
@@ -727,7 +904,7 @@ const DB={
     else { QUEUE.add({type:'delete', col:k, id}); NET.updateBar(); }
   },
   async syncAll(){
-    const tables=['tools','mechs','loans','machines','batteries','batHist','libTree','lubFrota','lubExec'];
+    const tables=['tools','mechs','loans','machines','batteries','batHist','libTree','lubFrota','lubExec','progOS','quadroBoard','quadroCat'];
     let total=0;
     // Primeiro envia fila pendente se estiver online
     if(NET.isOnline()) await NET.flushQueue();
@@ -736,9 +913,11 @@ const DB={
       if(docs.length>0){
         // Mescla: mantém registros locais que não vieram do Firebase (criados offline)
         const local=LOCAL.get(t);
+        const localById=new Map(local.map(l=>[l.id,l]));
         const fbIds=new Set(docs.map(d=>d.id));
         const onlyLocal=local.filter(l=>!fbIds.has(l.id));
-        LOCAL.set(t,[...docs,...onlyLocal]);
+        const merged=docs.map(d=>{const l=localById.get(d.id);return (l&&l.data&&!d.data)?{...d,data:l.data}:d;});
+        LOCAL.set(t,[...merged,...onlyLocal]);
         total+=docs.length;
       }
     }));
@@ -1004,7 +1183,7 @@ function qfloat(id){return parseFloat(qval(id))||0}
 const UNIDADES = ['Tunica','Santo André II','Caregi','Reata','Sulinense'];
 
 // ═══════ APP STATE ═══════
-let APP={module:null,page:'dash',toolSearch:'',toolFilter:'todos',batSearch:'',libSelected:null,libOpenFolders:{},libSearchQ:'',unidade:localStorage.getItem('gi_unidade')||null};
+let APP={module:null,page:'dash',toolSearch:'',toolFilter:'todos',batSearch:'',libSelected:null,libOpenFolders:{},libSearchQ:'',unidade:null};
 
 // ═══════════════════════════════════════════════
 //  MÓDULO CURVA S — REVISÃO ENTRESSAFRA 26/27
@@ -1656,7 +1835,7 @@ async function render(){
   document.getElementById('root').innerHTML = html;
   bindEvents();
 }
-function bindEvents(){ if(APP.module==='curva') setTimeout(curvaMount,0);if(APP.module==='lub') setTimeout(lubMount,0);document.onkeydown=e=>{if(e.key==='Escape'){closeModal();document.getElementById('lib-ctx')?.remove()}}}
+function bindEvents(){ if(APP.module==='curva') setTimeout(curvaMount,0);if(APP.module==='lub') setTimeout(lubMount,0);if(APP.module==='prog') setTimeout(progMount,0);if(APP.module==='quadro') setTimeout(quadroMount,0);document.onkeydown=e=>{if(e.key==='Escape'){closeModal();document.getElementById('lib-ctx')?.remove()}}}
 
 async function buildApp(){
   if(!AUTH.isLogged()) return buildLogin();
@@ -1669,6 +1848,8 @@ async function buildApp(){
   if(APP.module==='oil')return buildOilShell();
   if(APP.module==='curva')return buildCurvaShell();
   if(APP.module==='lub')return buildLubShell();
+  if(APP.module==='prog')return buildProgShell();
+  if(APP.module==='quadro')return buildQuadroShell();
   return'';
 }
 
@@ -3318,6 +3499,16 @@ function buildCover(){
         <p class="ccard-desc">Ficha digital de lubrificação da linha amarela, com aderência e consumo de graxa por máquina.</p>
         <div class="ctags"><span class="ctag a">Execução</span><span class="ctag a">Painel</span><span class="ctag a">Frota</span></div>
       </div>
+      <div class="ccard cb" onclick="APP.module='prog';APP.page='prog_semana';render()">
+        <div class="ccard-ico">📅</div><div class="ccard-name b">PROGRAMAÇÃO DE OS</div>
+        <p class="ccard-desc">Quadro semanal de ordens de serviço por dia, com calendário, PDF e dashboard das unidades.</p>
+        <div class="ctags"><span class="ctag b">Semanal</span><span class="ctag b">Por dia</span><span class="ctag b">Dashboard</span></div>
+      </div>
+      <div class="ccard cr" onclick="APP.module='quadro';render()">
+        <div class="ccard-ico">🛠</div><div class="ccard-name r">QUADRO PCM</div>
+        <p class="ccard-desc">Quadro de oficina por status — máquinas em manutenção, prioridades e relatório semanal.</p>
+        <div class="ctags"><span class="ctag r">Oficina</span><span class="ctag r">Kanban</span><span class="ctag r">Relatório</span></div>
+      </div>
       <div class="ccard co" onclick="APP.module='oil';render()">
         <div class="ccard-ico">🛢️</div><div class="ccard-name o">ANÁLISE DE ÓLEO</div>
         <p class="ccard-desc">Resultados de análises laboratoriais conectados via API do fornecedor.</p>
@@ -4879,6 +5070,661 @@ function lubMount(){
   }
 }
 // ═══════════════ FIM MÓDULO LUBRIFICAÇÃO ═══════════════
+// ═══════════════════════════════════════════════════════════════
+//  MÓDULO PROGRAMAÇÃO DE OS — nativo do PCMgest
+//  Reconstrução do quadro "Programação Semanal" no visual do app.
+//  Persistência no Firestore via LOCAL/FB/QUEUE (coleção progOS).
+//  Escopo por APP.unidade; sub-navegação por APP.page (prog_*).
+//  Reusa: esc, isoWeek, LOCAL, FB, QUEUE, NET, APP, render, UNIDADES,
+//         AUTH, trocarUnidade, customConfirm.
+// ═══════════════════════════════════════════════════════════════
+const PROG_DN=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+const PROG_DSA=['D','S','T','Q','Q','S','S'];
+const PROG_MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+const PROG_STATE={ano:null,sem:null,doc:null,timer:null};
+
+function progInit(){
+  if(PROG_STATE.ano)return;
+  const p=isoWeek(new Date()).split('-W');
+  PROG_STATE.ano=+p[0]; PROG_STATE.sem=+p[1];
+}
+function progN2(n){return String(n).padStart(2,'0');}
+function progSeg(ano,sem){const j=new Date(ano,0,4),dw=j.getDay()||7,s=new Date(j);s.setDate(j.getDate()-dw+1+(sem-1)*7);return s;}
+function progFmt(d){return progN2(d.getDate())+'/'+progN2(d.getMonth()+1);}
+function progDatas(ano,sem){const seg=progSeg(ano,sem);return PROG_DN.map((_,i)=>{const d=new Date(seg);d.setDate(seg.getDate()+i);return d;});}
+function progKey(uni,ano,sem){return uni+'__'+ano+'__W'+progN2(sem);}
+
+function progAll(){return LOCAL.get('progOS');}
+function progDoc(uni,ano,sem){
+  const id=progKey(uni,ano,sem);
+  const found=progAll().find(x=>x.id===id);
+  if(found){if(!Array.isArray(found.dias))found.dias=[[],[],[],[],[],[],[]];return found;}
+  return {id,unidade:uni,ano,sem,dias:[[],[],[],[],[],[],[]]};
+}
+function progSave(d){
+  LOCAL.upsert('progOS',d);
+  if(NET.isOnline()){FB.set('progOS',d.id,d).then(ok=>{if(!ok){QUEUE.add({type:'set',col:'progOS',id:d.id,data:d});NET.updateBar();}});}
+  else{QUEUE.add({type:'set',col:'progOS',id:d.id,data:d});NET.updateBar();}
+}
+function progSchedule(){clearTimeout(PROG_STATE.timer);PROG_STATE.timer=setTimeout(()=>progSave(PROG_STATE.doc),700);}
+function progLoad(){PROG_STATE.doc=progDoc(APP.unidade,PROG_STATE.ano,PROG_STATE.sem);}
+
+// contagem de uma unidade numa semana
+function progConta(uni,ano,sem){
+  const d=progDoc(uni,ano,sem);let os=0,maq=0,dias=0;
+  d.dias.forEach(arr=>{const at=arr.filter(m=>m._saved||m.frota);if(at.length)dias++;maq+=at.length;os+=arr.filter(m=>m.os).length;});
+  return {os,maq,dias};
+}
+
+// ═══════════════ CASCA ═══════════════
+function buildProgShell(){
+  progInit();
+  if(!APP.page||APP.page.indexOf('prog_')!==0)APP.page='prog_semana';
+  progLoad();
+  const pages=[
+    {id:'prog_semana',ico:'📅',lbl:'Programação'},
+    {id:'prog_dash',ico:'📊',lbl:'Dashboard'}
+  ];
+  const cur=pages.find(p=>p.id===APP.page)||pages[0];
+  let pc = APP.page==='prog_dash' ? buildProgDash() : buildProgSemana();
+  const c=progConta(APP.unidade,PROG_STATE.ano,PROG_STATE.sem);
+  return `<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">📅 PROGRAMAÇÃO</div><div class="sb-sub">${esc(APP.unidade)}</div><span class="pill b" style="align-self:flex-start;margin-top:6px">OS SEMANAL</span></div>
+    ${pages.map(p=>`<div class="sb-item ${APP.page===p.id?'act-b':''}" onclick="APP.page='${p.id}';render()"><span>${p.ico}</span><span style="flex:1">${p.lbl}</span></div>`).join('')}
+    <div class="sb-foot">
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title" style="color:var(--bluet)">${cur.ico} ${cur.lbl}</div>
+      <div class="tb-sub">🏭 ${esc(APP.unidade)} · Semana ${PROG_STATE.sem}/${PROG_STATE.ano} · ${c.os} OS · ${c.maq} máquina(s)</div></div>
+    </div>
+    <div class="content">${pc}</div>
+  </div>
+</div>`;
+}
+
+// ═══════════════ PROGRAMAÇÃO SEMANAL ═══════════════
+function buildProgSemana(){
+  return `
+  <div class="prog-ctrl">
+    <span class="plbl">Semana</span>
+    <input class="prog-num" id="prog-sem" type="number" min="1" max="53" value="${PROG_STATE.sem}">
+    <span class="plbl">Ano</span>
+    <input class="prog-num yr" id="prog-ano" type="number" min="2020" max="2035" value="${PROG_STATE.ano}">
+    <button class="btn btn-b btn-sm" onclick="progApplyWeek()">↻ Atualizar</button>
+    <button class="btn btn-gh btn-sm" onclick="progShiftWeek(-1)">‹ Anterior</button>
+    <button class="btn btn-gh btn-sm" onclick="progShiftWeek(1)">Próxima ›</button>
+    <button class="btn btn-b btn-sm" id="prog-pdf" onclick="progPDF()" style="margin-left:auto">📄 Gerar PDF</button>
+  </div>
+  <div class="prog-topo">
+    <div class="prog-week"><span class="pw-l">SEMANA</span><span class="pw-n">${PROG_STATE.sem}</span></div>
+    <div class="prog-cal" id="prog-cal">${progCalHTML()}</div>
+  </div>
+  <div id="prog-board">${progBoardHTML()}</div>`;
+}
+
+function progBoardHTML(){
+  const datas=progDatas(PROG_STATE.ano,PROG_STATE.sem);
+  const col=(di)=>{
+    const d=datas[di];
+    return `<div class="prog-day">
+      <div class="prog-day-hdr"><span>${PROG_DN[di].toUpperCase()} ${progFmt(d)}</span><button class="prog-badd" onclick="progAddOS(${di})">+ OS</button></div>
+      <div class="prog-day-body" id="prog-db-${di}">${progDayInner(di)}</div>
+    </div>`;
+  };
+  let all='';for(let di=0;di<7;di++)all+=col(di);
+  return `<div class="prog-grid">${all}</div>`;
+}
+
+function progDayInner(di){
+  const arr=PROG_STATE.doc.dias[di]||[];
+  if(!arr.length)return '<div class="prog-empty">Nenhuma OS</div>';
+  return arr.map((m,mi)=>progCardHTML(m,di,mi)).join('');
+}
+
+function progCardHTML(m,di,mi){
+  const saved=!!(m._saved&&m.frota);
+  return `<div class="prog-card">
+    <div class="prog-card-hdr">
+      <span class="prog-card-lbl" id="prog-lbl-${di}-${mi}">${saved?'▶ '+esc(m.frota):'Nova OS '+(mi+1)}</span>
+      <div class="prog-card-btns">
+        <button class="prog-bedit" id="prog-eb-${di}-${mi}" onclick="progEditOS(${di},${mi})" style="${saved?'':'display:none'}">editar</button>
+        <button class="prog-bdel" onclick="progDelOS(${di},${mi})">✕</button>
+      </div>
+    </div>
+    <div class="prog-form${saved?'':' open'}" id="prog-fm-${di}-${mi}">
+      <input class="pfi" type="text" placeholder="Frota (ex: PL-23)" value="${esc(m.frota)}" oninput="progField(${di},${mi},'frota',this.value)">
+      <input class="pfi" type="text" placeholder="O.S. (ex: 48749)" value="${esc(m.os)}" oninput="progField(${di},${mi},'os',this.value)">
+      <input class="pfi" type="text" placeholder="Mecânico" value="${esc(m.mecanico)}" oninput="progField(${di},${mi},'mecanico',this.value)">
+      <input class="pfi" type="text" placeholder="Serviço / descrição" value="${esc(m.servico)}" oninput="progField(${di},${mi},'servico',this.value)">
+      <button class="btn btn-b btn-sm" style="width:100%;justify-content:center" onclick="progSaveOS(${di},${mi})">✓ Salvar</button>
+    </div>
+    <div class="prog-view${saved?' show':''}" id="prog-vw-${di}-${mi}">${saved?progViewHTML(m):''}</div>
+  </div>`;
+}
+
+function progViewHTML(m){
+  return `<div><span class="pvl">Frota</span> <span class="pvv">${esc(m.frota)||'—'}</span>&emsp;<span class="pvl">O.S.</span> <span class="pvv">${esc(m.os)||'—'}</span></div>`+
+         `<div><span class="pvl">Mecânico</span> <span class="pvv">${esc(m.mecanico)||'—'}</span></div>`+
+         `<div class="pvs">▶ ${esc(m.servico)||'—'}</div>`;
+}
+
+function progCalHTML(){
+  const ano=PROG_STATE.ano,sem=PROG_STATE.sem;
+  const datas=progDatas(ano,sem),mes=datas[0].getMonth();
+  const sw=new Set(datas.filter(d=>d.getMonth()===mes).map(d=>d.getDate()));
+  const p=new Date(ano,mes,1).getDay(),dm=new Date(ano,mes+1,0).getDate();
+  let h=`<div class="prog-cal-mes">${PROG_MESES[mes]} ${ano}</div><table class="pmc"><tr>${PROG_DSA.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+  let dia=1,off=p;
+  while(dia<=dm){
+    h+='<tr>';
+    for(let c=0;c<7;c++){
+      if(dia===1&&c<off){h+='<td></td>';}
+      else if(dia<=dm){
+        const isSW=sw.has(dia);
+        const diIdx=datas.findIndex(d=>d.getDate()===dia&&d.getMonth()===mes);
+        const hasOS=diIdx>=0&&(PROG_STATE.doc.dias[diIdx]||[]).some(m=>m._saved||m.frota);
+        h+=`<td class="${isSW?'sw':''}">${dia}${hasOS?'<span class="pdot"></span>':''}</td>`;
+        dia++;
+      }else h+='<td></td>';
+    }
+    h+='</tr>';off=0;
+  }
+  return h+'</table>';
+}
+
+// ── handlers ──
+function progApplyWeek(){
+  const s=parseInt(document.getElementById('prog-sem').value)||PROG_STATE.sem;
+  const a=parseInt(document.getElementById('prog-ano').value)||PROG_STATE.ano;
+  PROG_STATE.sem=Math.min(53,Math.max(1,s));PROG_STATE.ano=a;render();
+}
+function progShiftWeek(delta){
+  let s=PROG_STATE.sem+delta,a=PROG_STATE.ano;
+  if(s<1){s=52;a--;}else if(s>52){s=1;a++;}
+  PROG_STATE.sem=s;PROG_STATE.ano=a;render();
+}
+function progAddOS(di){
+  PROG_STATE.doc.dias[di].push({frota:'',os:'',mecanico:'',servico:'',_saved:false});
+  const el=document.getElementById('prog-db-'+di);if(el)el.innerHTML=progDayInner(di);
+}
+function progField(di,mi,c,v){PROG_STATE.doc.dias[di][mi][c]=v;progSchedule();}
+function progSaveOS(di,mi){
+  const m=PROG_STATE.doc.dias[di][mi];m._saved=true;
+  document.getElementById('prog-fm-'+di+'-'+mi)?.classList.remove('open');
+  const vw=document.getElementById('prog-vw-'+di+'-'+mi);if(vw){vw.classList.add('show');vw.innerHTML=progViewHTML(m);}
+  const lbl=document.getElementById('prog-lbl-'+di+'-'+mi);if(lbl)lbl.textContent=(m.frota?'▶ '+m.frota:'Nova OS '+(mi+1));
+  const eb=document.getElementById('prog-eb-'+di+'-'+mi);if(eb)eb.style.display='';
+  progRefreshCal();progSave(PROG_STATE.doc);
+}
+function progEditOS(di,mi){
+  document.getElementById('prog-fm-'+di+'-'+mi)?.classList.add('open');
+  document.getElementById('prog-vw-'+di+'-'+mi)?.classList.remove('show');
+}
+function progDelOS(di,mi){
+  PROG_STATE.doc.dias[di].splice(mi,1);
+  const el=document.getElementById('prog-db-'+di);if(el)el.innerHTML=progDayInner(di);
+  progRefreshCal();progSave(PROG_STATE.doc);
+}
+function progRefreshCal(){const el=document.getElementById('prog-cal');if(el)el.innerHTML=progCalHTML();}
+
+// ═══════════════ DASHBOARD ═══════════════
+function buildProgDash(){
+  const dados=UNIDADES.map(u=>({nome:u,...progConta(u,PROG_STATE.ano,PROG_STATE.sem)}));
+  const tos=dados.reduce((a,d)=>a+d.os,0),tmq=dados.reduce((a,d)=>a+d.maq,0);
+  const uat=dados.filter(d=>d.dias>0).length,tdias=dados.reduce((a,d)=>a+d.dias,0);
+  const mxo=Math.max(...dados.map(d=>d.os),1),mxm=Math.max(...dados.map(d=>d.maq),1);
+  const bar=(d,val,mx,g)=>`<div class="prog-bar-row"><div class="prog-bar-lbl">${esc(d.nome)}</div><div class="prog-bar-track"><div class="prog-bar-fill ${g?'g':''}" style="width:${Math.round(val/mx*100)}%"></div></div><div class="prog-bar-val">${val}</div></div>`;
+  return `
+  <div class="prog-ctrl">
+    <span class="plbl">Semana</span>
+    <input class="prog-num" id="prog-sem" type="number" min="1" max="53" value="${PROG_STATE.sem}">
+    <span class="plbl">Ano</span>
+    <input class="prog-num yr" id="prog-ano" type="number" min="2020" max="2035" value="${PROG_STATE.ano}">
+    <button class="btn btn-b btn-sm" onclick="progApplyWeek()">↻ Atualizar</button>
+  </div>
+  <div class="kgrid k4">
+    <div class="kpi"><div class="klbl">Total de OS</div><div class="kval">${tos}</div><div class="ksub">semana ${PROG_STATE.sem}/${PROG_STATE.ano}</div></div>
+    <div class="kpi"><div class="klbl">Máquinas programadas</div><div class="kval" style="color:var(--bluet)">${tmq}</div><div class="ksub">todas as unidades</div></div>
+    <div class="kpi"><div class="klbl">Unidades ativas</div><div class="kval" style="color:var(--goldt)">${uat}</div><div class="ksub">de ${UNIDADES.length}</div></div>
+    <div class="kpi"><div class="klbl">Dias-unidade ativos</div><div class="kval">${tdias}</div><div class="ksub">total na semana</div></div>
+  </div>
+  <div class="card"><div class="shdr"><div class="stitle">OS por unidade</div></div>${dados.map(d=>bar(d,d.os,mxo,false)).join('')}</div>
+  <div class="card"><div class="shdr"><div class="stitle">Máquinas por unidade</div></div>${dados.map(d=>bar(d,d.maq,mxm,true)).join('')}</div>
+  <div class="card">
+    <div class="shdr"><div class="stitle">Resumo por unidade</div></div>
+    <div class="tw"><table>
+      <thead><tr><th>Unidade</th><th>Semana</th><th>Total OS</th><th>Máquinas</th><th>Dias ativos</th><th>Status</th></tr></thead>
+      <tbody>${dados.map(d=>`<tr><td><strong>${esc(d.nome)}</strong></td><td>Sem. ${PROG_STATE.sem}</td><td><strong>${d.os}</strong></td><td>${d.maq}</td><td>${d.dias}/7</td><td><span class="bdg ${d.dias>0?'ok':'neu'}">${d.dias>0?'Ativo':'Sem dados'}</span></td></tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+// ═══════════════ MOUNT ═══════════════
+function progMount(){
+  const si=document.getElementById('prog-sem'),ai=document.getElementById('prog-ano');
+  if(si)si.addEventListener('keydown',e=>{if(e.key==='Enter')progApplyWeek();});
+  if(ai)ai.addEventListener('keydown',e=>{if(e.key==='Enter')progApplyWeek();});
+}
+
+// ═══════════════ PDF (Programação Semanal, paisagem A4) ═══════════════
+function progPDF(){
+  const btn=document.getElementById('prog-pdf');
+  if(!window.jspdf){toast('Biblioteca PDF ainda carregando, tente de novo.','warn');return;}
+  const old=btn?btn.textContent:'';if(btn){btn.textContent='Gerando...';btn.disabled=true;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const PW=297,PH=210,M=6;
+    const ano=PROG_STATE.ano,sem=PROG_STATE.sem,uni=APP.unidade;
+    const doc=progDoc(uni,ano,sem);
+    const datas=progDatas(ano,sem),mes=datas[0].getMonth();
+    const AZ=[46,84,150],AZL=[220,230,241],AZH=[31,62,114],BORDA=[180,190,210],VM=[176,0,0];
+    const TOPO_H=28,GAP=2,DIA_HDR=8,ROD_H=7,totalW=PW-M*2,SEM_W=38,CAL_W=60;
+    const BANNER_X=M+SEM_W+GAP+CAL_W+GAP,BANNER_W=totalW-SEM_W-CAL_W-GAP*2;
+    let y=M;
+    pdf.setFillColor(...AZ);pdf.rect(M,y,SEM_W,TOPO_H,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(13);pdf.setFont('helvetica','bold');
+    pdf.text('SEMANA',M+SEM_W/2,y+10,{align:'center'});
+    pdf.setFontSize(17);pdf.text(String(sem),M+SEM_W/2,y+21,{align:'center'});
+    const CX=M+SEM_W+GAP;
+    pdf.setFillColor(...AZ);pdf.rect(CX,y,CAL_W,5,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(6.5);pdf.setFont('helvetica','bold');
+    pdf.text(PROG_MESES[mes],CX+CAL_W/2,y+3.5,{align:'center'});
+    const CW=CAL_W/7;
+    PROG_DSA.forEach((d,i)=>{pdf.setFillColor(...AZ);pdf.rect(CX+i*CW,y+5,CW,4,'F');pdf.setTextColor(255,255,255);pdf.setFontSize(5);pdf.setFont('helvetica','bold');pdf.text(d,CX+i*CW+CW/2,y+8,{align:'center'});});
+    const sw2=new Set(datas.filter(d=>d.getMonth()===mes).map(d=>d.getDate()));
+    const firstDay=new Date(ano,mes,1).getDay(),daysInMonth=new Date(ano,mes+1,0).getDate();
+    let dia=1,rowY=y+9,off=firstDay;const ROW_H=4;
+    while(dia<=daysInMonth){
+      for(let c=0;c<7;c++){
+        const cx=CX+c*CW,cy=rowY;
+        if(dia===1&&c<off){}
+        else if(dia<=daysInMonth){
+          const isSW=sw2.has(dia);
+          isSW?pdf.setFillColor(...AZL):pdf.setFillColor(255,255,255);
+          pdf.rect(cx,cy,CW,ROW_H,'F');pdf.setDrawColor(220,220,220);pdf.rect(cx,cy,CW,ROW_H,'S');
+          isSW?pdf.setTextColor(...AZH):pdf.setTextColor(100,100,100);
+          pdf.setFontSize(5);pdf.setFont('helvetica',isSW?'bold':'normal');
+          pdf.text(String(dia),cx+CW/2,cy+3,{align:'center'});dia++;
+        }
+      }
+      rowY+=ROW_H;off=0;if(dia>daysInMonth)break;
+    }
+    pdf.setDrawColor(...BORDA);pdf.rect(CX,y,CAL_W,TOPO_H,'S');
+    pdf.setFillColor(...AZ);pdf.rect(BANNER_X,y,BANNER_W,TOPO_H,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(9);pdf.setFont('helvetica','bold');
+    pdf.text('PROGRAMAÇÃO SEMANAL',BANNER_X+BANNER_W/2,y+11,{align:'center'});
+    pdf.setFontSize(11);pdf.text(String(uni).toUpperCase(),BANNER_X+BANNER_W/2,y+20,{align:'center'});
+    y+=TOPO_H+GAP;
+    const gradeH=PH-M-y-ROD_H-GAP,l1H=Math.round(gradeH*0.5),l2H=gradeH-l1H,colW=totalW/4;
+    function dOS(di,x,oy,w,h){
+      const mqs=(doc.dias[di]||[]).filter(m=>m.frota||m.os||m.mecanico||m.servico);
+      if(!mqs.length){pdf.setTextColor(180,180,180);pdf.setFontSize(7);pdf.setFont('helvetica','italic');pdf.text('Nenhuma OS',x+w/2,oy+7,{align:'center'});return;}
+      let cy=oy;
+      mqs.forEach((m,mi)=>{
+        if(cy+5>oy+h)return;
+        pdf.setFillColor(...AZL);pdf.rect(x,cy,w,5.5,'F');
+        pdf.setTextColor(...AZH);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');
+        pdf.text((m.frota||'—')+(m.os?' · OS: '+m.os:''),x+1.5,cy+3.8,{maxWidth:w-3});cy+=6;
+        if(m.mecanico&&cy<oy+h){pdf.setTextColor(50,50,50);pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.text('Mec: '+m.mecanico,x+2,cy+2.8,{maxWidth:w-4});cy+=4;}
+        if(m.servico&&cy<oy+h){pdf.setTextColor(...VM);pdf.setFontSize(7);pdf.setFont('helvetica','normal');pdf.text('> '+m.servico,x+2,cy+2.8,{maxWidth:w-4});cy+=4;}
+        cy+=2;
+        if(mi<mqs.length-1&&cy<oy+h){pdf.setDrawColor(200,210,230);pdf.line(x+2,cy,x+w-2,cy);cy+=2.5;}
+      });
+    }
+    for(let di=0;di<4;di++){
+      const x=M+di*colW;
+      pdf.setFillColor(...AZ);pdf.rect(x,y,colW,DIA_HDR,'F');
+      pdf.setTextColor(255,255,255);pdf.setFontSize(8);pdf.setFont('helvetica','bold');
+      pdf.text(PROG_DN[di].toUpperCase()+' '+progFmt(datas[di]),x+colW/2,y+5.5,{align:'center'});
+      pdf.setFillColor(255,255,255);pdf.rect(x,y+DIA_HDR,colW,l1H-DIA_HDR,'F');
+      pdf.setDrawColor(...BORDA);pdf.rect(x,y,colW,l1H,'S');
+      dOS(di,x+2,y+DIA_HDR+2,colW-4,l1H-DIA_HDR-3);
+    }
+    const y2=y+l1H+GAP;
+    for(let di=4;di<7;di++){
+      const x=M+(di-4)*colW;
+      pdf.setFillColor(...AZ);pdf.rect(x,y2,colW,DIA_HDR,'F');
+      pdf.setTextColor(255,255,255);pdf.setFontSize(8);pdf.setFont('helvetica','bold');
+      pdf.text(PROG_DN[di].toUpperCase()+' '+progFmt(datas[di]),x+colW/2,y2+5.5,{align:'center'});
+      pdf.setFillColor(255,255,255);pdf.rect(x,y2+DIA_HDR,colW,l2H-DIA_HDR,'F');
+      pdf.setDrawColor(...BORDA);pdf.rect(x,y2,colW,l2H,'S');
+      dOS(di,x+2,y2+DIA_HDR+2,colW-4,l2H-DIA_HDR-3);
+    }
+    pdf.setFillColor(245,245,245);pdf.rect(M+3*colW,y2,colW,l2H,'F');
+    pdf.setDrawColor(...BORDA);pdf.rect(M+3*colW,y2,colW,l2H,'S');
+    pdf.setTextColor(160,160,160);pdf.setFontSize(6.5);pdf.setFont('helvetica','normal');
+    pdf.text('NADIANA AGRO  |  PCM  |  Programação Semanal  |  '+uni+'  |  Semana '+sem+' / '+ano,PW/2,PH-M+1,{align:'center'});
+    pdf.save('Programacao_'+String(uni).replace(/\s/g,'_')+'_Sem'+sem+'_'+ano+'.pdf');
+  }catch(err){console.error(err);toast('Erro ao gerar PDF: '+err.message,'err');}
+  if(btn){btn.textContent=old;btn.disabled=false;}
+}
+
+const QUADRO_SEED={
+  'Caregi': [{"id":"AA08","tag":"583","desc":"DISTRIBUIDOR M4040 DN DRY BOX","grupo":"ADUBADORES AUTOPROPELIDOS","fab":"JOHN DEERE","modelo":"M4040 DN"},{"id":"AD09","tag":"000492","desc":"HERCULES 10000 INOX","grupo":"ADUBADEIRAS A LANCO","fab":"STARA","modelo":"HERCULES INOX 10 TON"},{"id":"AD11","tag":"000596","desc":"HERCULES 10.000","grupo":"ADUBADEIRAS A LANCO","fab":"STARA","modelo":"HERCULES INOX 10 TON"},{"id":"AD16.1","tag":"606","desc":"DISTRIBUIDOR DE CALCARIO FAB JAN","grupo":"ADUBADEIRAS A LANCO","fab":"","modelo":""},{"id":"AD18","tag":"AD18","desc":"DISTRIBUIDOR STARA BRUTTUS 25000","grupo":"ADUBADEIRAS A LANCO","fab":"STARA","modelo":"BRUTTUS 25000"},{"id":"CA11.1","tag":"000683","desc":"CAMINHAO HOWO 6X4 380CV BRANCO - OBA 8962","grupo":"CAMINHOES E CARRETAS","fab":"SINOTRUCK","modelo":"HOWO 380"},{"id":"CA24","tag":"000620","desc":"CAMINHAO MB ATEGO 1725","grupo":"CAMINHOES COMBOIO","fab":"MERCEDES BENZ","modelo":"MB ATEGO 1725"},{"id":"CA25","tag":"000619","desc":"CAMINHAO TANQUE","grupo":"CAMINHOES E CARRETAS","fab":"MERCEDES BENZ","modelo":"M. BENZ/AXOR 3344"},{"id":"CA43","tag":"000570","desc":"STRALIS HI-WAY 800S48TZ","grupo":"CAMINHOES E CARRETAS","fab":"IVECO","modelo":"HI-WAY 800S48TZ"},{"id":"CA48","tag":"000622","desc":"CAMINHAO IVECO TECTOR 260E30 6X4","grupo":"CAMINHOES E CARRETAS","fab":"IVECO","modelo":"TECTOR 260E30"},{"id":"CA50","tag":"000910","desc":"CAMINHAO VMX D8K 290 EURO 6 6X4","grupo":"CAMINHOES E CARRETAS","fab":"VOLVO","modelo":"VMX D8K 290"},{"id":"CA53","tag":"CA53","desc":"CAMINHAO VM 6X2 LX LEITO","grupo":"CAMINHOES E CARRETAS","fab":"VOLVO","modelo":"VM 290 6X2R"},{"id":"CA59","tag":"R 126","desc":"CAMINHÃO MERCEDES MB L1318 COMBOIO","grupo":"CAMINHOES COMBOIO","fab":"MERCEDES BENZ","modelo":"MB L1318"},{"id":"CAT100","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 500","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT101","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT104","tag":"0179/2023","desc":"CAMINHAO M. BENZ ACTROS 2651 S","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT105","tag":"0179/2023","desc":"CAMINHAO M. BENZ ACTROS 2646 LS","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT106","tag":"0179/2023","desc":"CAMINHAO M. BENZ ACTROS 2651 S","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT107","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT108","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT109","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT110","tag":"0179/2023","desc":"CAMINHAO SCANIA R540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT111","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT112","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT113","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 460","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT114","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT115","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT116","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT117","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 460","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT118","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT119","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT120","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT121","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT122","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT123","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT124","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT125","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT126","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT127","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT128","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT132","tag":"0179/2023","desc":"CAMINHAO VW 29530","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":"MWM6X10"},{"id":"CAT133","tag":"0179/2023","desc":"CAMINHAO SCANIA G480","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT134","tag":"0179/2023","desc":"CAMINHAO VOLVO FH 540","grupo":"CAMINHOES E CARRETAS","fab":"","modelo":""},{"id":"CAT14","tag":"CAT14","desc":"CAMINHAO FORD 2628","grupo":"CAMINHOES E CARRETAS","fab":"FORD","modelo":"6600 4X2 86 CV"},{"id":"CAT15","tag":"CAT15","desc":"CAMINHAO TRATOR M. BENZ","grupo":"CAMINHOES E CARRETAS","fab":"MERCEDES BENZ","modelo":"L 1513"},{"id":"CAT293","tag":"CAT293","desc":"IVECO STRALIS","grupo":"CAMINHOES E CARRETAS","fab":"IVECO","modelo":"STRALIS HD 570 6X2"},{"id":"CL14","tag":"000011","desc":"COLHEITADEIRA DE ALGODAO STS 9970 5 LINHAS","grupo":"COLHEITADEIRAS DE ALGODAO","fab":"JOHN DEERE","modelo":"STS  9970"},{"id":"CL22","tag":"000624","desc":"COLHEITADEIRA S690","grupo":"COLHEITADEIRAS DE GRAOS","fab":"JOHN DEERE","modelo":"S690"},{"id":"CL23","tag":"000630","desc":"COLHEITADEIRA S690","grupo":"COLHEITADEIRAS DE GRAOS","fab":"JOHN DEERE","modelo":"S690"},{"id":"CL27","tag":"000449","desc":"COLHEITADEIRA S680","grupo":"COLHEITADEIRAS DE GRAOS","fab":"JOHN DEERE","modelo":"S680"},{"id":"CL34","tag":"000602","desc":"COLHEITADEIRA DE ALGODAO CP690","grupo":"COLHEITADEIRAS DE ALGODAO","fab":"JOHN DEERE","modelo":"CP690"},{"id":"CL35.1","tag":"000533","desc":"COLHEITADEIRA DE GRAOS FENDT IDEAL 8","grupo":"COLHEITADEIRAS DE GRAOS","fab":"FENDT","modelo":"CLASSE 8"},{"id":"CL44","tag":"000901","desc":"COLHEITADEIRA DE ALGODAO CP770","grupo":"COLHEITADEIRAS DE ALGODAO","fab":"JOHN DEERE","modelo":"CP770"},{"id":"CL64","tag":"CL64","desc":"COLHEITADEIRA DE GRAOS S780","grupo":"COLHEITADEIRAS DE GRAOS","fab":"JOHN DEERE","modelo":"S7 800"},{"id":"EQ1100","tag":"659","desc":"GRADE ARADORA GSPCR/2 113","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"BALDAN","modelo":"GRADE ARADORA 24/28"},{"id":"EQ1101","tag":"241","desc":"GRADE NIVELADORA, FAB. TATU MARCHESAN","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"","modelo":""},{"id":"EQ1103","tag":"EQ1103","desc":"GRADE ARADORA, MOD. 28X32 POL","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"","modelo":""},{"id":"EQ22","tag":"000635","desc":"ARRANCADOR DE SOQUEIRA CHOPPER 550 HD","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"MORAES","modelo":"CHOPPER 550"},{"id":"EQ33","tag":"EQ33","desc":"CORRENTAO FAZ. SA2","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"NADIANA","modelo":"CORRENTAO FAZ. SA2"},{"id":"IM103","tag":"000493","desc":"GRADE NIVELADORA GENE 108 X 22 X 45","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"","modelo":""},{"id":"IM106","tag":"000067","desc":"AF SUPER CANHAO","grupo":"PULVERIZADORES","fab":"NADIANA","modelo":"NADIANA"},{"id":"IM122","tag":"000957","desc":"ESCARIFICADOR MATIC 15 BRACOS","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"JAN","modelo":"MASTIC DE 15 BRACOS"},{"id":"IM123","tag":"000854","desc":"ESCARIFICADOR MATIC 22 BRACOS + TANDEM","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"JAN","modelo":"MASTIC DE 22 BRACOS"},{"id":"IM144","tag":"000532","desc":"ROLO FACA KATRINA F5","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"INDUTAR","modelo":"F5"},{"id":"IM23","tag":"000329","desc":"GRADE NIVELADORA 50X20","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"TATU","modelo":"GRADE NIVELADORA 50X20"},{"id":"IM43","tag":"000660","desc":"GRADE ARADORA 24/28","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"BALDAN","modelo":"GRADE ARADORA 24/28"},{"id":"IM56","tag":"IM56","desc":"ARADO AIVECA REVERSIVEL","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"IKEDA","modelo":"AIVECA REVERSIVEL"},{"id":"IM57","tag":"243","desc":"PATROLINHA STARPLAN 5000","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"STARA","modelo":"STARPLAN 5000"},{"id":"IM630","tag":"IM630","desc":"SUBSOLADOR TERRUS 15 HASTES","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"GTS","modelo":"DUO MODULAR 15 HASTES GS"},{"id":"IM639","tag":"IM639","desc":"GRADE ARADORA GASI 22X42X500","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"SANTA IZABEL","modelo":"BTD3E B/S C/P"},{"id":"IM640","tag":"IM640","desc":"GRADE ARADORA GASI 22X42X500","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"SANTA IZABEL","modelo":"BTD3E B/S C/P"},{"id":"IM66","tag":"000069","desc":"TRITON ROCADOR","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"JAN","modelo":"JAN"},{"id":"IM67","tag":"IM67","desc":"ARRANCADOR DE SOQUEIRA DE ALGODAO","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"WATANABE","modelo":"ARRANCADOR DE SOQUEIRA"},{"id":"IM88","tag":"000314","desc":"GRADE ARADORA 28X28","grupo":"GRADES, SUBSOLADORES, ESCARIFI","fab":"BALDAN","modelo":"GRADE ARADORA 28X28"},{"id":"PA04","tag":"000381","desc":"PA CARREGADEIRA WA200 6","grupo":"PA CARREGADEIRAS","fab":"KOMATSU","modelo":"WA 200 6"},{"id":"PA09","tag":"PA09","desc":"PA CARREGADEIRA WA200 6","grupo":"PA CARREGADEIRAS","fab":"KOMATSU","modelo":"WA 200 6"},{"id":"PA12","tag":"PA12","desc":"PA CARREGADEIRA SHANTUI L36-B3","grupo":"PA CARREGADEIRAS","fab":"SHANTUI","modelo":"L36-B3"},{"id":"PA15","tag":"000927","desc":"PA CARREGADEIRA 524P","grupo":"PA CARREGADEIRAS","fab":"JOHN DEERE","modelo":"524 P"},{"id":"PG22","tag":"000627","desc":"PLATAFORMA DE GRAOS 745FD MY18 JOHN DEERE CL 22","grupo":"PLATAFORMAS DE SOJA","fab":"JOHN DEERE","modelo":"745FD MY18"},{"id":"PG23","tag":"000626","desc":"PLATAFORMA DE GRAOS 745FD MY18 JOHN DEERE CL23","grupo":"PLATAFORMAS DE SOJA","fab":"JOHN DEERE","modelo":"745FD MY18"},{"id":"PG27","tag":"000450","desc":"PLATAFORMA DE GRAOS 740 FD","grupo":"PLATAFORMAS DE SOJA","fab":"JOHN DEERE","modelo":"745FD MY18"},{"id":"PG64","tag":"PG64","desc":"PLATAFORMA CORTE DRAPER FLEX RDF 40","grupo":"PLATAFORMAS DE SOJA","fab":"JOHN DEERE","modelo":"DRAPER RDF 40"},{"id":"PGT01","tag":"PGT01","desc":"PLATAFORMA STARCOTTON 30\" JD STC 30\" JD 2351","grupo":"PLATAFORMAS DE SOJA","fab":"STARCOTTON","modelo":"JD2351"},{"id":"PL33","tag":"PL33","desc":"PLANTADEIRA HORSCH MAESTRO EVOLUTION 39 LINHAS","grupo":"PLANTADEIRAS","fab":"HORSCH","modelo":"MAESTRO EVOLUTION 39.45"},{"id":"PL34","tag":"PL34","desc":"PLANTADEIRA HORSCH MAESTRO EVOLUTION 39 LINHAS","grupo":"PLANTADEIRAS","fab":"HORSCH","modelo":"MAESTRO EVOLUTION 39.45"},{"id":"PM10","tag":"PM10","desc":"PLATAFORMA DE MILHO BOCUDA 18 LINHAS","grupo":"PLATAFORMAS DE MILHO","fab":"VENCE TUDO","modelo":"PM 18 BOCUDA 18L"},{"id":"PU18","tag":"000990","desc":"PULVERIZADOR M4030 (36 METROS)","grupo":"PULVERIZADORES","fab":"JOHN DEERE","modelo":"M4030"},{"id":"PU19","tag":"000991","desc":"PULVERIZADOR M4030 (36 METROS)","grupo":"PULVERIZADORES","fab":"JOHN DEERE","modelo":"M4030"},{"id":"PU19.1","tag":"PU19.1","desc":"SISTEMA DE PULVERIZAÇÃO LOCALIZADA - PU19","grupo":"PULVERIZADORES","fab":"","modelo":""},{"id":"TR41","tag":"000064","desc":"TRATOR TL 75E 4X2 85CV","grupo":"TRATOR LEVE","fab":"NEW HOLLAND","modelo":"TL 75E 4X2 75CV"},{"id":"TR44","tag":"000690","desc":"TRATOR 6110J","grupo":"TRATOR LEVE","fab":"JOHN DEERE","modelo":"6110J"},{"id":"TR52","tag":"000618","desc":"TRATOR DE JARDIM X125 JOHN DEERE","grupo":"TRATOR LEVE","fab":"JOHN DEERE","modelo":"JOHN DEERE"},{"id":"TR53","tag":"000864","desc":"TRATOR 8400R","grupo":"TRATOR PESADO","fab":"JOHN DEERE","modelo":"8400R"},{"id":"TR57","tag":"000853","desc":"TRATOR 6115J","grupo":"TRATOR LEVE","fab":"JOHN DEERE","modelo":"6115J"},{"id":"TR63","tag":"000593","desc":"TRATOR 8400R","grupo":"TRATOR PESADO","fab":"JOHN DEERE","modelo":"8400R"},{"id":"TR65","tag":"000681","desc":"TRATOR 6150J","grupo":"TRATOR LEVE","fab":"JOHN DEERE","modelo":"6150J"},{"id":"TR76","tag":"000904","desc":"TRATOR JOHN DEERE 6170J","grupo":"TRATOR LEVE","fab":"JOHN DEERE","modelo":"6170J"},{"id":"TR86","tag":"C066","desc":"TRATOR JOHN DEERE 9520R","grupo":"TRATOR PESADO","fab":"JOHN DEERE","modelo":"9520R"},{"id":"TR99","tag":"TR99","desc":"TRATOR 9R 640","grupo":"TRATOR PESADO","fab":"","modelo":""},{"id":"VL59","tag":"101523","desc":"CAMIONETE HILUX CD DSL 4X4 SR AT","grupo":"CAMINHONETES","fab":"TOYOTA","modelo":"CD DSL 4X4 SR AT"},{"id":"VL84","tag":"VL84","desc":"STRADA ENDURANCE CABINE PLUS 1.3 FIREFLY 2025 PL8","grupo":"CAMINHONETES","fab":"FIAT","modelo":"ENDURAN CS13"},{"id":"VL85","tag":"VL85","desc":"STRADA ENDURANCE CABINE PLUS 1.3 FIREFLY 2025 PL8","grupo":"CAMINHONETES","fab":"FIAT","modelo":"ENDURAN CS13"},{"id":"VL86","tag":"VL86","desc":"STRADA ENDURANCE CABINE PLUS 1.3 FIREFLY 2025 PL8","grupo":"CAMINHONETES","fab":"FIAT","modelo":"ENDURAN CS13"},{"id":"VL88","tag":"VL88","desc":"STRADA ENDURANCE CABINE PLUS 1.3 FIREFLY 2025 PL8","grupo":"CAMINHONETES","fab":"FIAT","modelo":"ENDURAN CS13"},{"id":"VL89","tag":"VL89","desc":"STRADA FREEDOM CABINE DUPLA 1.3 FLEX 2026","grupo":"CAMINHONETES","fab":"FIAT","modelo":"FREEDOM CD 1.3"},{"id":"VL92","tag":"VL92","desc":"STRADA FREEDOM CABINE DUPLA 1.3 FLEX 2026","grupo":"CAMINHONETES","fab":"FIAT","modelo":"FREEDOM CD 1.3"},{"id":"VLT89","tag":"VLT89","desc":"CAMINHAO VW 14.210","grupo":"CAMINHOES E CARRETAS","fab":"VOLKSWAGEM","modelo":"VOLKSVAGEM"},{"id":"VLT90","tag":"VLT90","desc":"CAMINHAO M. BENZ LS 1933","grupo":"CAMINHOES E CARRETAS","fab":"MERCEDES BENZ","modelo":"L 1519"},{"id":"VLT94","tag":"VLT94","desc":"CAMINHONETE CHEVROLET A10 - CLEVERSON","grupo":"CAMINHONETES","fab":"GM","modelo":"GM"}]
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  MÓDULO QUADRO PCM — Kanban de oficina por status (nativo)
+//  Reconstrução do "Quadro PCM" (por status) no visual do PCMgest.
+//  Persistência Firestore via LOCAL/FB/QUEUE: coleções quadroBoard e quadroCat.
+//  Escopo por APP.unidade. Catálogo seedado (QUADRO_SEED) por unidade.
+//  Reusa: esc, uid, toast, customConfirm, LOCAL, FB, QUEUE, NET, APP,
+//         render, UNIDADES, AUTH, trocarUnidade, openModal, closeModal.
+// ═══════════════════════════════════════════════════════════════
+const QUADRO_LANES=[
+  {id:'entrada',     lbl:'Entrada · Ag. Diagnóstico', rep:'Ag. Diagnóstico'},
+  {id:'diagnostico', lbl:'Diagnóstico',               rep:'Diagnóstico'},
+  {id:'ag-pecas',    lbl:'Aguardando Peças',          rep:'Ag. Peças'},
+  {id:'em-reparo',   lbl:'Em Reparo',                 rep:'Em Reparo'},
+  {id:'inspecao',    lbl:'Inspeção',                  rep:'Inspeção'},
+  {id:'pronto',      lbl:'Pronto',                    rep:'Pronto'}
+];
+const QUADRO_PRIOS={urgente:'🔴 Urgente',alta:'🟠 Alta',normal:'Normal'};
+const QUADRO_STATE={board:[],cat:[],fg:'',fp:'',fq:'',selG:'__all__',dragId:null};
+
+// ── adaptadores (globais, por unidade) ──
+function quadroBoardAll(){return LOCAL.get('quadroBoard');}
+function quadroCatAll(){return LOCAL.get('quadroCat');}
+function quadroBoardDoc(){const u=APP.unidade;const d=quadroBoardAll().find(x=>x.id===u);return d||{id:u,unidade:u,board:[]};}
+function quadroCatDoc(){const u=APP.unidade;const d=quadroCatAll().find(x=>x.id===u);return d||{id:u,unidade:u,cat:[]};}
+function quadroSaveBoard(d){
+  LOCAL.upsert('quadroBoard',d);
+  if(NET.isOnline()){FB.set('quadroBoard',d.id,d).then(ok=>{if(!ok){QUEUE.add({type:'set',col:'quadroBoard',id:d.id,data:d});NET.updateBar();}});}
+  else{QUEUE.add({type:'set',col:'quadroBoard',id:d.id,data:d});NET.updateBar();}
+}
+function quadroSaveCat(d){
+  LOCAL.upsert('quadroCat',d);
+  if(NET.isOnline()){FB.set('quadroCat',d.id,d).then(ok=>{if(!ok){QUEUE.add({type:'set',col:'quadroCat',id:d.id,data:d});NET.updateBar();}});}
+  else{QUEUE.add({type:'set',col:'quadroCat',id:d.id,data:d});NET.updateBar();}
+}
+function quadroSeed(){
+  const u=APP.unidade;
+  const has=quadroCatAll().find(x=>x.id===u);
+  if(!has && typeof QUADRO_SEED!=='undefined' && QUADRO_SEED[u]){
+    quadroSaveCat({id:u,unidade:u,cat:QUADRO_SEED[u].slice()});
+  }
+}
+function quadroLoad(){
+  quadroSeed();
+  QUADRO_STATE.board=(quadroBoardDoc().board||[]).slice();
+  QUADRO_STATE.cat=(quadroCatDoc().cat||[]).slice();
+}
+function quadroPersist(){quadroSaveBoard({id:APP.unidade,unidade:APP.unidade,board:QUADRO_STATE.board});}
+
+function quadroCount(st){return QUADRO_STATE.board.filter(m=>m.status===st).length;}
+function quadroDias(m){if(!m.entrada)return'';const a=new Date(m.entrada+'T00:00:00'),b=new Date();return Math.max(0,Math.round((b-a)/86400000));}
+
+// ═══════════════ CASCA ═══════════════
+function buildQuadroShell(){
+  quadroLoad();
+  const tot=QUADRO_STATE.board.length;
+  return `<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">🛠️ QUADRO PCM</div><div class="sb-sub">${esc(APP.unidade)}</div><span class="pill r" style="align-self:flex-start;margin-top:6px">OFICINA</span></div>
+    <div class="sb-item act-r"><span>🗂️</span><span style="flex:1">Quadro de Oficina</span><span class="sb-cnt">${tot}</span></div>
+    <div style="padding:10px 14px 4px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Status</div>
+    ${QUADRO_LANES.map(l=>`<div style="display:flex;justify-content:space-between;padding:5px 16px;font-size:12px;color:var(--muted2)"><span>${l.rep}</span><span style="font-weight:700;color:var(--text)">${quadroCount(l.id)}</span></div>`).join('')}
+    <div class="sb-foot">
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title" style="color:#be123c">🛠️ Quadro de Oficina</div>
+      <div class="tb-sub">🏭 ${esc(APP.unidade)} · ${tot} máquina(s) em oficina</div></div>
+    </div>
+    <div class="content"><div id="quadro-content">${buildQuadroBoard()}</div></div>
+  </div>
+</div>
+<div id="quadro-print"></div>`;
+}
+
+function buildQuadroBoard(){
+  const grupos=[...new Set(QUADRO_STATE.board.map(m=>m.grupo))].sort();
+  const fil=quadroFiltered();
+  return `
+  <div class="qd-bar">
+    <button class="btn btn-b btn-sm" style="background:#e11d48;border-color:#e11d48" onclick="quadroOpenAdd()">＋ Adicionar máquina</button>
+    <select class="qd-sel" id="qd-fg" onchange="quadroFilter()"><option value="">Todos os grupos</option>${grupos.map(g=>`<option value="${esc(g)}" ${QUADRO_STATE.fg===g?'selected':''}>${esc(g)}</option>`).join('')}</select>
+    <select class="qd-sel" id="qd-fp" onchange="quadroFilter()"><option value="">Todas prioridades</option>${Object.keys(QUADRO_PRIOS).map(p=>`<option value="${p}" ${QUADRO_STATE.fp===p?'selected':''}>${QUADRO_PRIOS[p]}</option>`).join('')}</select>
+    <input class="qd-q" id="qd-fq" placeholder="Buscar frota, tag, descrição…" value="${esc(QUADRO_STATE.fq)}" oninput="quadroFilter()">
+    <span class="qd-lbl">${fil.length} de ${QUADRO_STATE.board.length}</span>
+    <button class="btn btn-gh btn-sm" onclick="quadroReport()" style="margin-left:auto">🖨 Relatório</button>
+  </div>
+  <div class="qd-lanes">
+    ${QUADRO_LANES.map(l=>quadroLaneHTML(l,fil)).join('')}
+  </div>`;
+}
+
+function quadroFiltered(){
+  const {fg,fp,fq}=QUADRO_STATE;const q=fq.toLowerCase();
+  return QUADRO_STATE.board.filter(m=>{
+    if(fg&&m.grupo!==fg)return false;
+    if(fp&&(m.prioridade||'normal')!==fp)return false;
+    if(q&&!(m.id||'').toLowerCase().includes(q)&&!(m.tag||'').toLowerCase().includes(q)&&!(m.desc||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+}
+
+function quadroLaneHTML(l,fil){
+  const cards=fil.filter(m=>m.status===l.id);
+  const n=QUADRO_STATE.board.filter(m=>m.status===l.id).length;
+  return `<div class="qd-lane qdl-${l.id}" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="quadroDrop(event,'${l.id}')">
+    <div class="qd-lane-hd"><span>${esc(l.lbl)}</span><span class="qd-lane-ct">${n}</span></div>
+    <div class="qd-lane-body">
+      ${cards.length?cards.map(m=>quadroCardHTML(m)).join(''):'<div class="qd-empty">Nenhuma máquina</div>'}
+    </div>
+  </div>`;
+}
+
+function quadroCardHTML(m){
+  const prio=m.prioridade||'normal';
+  const fab=(m.fab&&m.fab!=='SEM IDENTIFICACAO')?m.fab:'';
+  const hasOs=m.os&&m.os.trim();
+  return `<div class="qd-card ${prio==='urgente'?'urg':prio==='alta'?'alt':''}" draggable="true" ondragstart="quadroDrag(event,'${esc(m.id)}')">
+    <div class="qd-c-acts"><button class="qd-ic" title="Editar" onclick="quadroEdit('${esc(m.id)}')">✏</button><button class="qd-ic rm" title="Remover" onclick="quadroRemove('${esc(m.id)}')">✕</button></div>
+    <div class="qd-c-hd"><span class="qd-c-pat">${esc(m.id)}</span><div class="qd-c-info"><div class="qd-c-desc">${esc(m.desc)}</div><div class="qd-c-tag">${esc(m.tag||'')}</div></div></div>
+    <div class="qd-c-grp">${esc(m.grupo||'')}</div>
+    <div class="qd-c-pills">
+      ${fab?`<span class="qd-pill fab">${esc(fab)}</span>`:''}
+      ${prio!=='normal'?`<span class="qd-pill prio">${QUADRO_PRIOS[prio]}</span>`:''}
+      ${hasOs?`<span class="qd-pill os">OS: ${esc(m.os)}</span>`:'<span class="qd-pill nos">⚠ Sem O.S.</span>'}
+    </div>
+    ${m.motivo?`<div class="qd-c-mot">⚑ ${esc(m.motivo)}</div>`:''}
+    ${m.obs?`<div class="qd-c-obs">${esc(m.obs)}</div>`:''}
+    ${(m.tecnico||m.entrada)?`<div class="qd-c-ft"><span>${m.tecnico?'👤 '+esc(m.tecnico):''}</span><span>${m.entrada?'📅 '+quadroFmtD(m.entrada):''}</span></div>`:''}
+  </div>`;
+}
+function quadroFmtD(s){if(!s)return'';const p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
+
+// ── re-render parcial ──
+function quadroRerender(){const el=document.getElementById('quadro-content');if(el)el.innerHTML=buildQuadroBoard();}
+
+// ── filtros ──
+function quadroFilter(){
+  QUADRO_STATE.fg=document.getElementById('qd-fg')?.value||'';
+  QUADRO_STATE.fp=document.getElementById('qd-fp')?.value||'';
+  QUADRO_STATE.fq=document.getElementById('qd-fq')?.value||'';
+  quadroRerender();
+}
+
+// ── drag & drop ──
+function quadroDrag(e,id){QUADRO_STATE.dragId=id;e.dataTransfer.effectAllowed='move';}
+function quadroDrop(e,lane){
+  e.preventDefault();
+  const id=QUADRO_STATE.dragId;QUADRO_STATE.dragId=null;
+  const m=QUADRO_STATE.board.find(x=>x.id===id);
+  if(m&&m.status!==lane){m.status=lane;quadroPersist();quadroRerender();toast(m.id+' → '+lane,'ok');}
+  else quadroRerender();
+}
+
+// ── remover ──
+async function quadroRemove(id){
+  const ok=await customConfirm({title:'Remover do quadro',message:'Remover '+id+' do quadro de oficina?',okText:'Remover',danger:true});
+  if(!ok)return;
+  QUADRO_STATE.board=QUADRO_STATE.board.filter(m=>m.id!==id);
+  quadroPersist();quadroRerender();toast('Removido','ok');
+}
+
+// ═══════════════ ADICIONAR MÁQUINA ═══════════════
+function quadroOpenAdd(){
+  QUADRO_STATE.selG='__all__';
+  openModal(`<div class="modal" style="max-width:760px">
+    <div class="mtitle" style="color:#be123c">🛠️ Adicionar máquina ao quadro</div>
+    <div class="qd-add-tabs">
+      <button class="qd-tab on" id="qd-tab-cat" onclick="quadroTab('cat')">Do catálogo</button>
+      <button class="qd-tab" id="qd-tab-new" onclick="quadroTab('new')">Cadastrar nova</button>
+    </div>
+    <div id="qd-add-cat">
+      <input class="ipt" id="qd-add-q" placeholder="Buscar no catálogo…" oninput="quadroRenderCat()" style="margin-bottom:8px">
+      <div class="qd-add-wrap"><div class="qd-glist" id="qd-glist"></div><div class="qd-mlist" id="qd-mlist"></div></div>
+    </div>
+    <div id="qd-add-new" style="display:none">
+      <div class="frow"><div><label>Frota / TAG *</label><input class="ipt" id="qn-id" placeholder="Ex: TR44"></div><div><label>Nº patrimônio</label><input class="ipt" id="qn-tag" placeholder="Ex: 000690"></div></div>
+      <div class="frow"><div style="flex:2"><label>Descrição *</label><input class="ipt" id="qn-desc" placeholder="Ex: TRATOR 6110J"></div></div>
+      <div class="frow"><div><label>Grupo</label><input class="ipt" id="qn-grupo" placeholder="Ex: TRATOR LEVE"></div><div><label>Fabricante</label><input class="ipt" id="qn-fab" placeholder="Ex: JOHN DEERE"></div></div>
+      <button class="btn btn-b btn-sm" style="background:#e11d48;border-color:#e11d48;margin-top:6px" onclick="quadroAddManual()">＋ Adicionar ao quadro</button>
+    </div>
+    <div style="text-align:right;margin-top:12px"><button class="btn btn-gh btn-sm" onclick="closeModal()">Fechar</button></div>
+  </div>`);
+  quadroRenderGrps();quadroRenderCat();
+}
+function quadroTab(t){
+  document.getElementById('qd-tab-cat').classList.toggle('on',t==='cat');
+  document.getElementById('qd-tab-new').classList.toggle('on',t==='new');
+  document.getElementById('qd-add-cat').style.display=t==='cat'?'':'none';
+  document.getElementById('qd-add-new').style.display=t==='new'?'':'none';
+}
+function quadroRenderGrps(){
+  const gl=document.getElementById('qd-glist');if(!gl)return;
+  const grupos=[...new Set(QUADRO_STATE.cat.map(m=>m.grupo))].sort();
+  const mk=(lbl,val,cnt)=>`<div class="qd-gi ${QUADRO_STATE.selG===val?'on':''}" onclick="quadroSelG('${esc(val).replace(/'/g,"\\'")}')"><span>${esc(lbl)}</span><span class="qd-gc">${cnt}</span></div>`;
+  gl.innerHTML=mk('Todos','__all__',QUADRO_STATE.cat.length)+grupos.map(g=>mk(g.length>22?g.slice(0,22)+'…':g,g,QUADRO_STATE.cat.filter(m=>m.grupo===g).length)).join('');
+}
+function quadroSelG(g){QUADRO_STATE.selG=g;quadroRenderGrps();quadroRenderCat();}
+function quadroRenderCat(){
+  const ml=document.getElementById('qd-mlist');if(!ml)return;
+  const q=(document.getElementById('qd-add-q')?.value||'').toLowerCase();
+  const onBoard=new Set(QUADRO_STATE.board.map(m=>m.id));
+  const res=QUADRO_STATE.cat.filter(m=>{
+    if(QUADRO_STATE.selG!=='__all__'&&m.grupo!==QUADRO_STATE.selG)return false;
+    if(q&&!(m.id||'').toLowerCase().includes(q)&&!(m.tag||'').toLowerCase().includes(q)&&!(m.desc||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+  if(!res.length){ml.innerHTML='<div class="qd-empty" style="padding:20px">'+(QUADRO_STATE.cat.length?'Nada encontrado':'Catálogo vazio nesta unidade — use "Cadastrar nova"')+'</div>';return;}
+  ml.innerHTML=res.map(m=>{
+    const jah=onBoard.has(m.id);
+    return `<div class="qd-mi ${jah?'dim':''}" ${jah?'':`onclick="quadroAddFromCat('${esc(m.id).replace(/'/g,"\\'")}')"`}>
+      <div><div class="qd-mi-id">${esc(m.id)} ${jah?'<span class=\"qd-mi-in\">no quadro</span>':''}</div><div class="qd-mi-desc">${esc(m.desc)}</div><div class="qd-mi-grp">${esc(m.grupo||'')}</div></div>
+      ${jah?'':'<span class="qd-mi-add">＋</span>'}
+    </div>`;
+  }).join('');
+}
+function quadroAddFromCat(id){
+  if(QUADRO_STATE.board.find(m=>m.id===id))return;
+  const b=QUADRO_STATE.cat.find(m=>m.id===id);if(!b)return;
+  QUADRO_STATE.board.push({...b,status:'entrada',motivo:'',os:'',obs:'',entrada:new Date().toISOString().split('T')[0],tecnico:'',prioridade:'normal'});
+  quadroPersist();quadroRenderCat();quadroRerender();toast(id+' adicionado','ok');
+}
+function quadroAddManual(){
+  const id=(document.getElementById('qn-id')?.value||'').trim();
+  const desc=(document.getElementById('qn-desc')?.value||'').trim();
+  if(!id||!desc){toast('Preencha frota e descrição.','warn');return;}
+  if(QUADRO_STATE.board.find(m=>m.id===id)){toast('Essa frota já está no quadro.','warn');return;}
+  const nova={id,tag:(document.getElementById('qn-tag')?.value||'').trim(),desc,grupo:(document.getElementById('qn-grupo')?.value||'').trim()||'SEM GRUPO',fab:(document.getElementById('qn-fab')?.value||'').trim(),modelo:''};
+  // adiciona ao catálogo (se ainda não existir) e ao quadro
+  if(!QUADRO_STATE.cat.find(m=>m.id===id)){QUADRO_STATE.cat.push(nova);quadroSaveCat({id:APP.unidade,unidade:APP.unidade,cat:QUADRO_STATE.cat});}
+  QUADRO_STATE.board.push({...nova,status:'entrada',motivo:'',os:'',obs:'',entrada:new Date().toISOString().split('T')[0],tecnico:'',prioridade:'normal'});
+  quadroPersist();closeModal();quadroRerender();toast(id+' adicionado','ok');
+}
+
+// ═══════════════ EDITAR ═══════════════
+function quadroEdit(id){
+  const m=QUADRO_STATE.board.find(x=>x.id===id);if(!m)return;
+  openModal(`<div class="modal" style="max-width:560px">
+    <div class="mtitle" style="color:#be123c">✏ ${esc(m.id)} — ${esc((m.desc||'').slice(0,30))}</div>
+    <div class="frow"><div><label>Status</label><select class="ipt" id="qe-status">${QUADRO_LANES.map(l=>`<option value="${l.id}" ${m.status===l.id?'selected':''}>${esc(l.rep)}</option>`).join('')}</select></div>
+      <div><label>Prioridade</label><select class="ipt" id="qe-prio">${Object.keys(QUADRO_PRIOS).map(p=>`<option value="${p}" ${(m.prioridade||'normal')===p?'selected':''}>${QUADRO_PRIOS[p]}</option>`).join('')}</select></div></div>
+    <div class="frow"><div><label>O.S.</label><input class="ipt" id="qe-os" value="${esc(m.os||'')}" placeholder="Nº da OS"></div>
+      <div><label>Data de entrada</label><input class="ipt" id="qe-dt" type="date" value="${esc(m.entrada||'')}"></div></div>
+    <div class="frow"><div style="flex:2"><label>Técnico responsável</label><input class="ipt" id="qe-tec" value="${esc(m.tecnico||'')}" placeholder="Nome"></div></div>
+    <div class="frow"><div style="flex:2"><label>Motivo</label><input class="ipt" id="qe-motivo" value="${esc(m.motivo||'')}" placeholder="Ex: Revisão programada"></div></div>
+    <div class="frow"><div style="flex:2"><label>Observação</label><textarea class="ipt" id="qe-obs" rows="2" placeholder="Detalhes">${esc(m.obs||'')}</textarea></div></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn btn-gh btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-b btn-sm" style="background:#e11d48;border-color:#e11d48" onclick="quadroSaveEdit('${esc(m.id).replace(/'/g,"\\'")}')">✓ Salvar</button>
+    </div>
+  </div>`);
+}
+function quadroSaveEdit(id){
+  const m=QUADRO_STATE.board.find(x=>x.id===id);if(!m)return;
+  m.status=document.getElementById('qe-status').value;
+  m.prioridade=document.getElementById('qe-prio').value;
+  m.os=document.getElementById('qe-os').value.trim();
+  m.entrada=document.getElementById('qe-dt').value;
+  m.tecnico=document.getElementById('qe-tec').value.trim();
+  m.motivo=document.getElementById('qe-motivo').value.trim();
+  m.obs=document.getElementById('qe-obs').value.trim();
+  quadroPersist();closeModal();quadroRerender();toast('Salvo ✓','ok');
+}
+
+// ═══════════════ RELATÓRIO (impressão) ═══════════════
+function quadroReport(){
+  const now=new Date();
+  const dataHoje=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const semana='Semana '+quadroSemanaAno(now);
+  const tot=QUADRO_STATE.board.length;
+  const cont=st=>QUADRO_STATE.board.filter(m=>m.status===st).length;
+  const secoes=QUADRO_LANES.map(l=>{
+    const ms=QUADRO_STATE.board.filter(m=>m.status===l.id);
+    if(!ms.length)return'';
+    const rows=ms.map((m,i)=>`<tr>
+      <td>${i+1}</td><td><b>${esc(m.id)}</b></td><td>${esc(m.desc||'')}</td><td>${esc(m.grupo||'')}</td>
+      <td>${m.os?esc(m.os):'<span style="color:#c0392b">Sem OS</span>'}</td><td>${m.entrada?quadroFmtD(m.entrada):'-'}</td>
+      <td>${quadroDias(m)!==''?quadroDias(m):'-'}</td><td>${esc(m.motivo||'-')}</td><td>${esc(m.tecnico||'-')}</td><td>${esc(m.obs||'')}</td></tr>`).join('');
+    return `<div class="qp-sec"><div class="qp-sec-t">${esc(l.rep).toUpperCase()} (${ms.length})</div>
+      <table class="qp-tbl"><thead><tr><th>#</th><th>Frota</th><th>Descrição</th><th>Grupo</th><th>O.S.</th><th>Entrada</th><th>Dias</th><th>Motivo</th><th>Técnico</th><th>Observação</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
+  const html=`<div class="qp-doc">
+    <div class="qp-head">
+      <div><div class="qp-h1">NADIANA AGRONEGÓCIOS — PCM</div><div class="qp-h2">${esc(APP.unidade)}</div><div class="qp-h3">${esc(semana)} / ${now.getFullYear()} · Relatório Semanal de Oficina</div></div>
+      <div class="qp-meta">Emitido em: ${esc(dataHoje)}<br>Total no quadro: ${tot} máquinas</div>
+    </div>
+    <div class="qp-sum">
+      <div class="qp-card tot"><div class="qp-n">${tot}</div><div class="qp-l">Total Oficina</div></div>
+      <div class="qp-card"><div class="qp-n">${cont('entrada')}</div><div class="qp-l">Ag. Diagnóstico</div></div>
+      <div class="qp-card"><div class="qp-n">${cont('diagnostico')}</div><div class="qp-l">Diagnóstico</div></div>
+      <div class="qp-card ag"><div class="qp-n">${cont('ag-pecas')}</div><div class="qp-l">Ag. Peças</div></div>
+      <div class="qp-card rep"><div class="qp-n">${cont('em-reparo')}</div><div class="qp-l">Em Reparo</div></div>
+      <div class="qp-card"><div class="qp-n">${cont('inspecao')}</div><div class="qp-l">Inspeção</div></div>
+      <div class="qp-card ok"><div class="qp-n">${cont('pronto')}</div><div class="qp-l">Pronto</div></div>
+    </div>
+    ${secoes||'<div style="text-align:center;color:#888;padding:30px">Nenhuma máquina no quadro.</div>'}
+    <div class="qp-ass"><div class="qp-ass-b"><div class="qp-ass-l">Responsável PCM — ${esc(APP.unidade)}</div></div><div class="qp-ass-b"><div class="qp-ass-l">Coordenador de Manutenção</div></div></div>
+    <div class="qp-ft"><span>Nadiana Agronegócios — PCM · ${esc(APP.unidade)}</span><span>${esc(semana)} · Emitido: ${now.toLocaleString('pt-BR')}</span></div>
+  </div>`;
+  const pv=document.getElementById('quadro-print');
+  pv.innerHTML=html;pv.classList.add('on');
+  window.print();
+  setTimeout(()=>{pv.classList.remove('on');pv.innerHTML='';},300);
+}
+function quadroSemanaAno(dt){const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-ys)/86400000)+1)/7);}
+
+// ═══════════════ MOUNT ═══════════════
+function quadroMount(){ /* handlers via inline; nada a religar */ }
+
 </script>
 <script>
 // Injeta funções de óleo avançadas após carga da página
