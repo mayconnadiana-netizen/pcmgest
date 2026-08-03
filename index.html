@@ -4704,12 +4704,24 @@ function lubDel(k,id){
   else{QUEUE.add({type:'delete',col:k,id});NET.updateBar();}
 }
 let LUB_SEEDED=false;
+const LUB_IMPORT_FROTA=[{"id": "EH01", "desc": "ESCAVADEIRA 210G LC", "modelo": "210GLC", "fab": "JOHN DEERE", "ano": "2014", "arq": "escavadeira", "fam": "210GLC", "uni": "Reata"}, {"id": "EH02", "desc": "RETROESCAVADEIRA CLG766A", "modelo": "CLG766A", "fab": "LIUGONG LATIN AMERICA", "ano": "2023", "arq": "retro", "fam": "CLG766A", "uni": "Sulinense"}, {"id": "EH03", "desc": "RETROESCAVADEIRA 310P", "modelo": "310 P", "fab": "JOHN DEERE", "ano": "", "arq": "retro", "fam": "310 P", "uni": "Túnica"}, {"id": "EH04", "desc": "ESCAVADEIRA 210P", "modelo": "210 P", "fab": "JOHN DEERE", "ano": "2024", "arq": "escavadeira", "fam": "210 P", "uni": "Reata"}, {"id": "EH05", "desc": "RETROESCAVADEIRA LIUGONG CLG 766A", "modelo": "CLG766A", "fab": "LIUGONG LATIN AMERICA", "ano": "2024", "arq": "retro", "fam": "CLG766A", "uni": "Santo André II"}, {"id": "EH06", "desc": "RETROESCAVADEIRA CLG766A", "modelo": "CLG766A", "fab": "LIUGONG LATIN AMERICA", "ano": "2024", "arq": "retro", "fam": "CLG766A", "uni": "Reata"}, {"id": "EHT03", "desc": "ESCAVADEIRA HIDRAULICA VOLVO EC210BLC", "modelo": "VOLVO", "fab": "VOLVO", "ano": "", "arq": "escavadeira", "fam": "VOLVO", "uni": ""}, {"id": "PA01", "desc": "PA CARREGADEIRA XGMA 932", "modelo": "XGMA 932", "fab": "XGMA", "ano": "2012", "arq": "pa", "fam": "XGMA 932", "uni": "Caregi"}, {"id": "PA03", "desc": "PA CARREGADEIRA W20E", "modelo": "W20E", "fab": "CASE", "ano": "2000", "arq": "pa", "fam": "W20E", "uni": "Santo André II"}, {"id": "PA04", "desc": "PA CARREGADEIRA WA200 6", "modelo": "WA 200 6", "fab": "KOMATSU", "ano": "2014", "arq": "pa", "fam": "WA 200 6", "uni": "Caregi"}, {"id": "PA05", "desc": "PA CARREGADEIRA W20B", "modelo": "W20B", "fab": "CASE", "ano": "1990", "arq": "pa", "fam": "W20B", "uni": "Santo André II"}, {"id": "PA06", "desc": "PA CARREGADEIRA WA200 5", "modelo": "WA 200 5", "fab": "KOMATSU", "ano": "2014", "arq": "pa", "fam": "WA 200 5", "uni": "Santo André II"}, {"id": "PA07", "desc": "PA CARREGADEIRA WA200 6", "modelo": "WA 200 6", "fab": "KOMATSU", "ano": "2017", "arq": "pa", "fam": "WA 200 6", "uni": "Túnica"}, {"id": "PA08", "desc": "PA CARREGADEIRA WA200 6", "modelo": "WA 200 6", "fab": "KOMATSU", "ano": "2017", "arq": "pa", "fam": "WA 200 6", "uni": "Sulinense"}, {"id": "PA09", "desc": "PA CARREGADEIRA WA200 6", "modelo": "WA 200 6", "fab": "KOMATSU", "ano": "2020", "arq": "pa", "fam": "WA 200 6", "uni": "Caregi"}, {"id": "PA10", "desc": "PA CARREGADEIRA SL30WN", "modelo": "SL30WN", "fab": "DEGONG", "ano": "2022", "arq": "pa", "fam": "SL30WN", "uni": "Santo André II"}, {"id": "PA11", "desc": "PA CARREGADEIRA SL30WN", "modelo": "SL30WN", "fab": "DEGONG", "ano": "2022", "arq": "pa", "fam": "SL30WN", "uni": "Caregi"}, {"id": "PA12", "desc": "PA CARREGADEIRA SHANTUI L36-B3", "modelo": "L36-B3", "fab": "SHANTUI", "ano": "", "arq": "pa", "fam": "L36-B3", "uni": "Caregi"}, {"id": "PA13", "desc": "PA CARREGADEIRA SHANTUI L36-B3", "modelo": "L36-B3", "fab": "SHANTUI", "ano": "", "arq": "pa", "fam": "L36-B3", "uni": "Túnica"}, {"id": "PA14", "desc": "PA CARREGADEIRA 838T", "modelo": "CLG838T", "fab": "LIUGONG LATIN AMERICA", "ano": "2024", "arq": "pa", "fam": "CLG838T", "uni": "Santo André II"}, {"id": "PA15", "desc": "PA CARREGADEIRA 524P", "modelo": "524 P", "fab": "JOHN DEERE", "ano": "2024", "arq": "pa", "fam": "524 P", "uni": "Caregi"}, {"id": "PA16", "desc": "PA CARREGADEIRA 524P", "modelo": "524 P", "fab": "JOHN DEERE", "ano": "2024", "arq": "pa", "fam": "524 P", "uni": "Túnica"}, {"id": "PA17", "desc": "PA CARREGADEIRA KOMATSU WA 320", "modelo": "WA 320", "fab": "KOMATSU", "ano": "2023", "arq": "pa", "fam": "WA 320", "uni": "Reata"}, {"id": "PA19", "desc": "PA CARREGADEIRA 838T", "modelo": "CLG838T", "fab": "LIUGONG LATIN AMERICA", "ano": "2024", "arq": "pa", "fam": "CLG838T", "uni": "Reata"}, {"id": "PA20", "desc": "PA CARREGADEIRA JOHN DEERE 524 P-TIER", "modelo": "524 P", "fab": "JOHN DEERE", "ano": "2025", "arq": "pa", "fam": "524 P", "uni": "Reata"}, {"id": "PA21", "desc": "PA CARREGADEIRA JOHN DEERE 524 P-TIER", "modelo": "524 P", "fab": "JOHN DEERE", "ano": "2025", "arq": "pa", "fam": "524 P", "uni": "Santo André II"}, {"id": "PAT06", "desc": "PA CARREGADEIRA CLARK", "modelo": "SEM IDENTIFICACAO", "fab": "SEM IDENTIFICACAO", "ano": "", "arq": "pa", "fam": "SEM IDENTIFICACAO", "uni": "Reata"}, {"id": "PAT07", "desc": "PA CARREGADEIRA 924H CATERPILLAR", "modelo": "SEM IDENTIFICACAO", "fab": "SEM IDENTIFICACAO", "ano": "2014", "arq": "pa", "fam": "SEM IDENTIFICACAO", "uni": "Caregi"}];
 function lubEnsureSeed(){
   if(LUB_SEEDED)return;
   LUB_SEEDED=true;
-  if(lubGetAll('lubFrota').length)return;
-  LUB_SEED.forEach(r=>lubSave('lubFrota',{id:r[0],patrimonio:r[0],descricao:r[1],modelo:r[2],
-    fabricante:r[3],ano:r[4],arquitetura:r[5],familia:r[6],unidade:'',horimetro:null}));
+  if(!lubGetAll('lubFrota').length){
+    LUB_SEED.forEach(r=>lubSave('lubFrota',{id:r[0],patrimonio:r[0],descricao:r[1],modelo:r[2],
+      fabricante:r[3],ano:r[4],arquitetura:r[5],familia:r[6],unidade:'',horimetro:null}));
+  }
+  if(!localStorage.getItem('lub_frota_import_v1')){
+    const have=new Set(lubGetAll('lubFrota').map(m=>m.id));
+    LUB_IMPORT_FROTA.forEach(r=>{ if(!have.has(r.id)) lubSave('lubFrota',{id:r.id,patrimonio:r.id,descricao:r.desc,modelo:r.modelo,fabricante:r.fab,ano:r.ano,arquitetura:r.arq,familia:r.fam,unidade:r.uni,horimetro:null}); });
+    localStorage.setItem('lub_frota_import_v1','1');
+  }
+  if(!localStorage.getItem('lub_frota_hor_v1')){
+    const HOR={EH05:804.2,PA03:13334,PA05:282.9,PA06:878,PA14:2237.7,PA21:1185.8};
+    lubGetAll('lubFrota').forEach(m=>{ if(HOR[m.id]!=null && (m.horimetro==null||m.horimetro==='')){ m.horimetro=HOR[m.id]; lubSave('lubFrota',m); } });
+    localStorage.setItem('lub_frota_hor_v1','1');
+  }
 }
 
 // ---- datas / util ----
@@ -4745,12 +4757,14 @@ function buildLubShell(){
   const pages=[
     {id:'lub_painel',ico:'📊',lbl:'Painel',sec:'Principal'},
     {id:'lub_exec',ico:'🖊️',lbl:'Execução',sec:null},
+    {id:'lub_venc',ico:'⏰',lbl:'Vencimentos',sec:null},
     {id:'lub_frota',ico:'🚜',lbl:'Frota',sec:'Cadastro',pill:nUni||'',pillc:'b'},
     {id:'lub_impr',ico:'🖨️',lbl:'Imprimir ficha',sec:null}
   ];
   let pc='';
   if(APP.page==='lub_painel')pc=buildLubPainel();
   else if(APP.page==='lub_exec')pc=buildLubExec();
+  else if(APP.page==='lub_venc')pc=buildLubVenc();
   else if(APP.page==='lub_frota')pc=buildLubFrota();
   else if(APP.page==='lub_impr')pc=buildLubImpr();
   const cur=pages.find(p=>p.id===APP.page)||pages[0];
@@ -5017,12 +5031,14 @@ function lubFichaBrancoHTML(m,wk){
   .sigs{display:flex;gap:40px;margin-top:50px}.sigs>div{flex:1;text-align:center}
   .sig-line{border-top:1px solid #333;margin-top:58px;padding-top:7px;font-size:11px;color:#555}
   .sig-line b{display:block;color:#222}.sig-line span{font-size:9px;color:#999;letter-spacing:.3px}
+.leg{margin-top:12px;border:1px solid #ddd;border-radius:6px;padding:8px 11px;font-size:10px;color:#444;line-height:1.9;background:#fafafa}.leg b{color:#222}.leg .mk{display:inline-block;min-width:16px;text-align:center;font-weight:700;border:1px solid #bbb;border-radius:3px;padding:0 4px;margin-right:4px;background:#fff}.leg .sep{color:#ccc;margin:0 7px}
   @media print{@page{size:A4;margin:12mm}}</style></head><body>
   <div class="hd"><div><div class="lg">NADIANA <span>PCM</span></div><div class="sub">Ficha de Campo — Lubrificação · ${esc(LUB_ARQ[arq].nome)}</div></div>
   <div class="doc">FC-LUB-LA-01 · Rev. 00<br>${esc(wk)}</div></div>
   <table class="info"><tr><td class="k">Patrim.</td><td><b>${esc(m.patrimonio)} — ${esc(m.modelo)}</b></td><td class="k">Unidade</td><td>${esc(m.unidade||'')}</td><td class="k">Horím.</td><td style="width:70px"></td></tr>
   <tr><td class="k">Lubrif.</td><td></td><td class="k">GX-01 kg</td><td></td><td class="k">GX-02 kg</td><td></td></tr></table>
   <table class="grid"><thead><tr><th class="l">Nº · Ponto</th><th>Bicos</th><th>Ciclo</th><th>Graxa</th>${LUB_DIAS.map(d=>`<th>${d[1]}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+  <div class="leg"><b>Legenda</b> &nbsp; <span class="mk">C</span>concluído (engraxado)<span class="sep">·</span><span class="mk">X</span>bico inoperante<span class="sep">·</span><span class="mk">NA</span>não aplicável<span class="sep">·</span>célula em branco = pendente<br><b>Ciclo</b> = periodicidade em horas · células destacadas = 10 h (diário/turno) · demais 50 h / 100 h<span class="sep">|</span><b>GX-01 / GX-02</b> = tipos de graxa (anotar consumo em kg no cabeçalho)<span class="sep">|</span>linhas <b>V</b> = verificação (inspeção visual, sem graxa)</div>
   <div class="sigs"><div><div class="sig-line"><b>Lubrificador</b><span>NOME / MATRÍCULA</span></div></div><div><div class="sig-line"><b>Analista de PCM</b><span>VISTO</span></div></div><div><div class="sig-line"><b>Coordenação de PCM</b><span>APROVAÇÃO</span></div></div></div>
   <script>window.onload=function(){window.print();}<\/script></body></html>`;
 }
@@ -5040,6 +5056,103 @@ function lubEmpty(){
 const LUB_UNIDS=(typeof UNIDADES!=='undefined'&&Array.isArray(UNIDADES)&&UNIDADES.length)?UNIDADES:['Caregi','Reata','Santo André II','Sulinense','Túnica'];
 
 // ═══════════════ MOUNT (bind pós-render) ═══════════════
+
+// ═══════════════ ENGRAXE / VENCIMENTO POR HORÍMETRO ═══════════════
+// Fluxo: 1) horímetro atual da máquina  2) inicia o serviço com intervalo e horímetro inicial
+//        3) a cada troca, lança o horímetro do momento -> zera o contador e guarda no histórico.
+function lubVItens(){try{return JSON.parse(localStorage.getItem('lubVenc')||'[]')}catch(e){return[]}}
+function lubVSetItens(v){localStorage.setItem('lubVenc',JSON.stringify(v))}
+function lubVAntec(){try{return Number(JSON.parse(localStorage.getItem('lubVencCfg')||'{}').antec)||50}catch(e){return 50}}
+function lubVSetAntec(v){localStorage.setItem('lubVencCfg',JSON.stringify({antec:Number(v)||50}));render()}
+function lubVNum(v){if(v==null||v==='')return null;if(typeof v==='number')return v;let s=String(v).trim().replace(/\s/g,'');if(s.indexOf(',')>-1&&s.indexOf('.')>-1)s=s.replace(/\./g,'').replace(',','.');else s=s.replace(',','.');const n=parseFloat(s);return isNaN(n)?null:n}
+function lubVNorm(s){return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+function lubVHoje(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()}
+function lubVFmt(n){return n==null||n===''?'—':Number(n).toLocaleString('pt-BR')}
+function lubVMaq(pat){return lubGetAll('lubFrota').find(m=>m.id===pat)}
+function lubVHor(pat){const m=lubVMaq(pat);return m&&m.horimetro!=null&&m.horimetro!==''?Number(m.horimetro):null}
+function lubVStat(it,hAt){const antec=lubVAntec();const prox=(it.h_ultima_troca||0)+(it.intervalo||0);if(hAt==null)return{k:'none',cls:'neu',lbl:'Sem horímetro',prox,rest:null,pct:0};const rest=prox-hAt;const rodado=hAt-(it.h_ultima_troca||0);const pct=it.intervalo?Math.min(rodado/it.intervalo,1.3):0;let k='ok',cls='ok',lbl='Em dia';if(rest<=0){k='crit';cls='err';lbl='Vencido'}else if(rest<=antec){k='warn';cls='warn';lbl='Próximo'}return{k,cls,lbl,prox,rest,pct}}
+const LUBV_COR={crit:'var(--red)',warn:'var(--amber)',ok:'var(--green)',none:'var(--muted)'};
+const LUBV_PRESETS=['Engraxe geral','Óleo motor','Óleo hidráulico','Óleo transmissão','Filtros','Graxa dos pinos'];
+
+// 1) atualizar horímetro atual da máquina (fonte única = Frota)
+function lubVSetHor(pat){const m=lubVMaq(pat);if(!m)return;openModal(`<div class="modal"><div class="mtitle p">⏱️ Horímetro atual</div>
+  <div class="infobox" style="font-size:12px"><strong style="font-family:var(--mono)">${esc(pat)}</strong> · ${esc(m.descricao||'')}</div>
+  <div class="frow"><div><label>Horímetro atual (h)</label><input id="lvH" value="${m.horimetro!=null?m.horimetro:''}" placeholder="ex.: 2237"/></div></div>
+  <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="lubVSaveHor('${esc(pat)}')">Salvar</button></div></div>`)}
+function lubVSaveHor(pat){const m=lubVMaq(pat);if(!m)return;const h=lubVNum(document.getElementById('lvH').value);m.horimetro=h;lubSave('lubFrota',m);closeModal();render();toast('Horímetro atualizado')}
+
+// 2) iniciar um serviço/engraxe
+function lubVIniciar(pat){const m=lubVMaq(pat);if(!m)return;const cur=m.horimetro!=null?m.horimetro:'';openModal(`<div class="modal"><div class="mtitle p">▶ Iniciar controle de engraxe/troca</div>
+  <div class="infobox" style="font-size:12px"><strong style="font-family:var(--mono)">${esc(pat)}</strong> · ${esc(m.descricao||'')}</div>
+  <div class="frow"><div><label>Serviço</label><input id="lvS" list="lvSdl" value="Engraxe geral"/><datalist id="lvSdl">${LUBV_PRESETS.map(p=>`<option value="${p}">`).join('')}</datalist></div></div>
+  <div class="frow c2"><div><label>Intervalo de troca (h) *</label><input id="lvI" placeholder="ex.: 50"/></div><div><label>Horímetro da última troca *</label><input id="lvU" value="${cur}" placeholder="horímetro inicial"/></div></div>
+  <p style="font-size:11.5px;color:var(--muted);margin:2px 2px 0">Dica: no início, o "horímetro da última troca" é o horímetro atual da máquina (ponto de partida).</p>
+  <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="lubVAddServ('${esc(pat)}')">Iniciar</button></div></div>`)}
+function lubVAddServ(pat){const serv=(document.getElementById('lvS').value||'Engraxe').trim();const intervalo=lubVNum(document.getElementById('lvI').value);const hUlt=lubVNum(document.getElementById('lvU').value);if(intervalo==null||intervalo<=0){toast('Informe o intervalo (h)','err');return}const arr=lubVItens();arr.push({id:'lv'+uid(),pat,serv,intervalo,h_ultima_troca:hUlt||0,data_ultima:lubVHoje(),historico:[]});lubVSetItens(arr);const m=lubVMaq(pat);if(m&&(m.horimetro==null||m.horimetro==='')&&hUlt!=null){m.horimetro=hUlt;lubSave('lubFrota',m)}closeModal();render();toast('Serviço iniciado')}
+
+// 3) registrar troca/engraxe -> lança o horímetro do momento
+function lubVTroca(id){const it=lubVItens().find(x=>x.id===id);if(!it)return;const cur=lubVHor(it.pat);openModal(`<div class="modal"><div class="mtitle p">🛢️ Registrar engraxe / troca</div>
+  <div class="infobox" style="font-size:12px"><strong style="font-family:var(--mono)">${esc(it.pat)}</strong> · ${esc(it.serv)} · intervalo ${lubVFmt(it.intervalo)} h</div>
+  <div class="frow c2"><div><label>Horímetro do momento *</label><input id="lvTh" value="${cur!=null?cur:''}" placeholder="horímetro agora"/></div><div><label>Data</label><input id="lvTd" value="${lubVHoje()}"/></div></div>
+  <div class="frow"><div><label>Observação</label><input id="lvTo" placeholder="óleo 15W40, graxa aplicada..."/></div></div>
+  <p style="font-size:11.5px;color:var(--muted);margin:2px 2px 0">Isso zera o contador e atualiza o horímetro atual da máquina.</p>
+  <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="lubVDoTroca('${id}')">Confirmar troca</button></div></div>`)}
+function lubVDoTroca(id){const arr=lubVItens();const it=arr.find(x=>x.id===id);if(!it)return;const h=lubVNum(document.getElementById('lvTh').value);if(h==null){toast('Informe o horímetro do momento','err');return}const data=document.getElementById('lvTd').value||lubVHoje();const obs=document.getElementById('lvTo').value||'';it.historico=it.historico||[];it.historico.unshift({data,h,rodou:h-(it.h_ultima_troca||0),obs});it.h_ultima_troca=h;it.data_ultima=data;lubVSetItens(arr);const m=lubVMaq(it.pat);if(m){m.horimetro=h;lubSave('lubFrota',m)}closeModal();render();toast('Troca registrada · contador zerado')}
+
+function lubVDel(id){const arr=lubVItens();const it=arr.find(x=>x.id===id);if(!it)return;if(!confirm('Remover o serviço "'+it.serv+'" de '+it.pat+'?'))return;lubVSetItens(arr.filter(x=>x.id!==id));render();toast('Serviço removido')}
+function lubVHist(id){const it=lubVItens().find(x=>x.id===id);if(!it)return;const hs=it.historico||[];openModal(`<div class="modal"><div class="mtitle">📜 Histórico · ${esc(it.pat)} · ${esc(it.serv)}</div>
+  ${hs.length?`<div class="tw"><table><thead><tr><th>Data</th><th>Horímetro</th><th>Rodou</th><th>Obs</th></tr></thead><tbody>${hs.map(x=>`<tr><td>${esc(x.data)}</td><td style="font-family:var(--mono)"><strong>${lubVFmt(x.h)}</strong> h</td><td style="color:var(--muted2)">${lubVFmt(x.rodou)} h</td><td style="color:var(--muted2)">${esc(x.obs||'')}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty"><div class="ei">🕓</div><p>Nenhuma troca registrada ainda.</p></div>`}
+  <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Fechar</button></div></div>`)}
+
+// importação opcional em massa dos horímetros atuais (atualiza a Frota)
+function lubVImpHor(inp){const f=inp.files[0];if(!f)return;inp.value='';const r=new FileReader();r.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'binary'});const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});let hr=0,h={};for(let i=0;i<Math.min(rows.length,8);i++){const hh={};(rows[i]||[]).forEach((c,j)=>hh[lubVNorm(c)]=j);if('pat'in hh||'patrimonio'in hh){hr=i;h=hh;break}}const cP=('pat'in h)?h.pat:h.patrimonio;const cH=h['horimetro atual']!=null?h['horimetro atual']:(h['horimetro']!=null?h['horimetro']:h['leitura']);if(cP==null||cH==null){toast('Planilha precisa de PAT e Horímetro','err');return}let upd=0;for(let i=hr+1;i<rows.length;i++){const rr=rows[i];if(!rr||!String(rr[cP]).trim())continue;const pat=String(rr[cP]).trim();const m=lubVMaq(pat);if(!m)continue;m.horimetro=lubVNum(rr[cH]);lubSave('lubFrota',m);upd++}render();toast('Horímetros atualizados · '+upd+' máquina(s)')}catch(err){toast('Erro ao ler a planilha','err')}};r.readAsBinaryString(f)}
+
+function buildLubVenc(){
+  const maqs=lubMaqsUnidade();
+  const itens=lubVItens();
+  const meus=maqs.map(m=>({m,its:itens.filter(x=>x.pat===m.id)}));
+  // KPIs
+  let venc=0,prox=0,ok=0,semh=0,nItens=0;
+  meus.forEach(({m,its})=>its.forEach(it=>{nItens++;const s=lubVStat(it,lubVHor(m.id));if(s.k==='crit')venc++;else if(s.k==='warn')prox++;else if(s.k==='ok')ok++;else semh++}));
+  const passo=`<div class="card" style="background:#b4530910;border-color:#b4530933;padding:12px 16px;margin-bottom:14px;font-size:12.5px;color:#8a4a08;line-height:1.7">
+    <strong>Como funciona:</strong> &nbsp;1️⃣ atualize o <strong>horímetro atual</strong> da máquina &nbsp;·&nbsp; 2️⃣ clique em <strong>▶ Iniciar</strong> para cada engraxe/troca (intervalo + horímetro inicial) &nbsp;·&nbsp; 3️⃣ a cada engraxe, use <strong>🛢️ Troca</strong> e lance o horímetro do momento — o contador zera e vai para o histórico.</div>`;
+  const toolbar=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px">
+    <button class="btn btn-gh btn-sm" onclick="document.getElementById('lubVfileHor').click()">⬆ Importar horímetros (opcional)</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)">Avisar quando faltar (h): <input type="number" value="${lubVAntec()}" onchange="lubVSetAntec(this.value)" style="width:64px;padding:6px 8px;border:1px solid var(--border2);border-radius:7px;font-family:var(--mono);font-size:12px"/></div>
+    <input type="file" id="lubVfileHor" accept=".xlsx,.xls,.csv" style="display:none" onchange="lubVImpHor(this)"/></div>`;
+  const kpis=`<div style="display:grid;gap:12px;grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+    <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="klbl">Vencidos</div><div class="kval" style="${venc?'color:var(--red)':''}">${venc}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--amber)"></div><div class="klbl">Próximos</div><div class="kval" style="${prox?'color:var(--amber)':''}">${prox}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="klbl">Em dia</div><div class="kval">${ok}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--muted)"></div><div class="klbl">Serviços monitorados</div><div class="kval">${nItens}</div></div></div>`;
+  if(!maqs.length)return passo+`<div class="card"><div class="empty"><div class="ei">🚜</div><p>Nenhuma máquina nesta unidade. Cadastre/atribua na aba <strong>Frota</strong> primeiro.</p></div></div>`;
+  // ordena máquinas: as com item mais urgente primeiro
+  meus.sort((a,b)=>{const ra=Math.min(...(a.its.map(it=>{const s=lubVStat(it,lubVHor(a.m.id));return s.rest==null?1e9:s.rest}).concat([1e12])));const rb=Math.min(...(b.its.map(it=>{const s=lubVStat(it,lubVHor(b.m.id));return s.rest==null?1e9:s.rest}).concat([1e12])));return ra-rb});
+  const cards=meus.map(({m,its})=>{
+    const hAt=lubVHor(m.id);
+    const linhas=its.map(it=>{const s=lubVStat(it,hAt);const cor=LUBV_COR[s.k];
+      return `<tr data-st="${s.k}">
+        <td>${esc(it.serv)}</td>
+        <td style="font-family:var(--mono);text-align:right">${lubVFmt(it.intervalo)}</td>
+        <td style="font-family:var(--mono);text-align:right">${lubVFmt(it.h_ultima_troca)}</td>
+        <td style="font-family:var(--mono);text-align:right">${lubVFmt(s.prox)}</td>
+        <td style="font-family:var(--mono);text-align:right;${s.rest!=null&&s.rest<=0?'color:var(--red);font-weight:700':''}">${s.rest==null?'—':lubVFmt(s.rest)}</td>
+        <td style="min-width:70px"><div style="height:7px;background:#0001;border-radius:5px;overflow:hidden"><span style="display:block;height:100%;width:${Math.min(s.pct*100,100)}%;background:${cor}"></span></div></td>
+        <td><span class="bdg ${s.cls}">${s.lbl}</span></td>
+        <td><div style="display:flex;gap:5px;justify-content:flex-end"><button class="btn btn-b btn-sm" style="background:#b45309;border-color:#b45309" onclick="lubVTroca('${it.id}')">🛢️ Troca</button><button class="btn btn-gh btn-sm" onclick="lubVHist('${it.id}')">Hist.</button><button class="btn btn-gh btn-sm" onclick="lubVDel('${it.id}')" style="color:var(--red)">✕</button></div></td>
+      </tr>`}).join('');
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:${its.length?'10px':'0'}">
+        <div><strong style="color:#b45309;font-family:var(--mono);font-size:15px">${esc(m.id)}</strong> <span style="color:var(--muted2);font-size:13px">${esc(m.descricao||'')}</span>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Horímetro atual: <strong style="font-family:var(--mono);color:var(--text)">${hAt!=null?lubVFmt(hAt)+' h':'— não informado'}</strong>
+            <button class="btn btn-gh btn-sm" style="margin-left:6px;padding:2px 8px" onclick="lubVSetHor('${esc(m.id)}')">✎ atualizar</button></div></div>
+        <button class="btn btn-b btn-sm" style="margin-left:auto;background:#b45309;border-color:#b45309" onclick="lubVIniciar('${esc(m.id)}')">${its.length?'＋ serviço':'▶ Iniciar controle'}</button>
+      </div>
+      ${its.length?`<div class="tw"><table><thead><tr><th>Serviço</th><th style="text-align:right">Intervalo</th><th style="text-align:right">Últ. troca</th><th style="text-align:right">Próx.</th><th style="text-align:right">Faltam</th><th>Vida útil</th><th>Status</th><th></th></tr></thead><tbody>${linhas}</tbody></table></div>`:''}
+    </div>`}).join('');
+  return passo+toolbar+kpis+`<div class="stitle" style="font-size:12px;color:var(--muted2);margin:4px 2px 8px">Máquinas — ${esc(APP.unidade)} (${maqs.length})</div>`+cards;
+}
+
 function lubMount(){
   if(APP.page==='lub_exec'){
     const maq=document.getElementById('lubExMaq');
@@ -5963,4 +6076,3 @@ function buildOilPareto(){
 }
 </script>
 </body>
-</html>
