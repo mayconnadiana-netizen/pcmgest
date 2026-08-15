@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,viewport-fit=cover"/>
 <title>Gestão Integrada — PCM</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
+<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=Q8d0ojWZOcIu2RGLx_W0L3cVQvUDiaSJrnaGxQYju-z8RNM3zSOUZu23ItVIPFuC_vsUwAqZLFTk6j4Zj6dZlXojfn-8nRnBBFePQCBQ6IMw2V4pxUFXJ35tMsuih2zHFpUx3y9Jy8BwCozVLTKnJF0T9U4rYbaOxpucF7b-qT8IKYaxaW-mymlkMHNcrGbKaMc3n9OPmKvH1-m4tWyU9xtcDVfPdK6L-83NqpAesUghLkB4B0CuNDedEGyISUhLsreVkx3ZTxsF91x414dob0sDyPzvFCl8hny-xhFnKtI3zzsk_y4dIlMVTVTcyTyK-w02Ue9eOb7mJHY6g1IRSKZ8TF-8jjHTwmP2bgRmKds" charset="UTF-8"></script><style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#e9ebef;--s1:#f7f8fa;--s2:#fbfcfd;--s3:#eef0f4;
@@ -798,6 +798,7 @@ const FB={
   toFS(obj){const f={};for(const[k,v]of Object.entries(obj)){if(v===null||v===undefined)f[k]={nullValue:null};else if(typeof v==='boolean')f[k]={booleanValue:v};else if(typeof v==='number')f[k]={doubleValue:v};else if(typeof v==='string')f[k]={stringValue:v};else f[k]={stringValue:JSON.stringify(v)};}return{fields:f}},
   fromFS(doc){if(!doc||!doc.fields)return null;const o={};for(const[k,v]of Object.entries(doc.fields)){if(v.nullValue!==undefined)o[k]=null;else if(v.booleanValue!==undefined)o[k]=v.booleanValue;else if(v.doubleValue!==undefined)o[k]=v.doubleValue;else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);else if(v.stringValue!==undefined){try{const p=JSON.parse(v.stringValue);o[k]=(typeof p==='object'&&p!==null)?p:v.stringValue;}catch(e){o[k]=v.stringValue;}}}return o},
   async getAll(col){try{let out=[],tok='';do{const r=await fetch(`${this.base(col)}?key=${this.key()}&pageSize=300${tok?'&pageToken='+encodeURIComponent(tok):''}`);if(!r.ok)break;const d=await r.json();if(d.documents)out=out.concat(d.documents.map(doc=>this.fromFS(doc)));tok=d.nextPageToken||'';}while(tok);return out;}catch(e){return[];}},
+  async get(col,id){try{const r=await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`);if(!r.ok)return null;return this.fromFS(await r.json());}catch(e){return null;}},
   async set(col,id,obj){try{const r=await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(this.toFS(obj))});return r.ok;}catch(e){return false;}},
   async delete(col,id){try{const r=await fetch(`${this.base(col)}/${encodeURIComponent(id)}?key=${this.key()}`,{method:'DELETE'});return r.ok;}catch(e){return false;}}
 };
@@ -3895,12 +3896,14 @@ function buildLibBrowser(){
   </div>`:''}
   ${files.length>0?`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px">Arquivos</div>
   <div class="file-grid">
-    ${files.map(f=>{const ext=f.name?.split('.').pop();return`<div class="file-card" oncontextmenu="libCtxMenu(event,'${f.id}','file')">
+    ${files.map(f=>{const ext=f.name?.split('.').pop();return`<div class="file-card" onclick="libOpenFile('${f.id}')" oncontextmenu="libCtxMenu(event,'${f.id}','file')">
       <div class="file-ico">${fileIcon(ext)}</div><div class="file-name">${esc(f.name)}</div>
       <div class="file-meta"><span class="bdg pur" style="font-size:9px">${fileType(ext)}</span></div>
       <div class="file-meta" style="margin-top:4px">${fmtSize(f.size)} · ${fmtDate(f.uploadedAt)}</div>
       ${f.desc?`<div class="file-meta" style="font-style:italic;margin-top:3px">${esc(f.desc)}</div>`:''}
-      <div class="file-actions">
+      ${f.cloud?`<div class="file-meta" style="margin-top:4px;color:var(--greent)">☁ Salvo no banco de dados</div>`:''}
+      <div class="file-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-p btn-sm" onclick="libOpenFile('${f.id}')">👁 Abrir</button>
         <button class="btn btn-gh btn-sm" onclick="libDownload('${f.id}')">⬇</button>
         <button class="btn btn-gh btn-sm" onclick="openEditFileModal('${f.id}')">✏</button>
         <button class="btn btn-d btn-sm" onclick="libDelFile('${f.id}')">✕</button>
@@ -3921,6 +3924,7 @@ function buildLibRecent(){
     <td style="font-size:11px;color:var(--muted2)">${fmtDate(f.uploadedAt)}</td>
     <td style="font-size:11px;color:var(--muted2)">📁 ${esc(path)}</td>
     <td><div style="display:flex;gap:4px">
+      <button class="btn btn-p btn-sm" onclick="libOpenFile('${f.id}')">👁 Abrir</button>
       <button class="btn btn-gh btn-sm" onclick="libDownload('${f.id}')">⬇</button>
       <button class="btn btn-gh btn-sm" onclick="libSelectFolder('${f.parentId||'null'}');APP.page='files';render()">📂 Abrir</button>
     </div></td>
@@ -3946,7 +3950,7 @@ function libCtxMenu(e,id,type){
   const m=document.createElement('div');m.id='lib-ctx';m.className='ctx-menu';
   m.style.left=e.clientX+'px';m.style.top=e.clientY+'px';
   if(type==='folder'){m.innerHTML=`<div class="ctx-item" onclick="libCtxClose();libSelectFolder('${id}')">📂 Abrir</div><div class="ctx-item" onclick="libCtxClose();openNewFolderModal('${id}')">📁 Nova subpasta</div><div class="ctx-item" onclick="libCtxClose();openUploadModal('${id}')">⬆ Upload aqui</div><div class="ctx-item" onclick="libCtxClose();openRenameFolderModal('${id}')">✏ Renomear</div><div class="ctx-sep"></div><div class="ctx-item danger" onclick="libCtxClose();libDelFolder('${id}')">✕ Excluir</div>`;}
-  else{m.innerHTML=`<div class="ctx-item" onclick="libCtxClose();libDownload('${id}')">⬇ Baixar</div><div class="ctx-item" onclick="libCtxClose();openEditFileModal('${id}')">✏ Editar</div><div class="ctx-sep"></div><div class="ctx-item danger" onclick="libCtxClose();libDelFile('${id}')">✕ Excluir</div>`;}
+  else{m.innerHTML=`<div class="ctx-item" onclick="libCtxClose();libOpenFile('${id}')">👁 Abrir</div><div class="ctx-item" onclick="libCtxClose();libDownload('${id}')">⬇ Baixar</div><div class="ctx-item" onclick="libCtxClose();openEditFileModal('${id}')">✏ Editar</div><div class="ctx-sep"></div><div class="ctx-item danger" onclick="libCtxClose();libDelFile('${id}')">✕ Excluir</div>`;}
   document.body.appendChild(m);setTimeout(()=>document.addEventListener('click',libCtxClose,{once:true}),10);
 }
 function libCtxClose(){document.getElementById('lib-ctx')?.remove()}
@@ -3994,8 +3998,10 @@ async function libDelFolder(id){
   const nodes=libNodes();const toDelete=[];
   function collect(fid){nodes.filter(n=>n.parentId===fid).forEach(n=>{toDelete.push(n.id);if(n.type==='folder')collect(n.id)});}
   collect(id);toDelete.push(id);
+  const deletingNodes=nodes.filter(n=>toDelete.includes(n.id));
+  for(const n of deletingNodes){ if(n.type==='file') await libDeleteStoredFile(n); }
   LOCAL.set('libTree',nodes.filter(n=>!toDelete.includes(n.id)));
-  toDelete.forEach(did=>FB.delete('libTree',did));
+  for(const did of toDelete) await FB.delete('libTree',did);
   if(APP.libSelected===id)APP.libSelected=null;
   toast('Excluída.');render();
 }
@@ -4018,101 +4024,120 @@ function openUploadModal(parentId){
 
 function libHandleDrop(e,parentId){e.preventDefault();document.getElementById('dz')?.classList.remove('drag-over');libHandleFiles(e.dataTransfer.files,parentId);}
 
+const LIB_FILE_CHUNK_SIZE = 600000; // ~600 KB por documento, abaixo do limite de 1 MiB do Firestore
+const LIB_MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB por arquivo
+
+function libChunkId(fileId,index){ return `${fileId}_${String(index).padStart(5,'0')}`; }
+
+async function libStoreFileData(fileId,dataUrl){
+  const chunks=[];
+  for(let i=0;i<dataUrl.length;i+=LIB_FILE_CHUNK_SIZE) chunks.push(dataUrl.slice(i,i+LIB_FILE_CHUNK_SIZE));
+  for(let i=0;i<chunks.length;i++){
+    const ok=await FB.set('libFileChunks',libChunkId(fileId,i),{fileId,index:i,data:chunks[i]});
+    if(!ok) throw new Error(`Falha ao enviar bloco ${i+1}/${chunks.length}`);
+  }
+  return chunks.length;
+}
+
+async function libLoadFileData(file){
+  if(file.data) return file.data; // compatibilidade com arquivos antigos deste navegador
+  const count=Number(file.chunkCount||0);
+  if(!count) return null;
+  const parts=[];
+  for(let i=0;i<count;i++){
+    const chunk=await FB.get('libFileChunks',libChunkId(file.id,i));
+    if(!chunk || typeof chunk.data!=='string') throw new Error(`Bloco ${i+1} não encontrado`);
+    parts.push(chunk.data);
+  }
+  return parts.join('');
+}
+
+async function libDeleteStoredFile(file){
+  const count=Number(file?.chunkCount||0);
+  for(let i=0;i<count;i++) await FB.delete('libFileChunks',libChunkId(file.id,i));
+}
+
 function libHandleFiles(fileList,parentId){
   const pid=(parentId===null||parentId==='null')?null:parentId;
   const desc=qval('fdesc');
-  const MAX_SIZE = 4 * 1024 * 1024; // 4MB limite seguro para localStorage
-  let added=0, errors=0;
-  const files = Array.from(fileList);
-  let processed = 0;
-
+  const files=Array.from(fileList);
   files.forEach(file=>{
-    // Verificar tamanho antes de ler
-    if(file.size > MAX_SIZE){
-      errors++;
-      processed++;
-      const prev=document.getElementById('upload-preview');
-      if(prev)prev.innerHTML=`<div class="infobox" style="margin-top:8px;font-size:12px;color:var(--red)">✕ "${file.name}" é grande demais (${(file.size/1024/1024).toFixed(1)}MB). Limite: 4MB.</div>`;
-      toast(`"${file.name}" grande demais — máx 4MB.`,'err');
+    if(file.size > LIB_MAX_FILE_SIZE){
+      toast(`"${file.name}" excede o limite de 20 MB.`,'err');
       return;
     }
-
     const reader=new FileReader();
-    reader.onerror=()=>{
-      errors++;
-      processed++;
-      toast(`Erro ao ler "${file.name}".`,'err');
-    };
+    reader.onerror=()=>toast(`Erro ao ler "${file.name}".`,'err');
     reader.onload=async e=>{
+      const nodeId=uid();
       try{
-        const ext = file.name.split('.').pop().toLowerCase();
+        const ext=file.name.split('.').pop().toLowerCase();
+        toast(`Enviando ${file.name} para o banco de dados...`,'info');
+        const chunkCount=await libStoreFileData(nodeId,e.target.result);
         const node={
-          id:uid(),
-          name:file.name,
-          type:'file',
-          parentId:pid,
-          size:file.size,
-          uploadedAt:new Date().toISOString(),
-          desc: desc||'',
-          ext,
-          mimeType: file.type||'',
-          data:e.target.result  // base64 — salvo só no localStorage
+          id:nodeId,name:file.name,type:'file',parentId:pid,size:file.size,
+          uploadedAt:new Date().toISOString(),desc:desc||'',ext,mimeType:file.type||'',
+          chunkCount,storage:'firestore-chunks',cloud:true
         };
-        // Salvar no localStorage (com data)
-        const fresh=libNodes();
-        fresh.push(node);
-        LOCAL.set('libTree',fresh);
-        if(!LOCAL.find('libTree',node.id)){ toast(`Sem espaço local para "${file.name}" — o conteúdo não ficará disponível para download neste navegador.`,'warn'); }
-        // Salvar no Firestore SEM o data (evita limite 1MB)
-        const nodeForFS={...node};
-        delete nodeForFS.data;
-        await FB.set('libTree',node.id,nodeForFS);
-        added++;
-        processed++;
+        const ok=await FB.set('libTree',node.id,node);
+        if(!ok) throw new Error('Não foi possível gravar os metadados do arquivo');
+        const fresh=libNodes();fresh.push(node);LOCAL.set('libTree',fresh);
         if(pid)APP.libOpenFolders[pid]=true;
         const prev=document.getElementById('upload-preview');
         if(prev){
-          const icon = fileIcon(ext);
-          const size = file.size < 1024 ? file.size+'B' : file.size < 1024*1024 ? (file.size/1024).toFixed(0)+'KB' : (file.size/1024/1024).toFixed(1)+'MB';
-          prev.innerHTML=`<div class="infobox" style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${added} arquivo${added>1?'s':''} adicionado${added>1?'s':''}: ${icon} ${esc(file.name)} (${size})</div>`;
+          const icon=fileIcon(ext);
+          const size=file.size<1024?file.size+'B':file.size<1024*1024?(file.size/1024).toFixed(0)+'KB':(file.size/1024/1024).toFixed(1)+'MB';
+          prev.innerHTML=`<div class="infobox" style="margin-top:8px;font-size:12px;color:var(--green)">✓ ${icon} ${esc(file.name)} (${size}) salvo no banco de dados · ${chunkCount} bloco(s)</div>`;
         }
-        toast(`${file.name} adicionado!`,'ok');
-        render();
+        toast(`${file.name} salvo na nuvem!`,'ok');render();
       }catch(err){
-        errors++;
-        processed++;
-        console.error('libHandleFiles error:',err);
-        toast(`Erro ao salvar "${file.name}": ${err.message||'tente novamente'}`,'err');
+        console.error('libHandleFiles cloud error:',err);
+        const temp={id:nodeId,chunkCount:Math.ceil((e.target.result?.length||0)/LIB_FILE_CHUNK_SIZE)};
+        await libDeleteStoredFile(temp);
+        toast(`Erro ao salvar "${file.name}" no banco: ${err.message||'tente novamente'}`,'err');
       }
     };
-    // Ler como DataURL (base64) — funciona para todos os tipos incluindo .docx
     reader.readAsDataURL(file);
   });
 }
 
-function libDownload(id){
-  const f=libNodes().find(n=>n.id===id);
-  if(!f)return toast('Arquivo não encontrado.','err');
-  if(!f.data){
-    // Tentar buscar do Firebase
-    toast('Buscando arquivo...','info');
-    FB.get('libTree',id).then(node=>{
-      if(node&&node.data){
-        const a=document.createElement('a');a.href=node.data;a.download=f.name;document.body.appendChild(a);a.click();a.remove();
-        toast('Download: '+f.name,'ok');
-      } else {
-        toast('Arquivo sem conteúdo — reenvie o arquivo.','err');
-      }
-    }).catch(()=>toast('Erro ao baixar arquivo.','err'));
-    return;
-  }
-  const a=document.createElement('a');
-  a.href=f.data;
-  a.download=f.name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  toast('Download: '+f.name,'ok');
+async function libGetFileData(id){
+  let f=libNodes().find(n=>n.id===id);
+  if(!f) return null;
+  // atualiza metadados pela nuvem para outro computador / cache antigo
+  const remote=await FB.get('libTree',id);
+  if(remote){ f={...f,...remote}; LOCAL.upsert('libTree',f); }
+  const data=await libLoadFileData(f);
+  return data?{file:f,data}:null;
+}
+
+async function libDownload(id){
+  toast('Buscando arquivo no banco de dados...','info');
+  try{
+    const pack=await libGetFileData(id);
+    if(!pack) return toast('Arquivo sem conteúdo no banco de dados. Reenvie o arquivo.','err');
+    const a=document.createElement('a');a.href=pack.data;a.download=pack.file.name;document.body.appendChild(a);a.click();a.remove();
+    toast('Download: '+pack.file.name,'ok');
+  }catch(err){ console.error(err);toast('Erro ao baixar arquivo do banco de dados.','err'); }
+}
+
+async function libOpenFile(id){
+  toast('Abrindo arquivo...','info');
+  try{
+    const pack=await libGetFileData(id);
+    if(!pack) return toast('Arquivo sem conteúdo no banco de dados.','err');
+    const r=await fetch(pack.data);const blob=await r.blob();const url=URL.createObjectURL(blob);
+    const ext=(pack.file.ext||'').toLowerCase();
+    if(['pdf','png','jpg','jpeg','gif','webp','txt','csv','html'].includes(ext)){
+      const w=window.open(url,'_blank');
+      if(!w) toast('Permita pop-ups para abrir o arquivo.','warn');
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }else{
+      const a=document.createElement('a');a.href=url;a.download=pack.file.name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+      toast('Arquivo baixado para abrir no aplicativo correspondente.','ok');
+    }
+  }catch(err){ console.error(err);toast('Erro ao abrir arquivo.','err'); }
 }
 
 function openEditFileModal(id){
@@ -4127,14 +4152,16 @@ function openEditFileModal(id){
 async function libEditFile(id){
   const name=qval('fn'),desc=qval('fdesc');if(!name)return toast('Digite um nome.','err');
   const nodes=libNodes();const i=nodes.findIndex(n=>n.id===id);
-  if(i>=0){nodes[i].name=name;nodes[i].desc=desc;LOCAL.set('libTree',nodes);FB.set('libTree',id,nodes[i]);}
+  if(i>=0){nodes[i].name=name;nodes[i].desc=desc;LOCAL.set('libTree',nodes);const meta={...nodes[i]};delete meta.data;FB.set('libTree',id,meta);}
   closeModal();toast('Atualizado!');render();
 }
 
 async function libDelFile(id){
-  if(!await customConfirm({title:'Excluir Registro',msg:'Esta ação não pode ser desfeita.',icon:'📋',confirmLabel:'Sim, excluir'}))return;
-  LOCAL.set('libTree',libNodes().filter(n=>n.id!==id));FB.delete('libTree',id);
-  toast('Excluído.');render();
+  if(!await customConfirm({title:'Excluir Registro',msg:'Esta ação não pode ser desfeita. O arquivo também será removido do banco de dados.',icon:'📋',confirmLabel:'Sim, excluir'}))return;
+  const file=libNodes().find(n=>n.id===id) || await FB.get('libTree',id);
+  if(file) await libDeleteStoredFile(file);
+  LOCAL.set('libTree',libNodes().filter(n=>n.id!==id));await FB.delete('libTree',id);
+  toast('Arquivo excluído do banco de dados.');render();
 }
 
 // ═══════ FERRAMENTARIA MODALS ═══════
