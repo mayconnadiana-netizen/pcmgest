@@ -802,60 +802,103 @@ const AUTH = {
   },
 
   // Busca usuário no Firebase (coleção "users")
+  // Retorna null apenas quando o documento realmente não existe.
+  // Erros de conexão/permissão são propagados para não parecer "e-mail não encontrado".
   async findUser(email) {
+    email = String(email||'').trim().toLowerCase();
     try {
-      const r = await fetch(`https://firestore.googleapis.com/v1/projects/pcm-gest/databases/(default)/documents/users/${encodeURIComponent(email)}?key=AIzaSyDylbEPtXs35nw9r2Q1n8lSou5r8u2c_WA`);
-      if (!r.ok) return null;
+      const url = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/users/${encodeURIComponent(email)}?key=${firebaseConfig.apiKey}`;
+      const r = await fetch(url);
+
+      if (r.status === 404) return null;
+
+      if (!r.ok) {
+        let detalhe = '';
+        try {
+          const err = await r.json();
+          detalhe = err?.error?.message || '';
+        } catch(e){}
+        const msg = r.status === 403
+          ? 'Acesso ao banco de usuários foi negado pelo Firebase.'
+          : `Falha ao consultar usuários no Firebase (${r.status}).`;
+        throw new Error(detalhe ? `${msg} ${detalhe}` : msg);
+      }
+
       const d = await r.json();
       if (!d.fields) return null;
-      return FB.fromFS(d);
-    } catch(e){ return null; }
+      const user = FB.fromFS(d);
+      return user ? {...user, email: String(user.email||email).trim().toLowerCase()} : null;
+    } catch(e){
+      console.error('AUTH.findUser:', e);
+      throw e;
+    }
   },
 
-  // Salva usuário no Firebase
+  // Salva usuário no Firebase e confirma a gravação
   async saveUser(user) {
-    await FB.set('users', user.email, user);
+    const normalized = {...user, email:String(user.email||'').trim().toLowerCase()};
+    const ok = await FB.set('users', normalized.email, normalized);
+    if (!ok) throw new Error('Não foi possível salvar o usuário no Firebase. Verifique a conexão e as regras do Firestore.');
+    return normalized;
   },
 
   // Lista todos os usuários
   async listUsers() {
-    return await FB.getAll('users');
+    try{
+      return await FB.getAll('users');
+    }catch(e){
+      console.error('AUTH.listUsers:',e);
+      return [];
+    }
   },
 
   // Login
   async login(email, password) {
-    email = email.trim().toLowerCase();
-    const hashed = await this.hash(password);
-    const user = await this.findUser(email);
-    if (!user) return { ok: false, msg: 'E-mail não encontrado.' };
-    if (user.passwordHash !== hashed) return { ok: false, msg: 'Senha incorreta.' };
-    if (user.status === 'pending') return { ok: false, msg: 'pending' };
-    if (user.status === 'blocked') return { ok: false, msg: 'Conta bloqueada. Entre em contato com o administrador.' };
-    this.save(user);
-    return { ok: true };
+    email = String(email||'').trim().toLowerCase();
+    try{
+      const hashed = await this.hash(password);
+      const user = await this.findUser(email);
+      if (!user) return { ok: false, msg: 'E-mail não encontrado no banco de usuários.' };
+      if (!user.passwordHash) return { ok:false, msg:'Cadastro de usuário inválido: senha não configurada. Procure o administrador.' };
+      if (user.passwordHash !== hashed) return { ok: false, msg: 'Senha incorreta.' };
+      if (user.status === 'pending') return { ok: false, msg: 'pending' };
+      if (user.status === 'blocked') return { ok: false, msg: 'Conta bloqueada. Entre em contato com o administrador.' };
+      if (user.status && !['active','pending','blocked'].includes(user.status))
+        return {ok:false,msg:'Cadastro de usuário com status inválido.'};
+      this.save(user);
+      return { ok: true };
+    }catch(e){
+      console.error('AUTH.login:',e);
+      return {ok:false,msg:e.message||'Não foi possível acessar o banco de usuários.'};
+    }
   },
 
   // Registro
   async register(name, email, password) {
-    email = email.trim().toLowerCase();
-    if (!name || !email || !password) return { ok: false, msg: 'Preencha todos os campos.' };
-    if (password.length < 6) return { ok: false, msg: 'A senha deve ter no mínimo 6 caracteres.' };
-    const existing = await this.findUser(email);
-    if (existing) return { ok: false, msg: 'Este e-mail já está cadastrado.' };
-    const hashed = await this.hash(password);
-    const isAdmin = email === ADMIN_EMAIL;
-    const user = {
-      id: uid(),
-      email,
-      name,
-      passwordHash: hashed,
-      status: isAdmin ? 'active' : 'pending',
-      role: isAdmin ? 'admin' : 'user',
-      createdAt: new Date().toISOString()
-    };
-    await this.saveUser(user);
-    if (isAdmin) { this.save(user); return { ok: true }; }
-    return { ok: true, pending: true };
+    email = String(email||'').trim().toLowerCase();
+    try{
+      if (!name || !email || !password) return { ok: false, msg: 'Preencha todos os campos.' };
+      if (password.length < 6) return { ok: false, msg: 'A senha deve ter no mínimo 6 caracteres.' };
+      const existing = await this.findUser(email);
+      if (existing) return { ok: false, msg: 'Este e-mail já está cadastrado.' };
+      const hashed = await this.hash(password);
+      const isAdmin = email === ADMIN_EMAIL;
+      const user = {
+        id: uid(),
+        email,
+        name,
+        passwordHash: hashed,
+        status: isAdmin ? 'active' : 'pending',
+        role: isAdmin ? 'admin' : 'user',
+        createdAt: new Date().toISOString()
+      };
+      const saved = await this.saveUser(user);
+      if (isAdmin) { this.save(saved); return { ok: true }; }
+      return { ok: true, pending: true };
+    }catch(e){
+      console.error('AUTH.register:',e);
+      return {ok:false,msg:e.message||'Não foi possível cadastrar o usuário no banco.'};
+    }
   },
 
   // Admin: aprovar usuário com unidades
