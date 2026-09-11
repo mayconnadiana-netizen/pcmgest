@@ -957,7 +957,7 @@ const FB={
 };
 
 // ═══════ LOCAL CACHE ═══════
-const KEYS={tools:'gi_tools',mechs:'gi_mechs',loans:'gi_loans',machines:'gi_machines',batteries:'gi_batteries',batHist:'gi_bathist',libTree:'gi_libtree',lubFrota:'gi_lubfrota',lubExec:'gi_lubexec',progOS:'gi_progos',quadroBoard:'gi_quadroboard',quadroCat:'gi_quadrocat',machineMaster:'gi_machine_master',machineMoves:'gi_machine_moves'};
+const KEYS={tools:'gi_tools',mechs:'gi_mechs',loans:'gi_loans',machines:'gi_machines',batteries:'gi_batteries',batHist:'gi_bathist',libTree:'gi_libtree',lubFrota:'gi_lubfrota',lubExec:'gi_lubexec',progOS:'gi_progos',quadroBoard:'gi_quadroboard',quadroCat:'gi_quadrocat',machineMaster:'gi_machine_master',machineMoves:'gi_machine_moves',tires:'gi_tires',tireHist:'gi_tirehist'};
 const LOCAL={
   get(k){try{return JSON.parse(localStorage.getItem(KEYS[k])||'[]')}catch(e){return[]}},
   set(k,v){try{localStorage.setItem(KEYS[k],JSON.stringify(v))}catch(e){}},
@@ -2006,6 +2006,7 @@ async function buildApp(){
   if(APP.module==='lub')return buildLubShell();
   if(APP.module==='prog')return buildProgShell();
   if(APP.module==='quadro')return buildQuadroShell();
+  if(APP.module==='tires')return buildTireShell();
   if(APP.module==='indicadores')return buildIndicadoresPCM();
   return'';
 }
@@ -2354,6 +2355,7 @@ function getOilPlanos(){ try{ return JSON.parse(localStorage.getItem('oil_planos
 function saveOilPlanos(p){ localStorage.setItem('oil_planos', JSON.stringify(p)); }
 
 function buildOilShell(){
+  oilApplyOverridesOnce();
   if(!APP.oilPage) APP.oilPage = 'dash';
   const criticos = OIL_MOTORES.filter(m=>m.status==='critico').length;
   const anormais = OIL_MOTORES.filter(m=>m.status==='anormal').length;
@@ -2372,6 +2374,7 @@ function buildOilShell(){
     {id:'rul',      ico:'⏱️', lbl:'Vida Útil (RUL)',   sec:'Preditivo'},
     {id:'roi',      ico:'💰', lbl:'ROI & Custo',       sec:null},
     {id:'maquinas_rel', ico:'📋', lbl:'Máquinas & Relatórios', sec:'Gestão', pill:planosAbertos||'', pillc:'amr'},
+    {id:'quadro',   ico:'📌', lbl:'Quadro de Plano de Ação', sec:null, pill:planosAbertos||'', pillc:'amr'},
     {id:'falha',    ico:'🔍', lbl:'Análise de Falha',   sec:'Diagnóstico'},
     {id:'causaraiz',ico:'🌳', lbl:'Causa Raiz (5 Porquês)',sec:null},
     {id:'pareto',   ico:'📊', lbl:'Pareto de Falhas',   sec:null},
@@ -2385,6 +2388,7 @@ function buildOilShell(){
   else if(APP.oilPage==='rul')       pc=buildOilRUL();
   else if(APP.oilPage==='roi')       pc=buildOilROI();
   else if(APP.oilPage==='maquinas_rel') pc=buildOilMaquinasRel();
+  else if(APP.oilPage==='quadro')    pc=buildOilQuadro();
   else if(APP.oilPage && APP.oilPage.startsWith('rel_')) pc=buildOilRelatorioMaquina(APP.oilPage.replace('rel_',''));
   else if(APP.oilPage==='falha')      pc=buildOilAnalyseFalha();
   else if(APP.oilPage==='causaraiz')  pc=buildOilCausaRaiz();
@@ -3244,6 +3248,406 @@ function toggleOilPasso(planoId, passoId){
   render();
 }
 
+// ═══════════════════════════════════════════════════════════════
+// QUADRO DE PLANO DE AÇÃO — ANÁLISE DE ÓLEO
+// Importa planilha de laudos → atualiza motores/status → gera/atualiza
+// planos de ação automaticamente → quadro (kanban) para execução.
+// ═══════════════════════════════════════════════════════════════
+const OIL_OVERRIDES_KEY='oil_motores_overrides';
+
+function oilLoadOverrides(){ try{ return JSON.parse(localStorage.getItem(OIL_OVERRIDES_KEY)||'{}'); }catch(e){ return {}; } }
+function oilSaveOverrides(map){ localStorage.setItem(OIL_OVERRIDES_KEY, JSON.stringify(map)); }
+
+// Aplica overrides persistidos (de importações anteriores) sobre OIL_MOTORES, uma vez por carregamento.
+// Cada override é o objeto COMPLETO do motor: se já existe (mesmo id), substitui os campos;
+// se é um motor novo (criado automaticamente numa importação anterior), é inserido no array.
+function oilApplyOverridesOnce(){
+  if(OIL_MOTORES._overridesApplied) return;
+  OIL_MOTORES._overridesApplied = true;
+  const ov = oilLoadOverrides();
+  Object.values(ov).forEach(saved=>{
+    const existing = OIL_MOTORES.find(m=>m.id===saved.id);
+    if(existing) Object.assign(existing, saved);
+    else OIL_MOTORES.push(saved);
+  });
+}
+
+// Calcula o pior status entre todos os parâmetros medidos, usando os limites já usados no app.
+// (Usado apenas para o plano manual/planilha genérica — quando o laudo já traz "Status da amostra",
+// esse valor do laboratório é usado diretamente, por ser mais confiável.)
+function oilComputeStatus(params, limites){
+  const ordem={normal:0,atencao:1,anormal:2,critico:3};
+  let pior='normal';
+  Object.keys(limites||{}).forEach(k=>{
+    if(params[k]==null || params[k]==='') return;
+    const s=oilParamStatus(Number(params[k]), limites[k]);
+    if(ordem[s]>ordem[pior]) pior=s;
+  });
+  return pior;
+}
+
+function oilFindMotor(ref){
+  const n=String(ref||'').trim().toLowerCase();
+  if(!n) return null;
+  return OIL_MOTORES.find(m=>
+    String(m.id).toLowerCase()===n ||
+    String(m.placa||'').toLowerCase()===n ||
+    String(m.nome||'').toLowerCase()===n
+  ) || null;
+}
+
+// Sugere a(s) ação(ões) do plano a partir de quais parâmetros estão fora da faixa (fallback quando
+// o laudo importado não trouxe um texto de "Ações de inspeção" pronto).
+function oilSugerirAcoes(m){
+  const acoes=[], p=m.params||{}, lim=m.limites||{};
+  const st=(k)=>lim[k]?oilParamStatus(Number(p[k]),lim[k]):'normal';
+  if(['ferro','cobre','chumbo','aluminio'].some(k=>lim[k]&&st(k)!=='normal'))
+    acoes.push('Troca de óleo e filtro + inspeção de desgaste interno (metais elevados)');
+  if(lim.viscosidade && st('viscosidade')!=='normal')
+    acoes.push('Verificar viscosidade — possível contaminação por combustível ou superaquecimento');
+  if(lim.acidez && st('acidez')!=='normal')
+    acoes.push('Verificar acidez (TAN) — indício de oxidação, antecipar troca de óleo');
+  if(lim.silicio && st('silicio')!=='normal')
+    acoes.push('Inspecionar filtro de ar e vedações — contaminação por silício/poeira');
+  if(lim.agua && st('agua')!=='normal')
+    acoes.push('Investigar entrada de água — juntas, respiro e arrefecimento');
+  if(lim.oxidacao && st('oxidacao')!=='normal')
+    acoes.push('Reduzir intervalo de troca — nível de oxidação elevado');
+  if(!acoes.length) acoes.push('Monitoramento de rotina — parâmetros dentro da faixa');
+  return acoes;
+}
+
+function oilPrazoSugerido(prioridade){
+  const d=new Date();
+  d.setDate(d.getDate()+({critico:2,anormal:7,atencao:15,normal:30}[prioridade]||15));
+  return d.toISOString().slice(0,10);
+}
+
+function oilRulFromStatus(status){
+  return {critico:12,anormal:38,atencao:60,normal:85}[status] ?? 60;
+}
+
+// Faixas de referência para equipamentos criados automaticamente via importação de laudo (parâmetro
+// medido pelo laboratório em cSt a 100°C para óleo de motor — diferente da faixa a 40°C usada nos
+// motores de demonstração).
+const OIL_DEFAULT_LIMITES={viscosidade:[12.5,16.3],ferro:[0,150],cobre:[0,30],chumbo:[0,30],aluminio:[0,20],silicio:[0,25],agua:[0,0.2],oxidacao:[0,40]};
+
+// ═══════════════════════════════════════════════════════════════
+// IMPORTAÇÃO DA PLANILHA DE LAUDO (modelo ALS/S360 — "Exportação de
+// Resultados de Amostra"). O layout é lido pelo NOME das colunas do
+// cabeçalho (linha 1), então a ordem/quantidade de colunas do arquivo
+// pode variar sem quebrar a importação.
+// ═══════════════════════════════════════════════════════════════
+const OIL_IMPORT={rows:[]};
+
+// Normaliza um cabeçalho/texto para comparação: sem acento, sem °, minúsculo, espaços únicos.
+function oilNormHeader(s){
+  return String(s||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[°º]/g,'')
+    .replace(/\s+/g,' ')
+    .trim().toLowerCase();
+}
+
+// Traduz o texto de status do laudo ("Normal","Atenção","Anormal","Crítico") para as chaves internas.
+function oilNormStatusLabel(s){
+  const n=oilNormHeader(s);
+  return {normal:'normal',atencao:'atencao',anormal:'anormal',critico:'critico'}[n] || null;
+}
+
+// Converte datas em formatos comuns de planilha (serial Excel, dd/mm/aaaa, aaaa-mm-dd) para ISO curto.
+function oilParseDateFlexible(v){
+  if(v==null || v==='') return '';
+  if(v instanceof Date) return isNaN(v.getTime())?'':v.toISOString().slice(0,10);
+  if(typeof v==='number'){
+    const d=new Date(Math.round((v-25569)*86400*1000));
+    return isNaN(d.getTime())?'':d.toISOString().slice(0,10);
+  }
+  const s=String(v).trim();
+  let m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return s.slice(0,10);
+  return '';
+}
+
+// Mapa: nome (normalizado) da coluna do laudo → colunas onde ele aparece (pode haver mais de uma,
+// pois o laboratório repete o cabeçalho para métodos/programas diferentes; usamos a primeira preenchida).
+function oilBuildHeaderIndex(headers){
+  const idx={};
+  headers.forEach((h,i)=>{
+    const k=oilNormHeader(h);
+    if(!k) return;
+    if(!idx[k]) idx[k]=[];
+    idx[k].push(i);
+  });
+  return idx;
+}
+function oilGetFirstText(row, idx, name){
+  const cols=idx[oilNormHeader(name)]||[];
+  for(const c of cols){ const v=row[c]; if(v!=null && String(v).trim()!=='') return String(v).trim(); }
+  return '';
+}
+function oilGetFirstNumber(row, idx, name){
+  const cols=idx[oilNormHeader(name)]||[];
+  for(const c of cols){
+    const v=row[c]; if(v==null || String(v).trim()==='') continue;
+    const n=Number(String(v).replace(',','.'));
+    if(!isNaN(n)) return n;
+  }
+  return null;
+}
+
+// Parâmetros numéricos do laudo → chave interna usada em motor.params. Só entram aqui os que têm
+// faixa de referência em OIL_DEFAULT_LIMITES, para exibir corretamente na página de detalhe do motor.
+// Outros parâmetros do laudo (TBN, Nitração, Sulfatação, Fuligem etc.) já ficam registrados no texto
+// de "Ações de inspeção"/"Avaliação" do próprio laboratório, usado na ação do plano.
+const OIL_S360_PARAM_MAP={
+  'ferro':'ferro', 'cobre':'cobre', 'chumbo':'chumbo', 'aluminio':'aluminio', 'silicio':'silicio',
+  'viscosidade 100c':'viscosidade', 'viscosidade 40c':'viscosidade',
+  'oxidacao-ftir':'oxidacao',
+};
+
+function oilOpenImport(){
+  OIL_IMPORT.rows=[];
+  openModal(`<div class="modal" style="max-width:960px">
+    <div class="mtitle g">📥 Importar laudo de análise de óleo</div>
+    <div class="infobox">Anexe o arquivo <strong>.xlsx exportado direto do laboratório</strong> (modelo ALS/S360 — "Exportação de Resultados de Amostra"). O sistema identifica as colunas pelo nome do cabeçalho, localiza o equipamento pela <strong>Tag/Frota</strong>, usa o <strong>Status da amostra</strong> e as <strong>Ações de inspeção</strong> já emitidas pelo laboratório, e gera/atualiza automaticamente o plano de ação no Quadro. Equipamentos ainda não cadastrados são criados automaticamente.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <label class="btn btn-g btn-sm" style="cursor:pointer;margin:0">📂 Selecionar planilha do laboratório<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="oilReadImport(this)"></label>
+    </div>
+    <div id="oil-import-status" class="infobox">Selecione o arquivo .xlsx exportado pelo laboratório.</div>
+    <div class="mm-table" id="oil-import-preview" style="display:none;max-height:360px;overflow:auto"></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-g" id="oil-import-confirm" disabled onclick="oilConfirmImport()">Importar e atualizar plano</button></div>
+  </div>`);
+}
+
+function oilReadImport(input){
+  const file=input.files?.[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      let rows=[];
+      if(file.name.toLowerCase().endsWith('.csv')){
+        rows=String(e.target.result).split(/\r?\n/).map(l=>l.split(/[;,]/).map(c=>c.trim().replace(/^"|"$/g,'')));
+      }else{
+        const wb=XLSX.read(e.target.result,{type:'binary'});
+        const sheetName = wb.SheetNames.find(n=>/resultado/i.test(n)) || wb.SheetNames[0];
+        rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:''});
+      }
+      const headers=rows[0]||[];
+      const idx=oilBuildHeaderIndex(headers);
+      const data=rows.slice(1).filter(r=>r.some(c=>String(c??'').trim()!==''));
+
+      OIL_IMPORT.rows=data.map((r,i)=>{
+        const tag=oilGetFirstText(r,idx,'Tag / frota');
+        let err='';
+        if(!tag) err='Coluna "Tag / frota" vazia — não é possível identificar o equipamento';
+
+        const dataColeta=oilParseDateFlexible(oilGetFirstText(r,idx,'Data de coleta')) ||
+                          oilParseDateFlexible(oilGetFirstText(r,idx,'Data de recebimento')) ||
+                          new Date().toISOString().slice(0,10);
+        const statusLab=oilNormStatusLabel(oilGetFirstText(r,idx,'Status da amostra')) || 'normal';
+        const acao=oilGetFirstText(r,idx,'Ações de inspeção');
+        const avaliacao=oilGetFirstText(r,idx,'Avaliação');
+        const compartimento=oilGetFirstText(r,idx,'Nome do compartimento');
+        const familia=oilGetFirstText(r,idx,'Família do equipamento');
+        const fabricante=oilGetFirstText(r,idx,'Fabricante do equipamento');
+        const modelo=oilGetFirstText(r,idx,'Modelo do equipamento');
+        const chassi=oilGetFirstText(r,idx,'Serie / chassi');
+        const setor=oilGetFirstText(r,idx,'Setor');
+        const amostra=oilGetFirstText(r,idx,'Número da Amostra');
+        const horasEquip=oilGetFirstNumber(r,idx,'Horas do equipamento na coleta');
+        const horasOleo=oilGetFirstNumber(r,idx,'Horas do óleo');
+
+        const params={};
+        Object.entries(OIL_S360_PARAM_MAP).forEach(([labName,ourKey])=>{
+          const v=oilGetFirstNumber(r,idx,labName);
+          if(v!=null && params[ourKey]==null) params[ourKey]=v;
+        });
+
+        const motor=oilFindMotor(tag);
+        return {i:i+2, tag, err, dataColeta, statusLab, acao, avaliacao, compartimento,
+                familia, fabricante, modelo, chassi, setor, amostra, horasEquip, horasOleo, params,
+                motorId:motor?motor.id:null, motorNovo:!motor};
+      });
+      oilRenderImportPreview();
+    }catch(err){ toast('Erro ao ler planilha: '+err.message,'err'); }
+  };
+  if(file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file,'UTF-8'); else reader.readAsBinaryString(file);
+}
+
+function oilRenderImportPreview(){
+  const all=OIL_IMPORT.rows, ok=all.filter(x=>!x.err), bad=all.filter(x=>x.err);
+  const novos=ok.filter(x=>x.motorNovo).length;
+  const st=document.getElementById('oil-import-status');
+  if(st) st.innerHTML=`<strong>${all.length}</strong> linha(s) lidas · <span style="color:var(--greent)">${ok.length} válidas</span>${novos?` · <span style="color:var(--bluet)">${novos} equipamento(s) novo(s)</span>`:''}${bad.length?` · <span style="color:var(--redt)">${bad.length} com erro</span>`:''}`;
+  const pv=document.getElementById('oil-import-preview'); if(!pv) return;
+  pv.style.display='';
+  pv.innerHTML=`<table><thead><tr><th>Linha</th><th>Tag/Frota</th><th>Equipamento</th><th>Data</th><th>Status do laudo</th><th>Ação de inspeção</th></tr></thead><tbody>
+    ${all.map(x=>{
+      const equip=[x.fabricante,x.modelo].filter(Boolean).join(' ') || (x.motorId?OIL_MOTORES.find(m=>m.id===x.motorId)?.nome:'');
+      return `<tr><td>${x.i}</td><td><strong>${esc(x.tag||'—')}</strong>${x.motorNovo&&!x.err?' <span class="bdg info">novo</span>':''}</td><td>${esc(equip||'—')}</td><td>${esc(x.dataColeta)}</td><td>${x.err?`<span class="bdg err">${esc(x.err)}</span>`:`<span class="oil-status-badge ${x.statusLab}">${oilStatusLabel(x.statusLab)}</span>`}</td><td style="font-size:11px;max-width:340px">${esc((x.acao||x.avaliacao||'—').slice(0,140))}${(x.acao||x.avaliacao||'').length>140?'…':''}</td></tr>`;
+    }).join('')}
+  </tbody></table>`;
+  const b=document.getElementById('oil-import-confirm'); if(b) b.disabled=!ok.length;
+}
+
+function oilConfirmImport(){
+  const valid=OIL_IMPORT.rows.filter(x=>!x.err);
+  if(!valid.length) return;
+  const overrides=oilLoadOverrides();
+  let planosGerados=0, planosAtualizados=0, motoresNovos=0;
+  const planos=getOilPlanos();
+
+  valid.forEach(x=>{
+    let motor=OIL_MOTORES.find(m=>m.id===x.motorId);
+    if(!motor){
+      motor={
+        id:x.tag, nome:[x.fabricante,x.modelo].filter(Boolean).join(' ')||x.tag, placa:x.tag,
+        chassi:x.chassi||'', setor:x.setor||'', horasMotor:x.horasEquip||0, horasOleo:x.horasOleo||0,
+        ultimaAnalise:x.dataColeta, proximaTroca:'', status:'normal', rul:85, rulMax:100, degradacao:15,
+        params:{}, limites:{...OIL_DEFAULT_LIMITES}, historico:[]
+      };
+      OIL_MOTORES.push(motor);
+      motoresNovos++;
+    }
+
+    motor.params={...motor.params, ...x.params};
+    motor.ultimaAnalise=x.dataColeta;
+    if(x.horasEquip!=null) motor.horasMotor=x.horasEquip;
+    if(x.horasOleo!=null) motor.horasOleo=x.horasOleo;
+    if(x.chassi) motor.chassi=x.chassi;
+    if(x.setor) motor.setor=x.setor;
+    motor.status=x.statusLab;
+    motor.rul=oilRulFromStatus(x.statusLab);
+    motor.degradacao=100-motor.rul;
+    motor.historico=[...(motor.historico||[]), {
+      data:x.dataColeta, viscosidade:motor.params.viscosidade??'—', acidez:motor.params.acidez??'—',
+      ferro:motor.params.ferro??'—', status:x.statusLab
+    }];
+    overrides[motor.id]=JSON.parse(JSON.stringify(motor));
+
+    if(x.statusLab!=='normal'){
+      const acaoTexto=x.acao || oilSugerirAcoes(motor).join(' · ');
+      const obsTexto=[x.avaliacao, x.compartimento?`Compartimento: ${x.compartimento}`:'', x.amostra?`Amostra: ${x.amostra}`:''].filter(Boolean).join(' · ');
+      const existente=planos.find(p=>p.motorId===motor.id && p.status!=='concluido' && p.origem==='auto');
+      if(existente){
+        existente.acao=acaoTexto;
+        existente.prioridade=x.statusLab;
+        existente.prazo=oilPrazoSugerido(x.statusLab);
+        existente.obs=obsTexto||existente.obs;
+        planosAtualizados++;
+      }else{
+        planos.push({
+          id:uid(), motorId:motor.id, acao:acaoTexto, responsavel:'', prazo:oilPrazoSugerido(x.statusLab),
+          prioridade:x.statusLab, obs:obsTexto, status:'pendente',
+          origem:'auto', criadoEm:new Date().toISOString()
+        });
+        planosGerados++;
+      }
+    }
+  });
+
+  oilSaveOverrides(overrides);
+  saveOilPlanos(planos);
+  closeModal();
+  toast(`Laudo importado · ${motoresNovos} equipamento(s) novo(s) · ${planosGerados} plano(s) novo(s), ${planosAtualizados} atualizado(s).`,'ok');
+  APP.oilPage='quadro';
+  render();
+}
+
+// ── QUADRO (KANBAN) DE PLANO DE AÇÃO ──
+function buildOilQuadro(){
+  const planos=getOilPlanos();
+  const cols=[
+    {key:'pendente',  lbl:'📋 Pendente',     color:'#f59e0b'},
+    {key:'execucao',  lbl:'🔧 Em Execução',  color:'#3b82f6'},
+    {key:'concluido', lbl:'✅ Concluído',    color:'#22c55e'},
+  ];
+  const cardHtml=(p)=>{
+    const motor=OIL_MOTORES.find(m=>m.id===p.motorId);
+    const color=oilStatusColor(p.prioridade||motor?.status||'normal');
+    return `<div class="card" style="margin-bottom:10px;border-left:3px solid ${color};padding:12px">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:6px">
+        <div style="font-weight:700;font-size:12.5px;cursor:pointer" onclick="APP.oilPage='motor_${motor?.id}';render()">${esc(motor?motor.nome:'—')}</div>
+        <span class="oil-status-badge ${p.prioridade||'normal'}" style="font-size:9px">${oilStatusLabel(p.prioridade||'normal')}</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--muted2);margin:6px 0">${esc(p.acao||'')}</div>
+      <div style="font-size:10.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap">
+        ${p.responsavel?`<span>👤 ${esc(p.responsavel)}</span>`:'<span style="color:#b91c1c">👤 sem responsável</span>'}
+        ${p.prazo?`<span>📅 ${new Date(p.prazo+'T00:00:00').toLocaleDateString('pt-BR')}</span>`:''}
+        ${p.origem==='auto'?'<span>🤖 auto (planilha)</span>':''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-gh btn-sm" onclick="openOilPlanoEditar('${p.id}')">👤 Responsável/Prazo</button>
+        ${p.status==='pendente'?`<button class="btn btn-b btn-sm" onclick="updateOilPlanoStatus('${p.id}','execucao')">▶ Iniciar</button>`:''}
+        ${p.status==='execucao'?`<button class="btn btn-g btn-sm" onclick="updateOilPlanoStatus('${p.id}','concluido')">✔ Concluir</button>`:''}
+        ${p.status==='concluido'?`<button class="btn btn-gh btn-sm" onclick="updateOilPlanoStatus('${p.id}','execucao')">↺ Reabrir</button>`:''}
+        <button class="btn btn-d btn-sm" onclick="if(confirm('Remover este plano?'))deleteOilPlano('${p.id}')">🗑</button>
+      </div>
+    </div>`;
+  };
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div><div class="ctitle">📌 Quadro de Plano de Ação — Análise de Óleo</div>
+    <div style="font-size:11px;color:var(--muted2)">Importe a planilha de laudos para atualizar automaticamente o status dos motores e o plano de ação, ou crie um plano manual.</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g btn-sm" onclick="oilOpenImport()">📥 Importar planilha</button>
+      <button class="btn btn-gh btn-sm" onclick="openOilPlanoModal(OIL_MOTORES[0]?.id)">+ Plano manual</button>
+    </div>
+  </div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start">`;
+  cols.forEach(c=>{
+    const items=planos.filter(p=>p.status===c.key).sort((a,b)=>(a.prazo||'').localeCompare(b.prazo||''));
+    html+=`<div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid ${c.color}">
+        <div style="font-weight:700;font-size:12.5px">${c.lbl}</div>
+        <span class="pill" style="background:${c.color};color:#fff">${items.length}</span>
+      </div>
+      <div>${items.length?items.map(cardHtml).join(''):'<div style="font-size:11px;color:var(--muted);text-align:center;padding:20px 0">Nenhum plano</div>'}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+function openOilPlanoEditar(id){
+  const p=getOilPlanos().find(x=>x.id===id); if(!p) return;
+  closeModal();
+  const m=document.createElement('div');
+  m.className='overlay'; m.id='modal-overlay';
+  m.innerHTML=`<div class="modal" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="modal-title">👤 Responsável e prazo</div>
+      <button class="btn btn-gh btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="fgroup" style="margin-bottom:12px">
+      <label class="flbl">Responsável</label>
+      <input class="finput" id="oil-plano-editar-resp" type="text" value="${esc(p.responsavel||'')}" placeholder="Nome do mecânico"/>
+    </div>
+    <div class="fgroup" style="margin-bottom:16px">
+      <label class="flbl">Prazo</label>
+      <input class="finput" id="oil-plano-editar-prazo" type="date" value="${esc(p.prazo||'')}"/>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" onclick="salvarOilPlanoEditar('${id}')">💾 Salvar</button>
+      <button class="btn btn-gh" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{ if(e.target===m) closeModal(); });
+}
+
+function salvarOilPlanoEditar(id){
+  const resp=document.getElementById('oil-plano-editar-resp')?.value?.trim();
+  const prazo=document.getElementById('oil-plano-editar-prazo')?.value;
+  const planos=getOilPlanos().map(p=>p.id===id?{...p, responsavel:resp||p.responsavel, prazo:prazo||p.prazo}:p);
+  saveOilPlanos(planos);
+  closeModal();
+  toast('Plano atualizado.','ok');
+  render();
+}
+
 // ── CONFIG ──
 // ═══════ S360 API ═══════
 // SOLUÇÃO CORS: as chamadas passam pelo proxy local em servidor.py.
@@ -3644,6 +4048,11 @@ function buildCover(){
         <div class="ccard-ico">🔋</div><div class="ccard-name b">BATERIAS</div>
         <p class="ccard-desc">Máquinas, baterias, alocações e controle de garantias.</p>
         <div class="ctags"><span class="ctag b">Máquinas</span><span class="ctag b">Baterias</span><span class="ctag b">Garantias</span></div>
+      </div>
+      <div class="ccard cb" onclick="APP.module='tires';APP.page='dash';render()">
+        <div class="ccard-ico">🛞</div><div class="ccard-name b">CONTROLE DE PNEUS</div>
+        <p class="ccard-desc">Pneus, alocação por posição, desgaste, rodízio e garantias.</p>
+        <div class="ctags"><span class="ctag b">Pneus</span><span class="ctag b">Desgaste</span><span class="ctag b">Rodízio</span></div>
       </div>
       <div class="ccard cp" onclick="APP.module='library';APP.page='files';render()">
         <div class="ccard-ico">📚</div><div class="ccard-name p">BIBLIOTECA</div>
@@ -4627,6 +5036,304 @@ async function deallocBat(batId){
   await DB.update('batteries',batId,{machineId:null});
   toast('Desalocada.');render();
 }
+
+// ═══════════════════════════════════════════════════════════════
+//  MÓDULO CONTROLE DE PNEUS — reaproveita a coleção 'machines'
+//  já usada pelo módulo de Baterias.
+// ═══════════════════════════════════════════════════════════════
+const TIRE_POSICOES = [
+  'Dianteiro Esquerdo','Dianteiro Direito',
+  'Traseiro Esquerdo','Traseiro Esquerdo Interno','Traseiro Esquerdo Externo',
+  'Traseiro Direito','Traseiro Direito Interno','Traseiro Direito Externo',
+  'Estepe'
+];
+
+// ═══════════════ HELPERS ═══════════════
+function tireWearPct(t){
+  const ini=parseFloat(t.treadInitial), cur=parseFloat(t.treadCurrent);
+  if(!ini||cur==null||isNaN(cur))return null;
+  return Math.max(0,Math.min(100,Math.round((1-(cur/ini))*100)));
+}
+function tireWearStatus(t){
+  const p=tireWearPct(t);
+  if(p===null)return{cls:'neu',lbl:'Sem leitura'};
+  if(p>=80)return{cls:'err',lbl:`⚠ Crítico ${p}%`};
+  if(p>=60)return{cls:'amr',lbl:`⏳ Atenção ${p}%`};
+  return{cls:'ok',lbl:`✓ Ok ${p}%`};
+}
+function tireStatusBdg(t){
+  if(t.status==='descartado')return`<span class="bdg neu">Descartado</span>`;
+  if(t.machineId)return`<span class="bdg info">⚡ Instalado</span>`;
+  return`<span class="bdg ok">Estoque</span>`;
+}
+
+// ═══════════════ SHELL ═══════════════
+function buildTireShell(){
+  const machines=DB.get('machines'), tires=DB.get('tires'), tireHist=DB.get('tireHist');
+  const installed=tires.filter(t=>t.machineId && t.status!=='descartado');
+  const stock=tires.filter(t=>!t.machineId && t.status!=='descartado');
+  const critico=tires.filter(t=>t.status!=='descartado' && tireWearPct(t)!==null && tireWearPct(t)>=80);
+  const expVenc=tires.filter(t=>t.warranty && daysLeft(t.warranty)<0 && t.status!=='descartado');
+  const expSoon=tires.filter(t=>{const d=daysLeft(t.warranty);return d!==null&&d>=0&&d<90&&t.status!=='descartado'});
+  const alerts=critico.length+expVenc.length;
+  const pages=[
+    {id:'dash',ico:'📊',lbl:'Dashboard',sec:'Principal'},
+    {id:'machines',ico:'🚜',lbl:'Máquinas',sec:null,pill:machines.length,pillc:'b'},
+    {id:'tires',ico:'🛞',lbl:'Pneus',sec:null,pill:tires.filter(t=>t.status!=='descartado').length,pillc:'b'},
+    {id:'alloc',ico:'🔄',lbl:'Alocação',sec:'Operação',pill:installed.length,pillc:'b'},
+    {id:'wear',ico:'📉',lbl:'Desgaste',sec:null,pill:critico.length||'',pillc:'r'},
+    {id:'warranty',ico:'🛡',lbl:'Garantias',sec:null,pill:(expVenc.length+expSoon.length)||'',pillc:expVenc.length?'r':'amr'},
+    {id:'reports',ico:'📈',lbl:'Relatórios',sec:'Análise'}
+  ];
+  let pc='';
+  if(APP.page==='dash')pc=buildTireDash(machines,tires);
+  else if(APP.page==='machines')pc=buildMachinesList(machines,tires.map(t=>({...t}))); // reaproveita cadastro compartilhado
+  else if(APP.page==='tires')pc=buildTireList(tires,machines);
+  else if(APP.page==='alloc')pc=buildTireAlloc(tires,machines,tireHist);
+  else if(APP.page==='wear')pc=buildTireWear(tires,machines);
+  else if(APP.page==='warranty')pc=buildTireWarrantyPage(tires,machines);
+  else if(APP.page==='reports')pc=`<div class="shdr"><div class="stitle">Relatórios PDF</div><button class="btn btn-b" onclick="relTires()">📊 Gerar Relatório de Pneus</button></div>
+    <div class="g2"><div class="card" style="cursor:pointer" onclick="relTires()"><div style="font-size:28px;margin-bottom:8px">🛞</div><div style="font-weight:700">Inventário de Pneus</div><div style="font-size:12px;color:var(--muted2)">Status, desgaste e garantias</div></div></div>`;
+  return`<div class="shell">
+  <div class="sidebar">
+    <div class="sb-hdr"><div class="sb-name">🛞 PNEUS</div><div class="sb-sub">${esc(APP.unidade)}</div><span class="sb-bdg b">ATIVO</span></div>
+    ${pages.map(p=>`${p.sec?`<div class="sb-sec">${p.sec}</div>`:''}<div class="sb-item ${APP.page===p.id?'act-b':''}" onclick="APP.page='${p.id}';render()"><span>${p.ico}</span><span style="flex:1">${p.lbl}</span>${p.pill?`<span class="pill ${p.pillc}">${p.pill}</span>`:''}</div>`).join('')}
+    <div class="sb-foot">
+      <div class="sb-item" onclick="relTires()" style="border-radius:6px"><span>📊</span><span>Relatório PDF</span></div>
+      <div class="sb-item" onclick="APP.module=null;render()" style="border-radius:6px"><span>←</span><span>Menu Principal</span></div>
+      <div class="sb-item" onclick="trocarUnidade()" style="border-radius:6px;margin-top:4px"><span>🏭</span><span style="font-size:11px">Trocar Unidade</span></div>
+      <div class="sb-item" onclick="AUTH.logout()" style="border-radius:6px;color:var(--muted)"><span>🚪</span><span style="font-size:11px">Sair</span></div>
+      ${AUTH.isAdmin()?`<div class="sb-item" onclick="APP.module='admin';render()" style="border-radius:6px"><span>👥</span><span style="font-size:11px">Usuários</span></div>`:''}
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(AUTH.current()?.name||AUTH.current()?.email||'')}</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title" style="color:var(--blue)">${pages.find(p=>p.id===APP.page)?.ico} ${pages.find(p=>p.id===APP.page)?.lbl}</div>
+      <div class="tb-sub">🏭 ${esc(APP.unidade)} · ${machines.length} máquinas · ${tires.filter(t=>t.status!=='descartado').length} pneus · ${installed.length} instalados</div></div>
+      <div style="display:flex;gap:8px;align-items:center">${alerts?`<span class="bdg err">⚠ ${alerts} alerta${alerts>1?'s':''}</span>`:''}</div>
+    </div>
+    <div class="content">${pc}</div>
+  </div>
+</div>`}
+
+// ═══════════════ DASHBOARD ═══════════════
+function buildTireDash(machines,tires){
+  const active=tires.filter(t=>t.status!=='descartado');
+  const installed=active.filter(t=>t.machineId);
+  const stock=active.filter(t=>!t.machineId);
+  const critico=active.filter(t=>tireWearPct(t)!==null && tireWearPct(t)>=80);
+  const atencao=active.filter(t=>{const p=tireWearPct(t);return p!==null&&p>=60&&p<80});
+  const expVenc=active.filter(t=>t.warranty&&daysLeft(t.warranty)<0);
+  const totalVal=active.reduce((s,t)=>s+(t.purchaseValue||0),0);
+  const noPneus=machines.filter(m=>!active.some(t=>t.machineId===m.id));
+  return`<div class="kgrid k4">
+    <div class="kpi"><div class="kbar" style="background:var(--blue)"></div><div class="klbl">Total Pneus</div><div class="kval">${active.length}</div><div class="ksub">${stock.length} em estoque</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--green)"></div><div class="klbl">Instalados</div><div class="kval">${installed.length}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--gold)"></div><div class="klbl">Valor Total</div><div class="kval sm">${fmt(totalVal)}</div></div>
+    <div class="kpi"><div class="kbar" style="background:var(--red)"></div><div class="klbl">Desgaste Crítico</div><div class="kval" style="${critico.length?'color:var(--red)':''}">${critico.length}</div><div class="ksub">${atencao.length} em atenção</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ctitle b">🚜 Máquinas sem pneus registrados</div>
+    ${noPneus.length===0?`<div class="empty"><div class="ei">✅</div><p>Todas as máquinas têm pneus registrados.</p></div>`:`<div class="tw"><table><thead><tr><th>Máquina</th><th>Setor</th></tr></thead><tbody>
+    ${noPneus.map(m=>`<tr><td><strong>${esc(m.name)}</strong></td><td style="font-size:11px;color:var(--muted2)">${esc(m.sector||'—')}</td></tr>`).join('')}
+    </tbody></table></div>`}
+    </div>
+    <div class="card"><div class="ctitle b">⚠ Alertas de Desgaste</div>
+    ${[...critico,...atencao].length===0?`<div class="empty"><div class="ei">✅</div><p>Nenhum pneu com desgaste crítico.</p></div>`:`<div class="tw"><table><thead><tr><th>Código</th><th>Máquina</th><th>Posição</th><th>Desgaste</th></tr></thead><tbody>
+    ${[...critico,...atencao].map(t=>{const m=machines.find(x=>x.id===t.machineId);const ws=tireWearStatus(t);return`<tr><td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td><td>${esc(m?.name||'—')}</td><td style="font-size:11px;color:var(--muted2)">${esc(t.position||'—')}</td><td><span class="bdg ${ws.cls}">${ws.lbl}</span></td></tr>`}).join('')}
+    </tbody></table>`}
+    </div>
+    <div class="card"><div class="ctitle b">📍 Por Posição (instalados)</div>
+    <div class="tw"><table><thead><tr><th>Máquina</th><th>Posição</th><th>Pneu</th><th>Medida</th></tr></thead><tbody>
+    ${installed.map(t=>{const m=machines.find(x=>x.id===t.machineId);return`<tr><td><strong>${esc(m?.name||'?')}</strong></td><td style="font-size:11px;color:var(--muted2)">${esc(t.position||'—')}</td><td style="font-family:var(--mono)">${esc(t.code)}</td><td>${esc(t.size||'—')}</td></tr>`}).join('')}
+    </tbody></table></div>
+    </div>
+    <div class="card"><div class="ctitle b">🛡 Garantias Vencidas</div>
+    ${expVenc.length===0?`<div class="empty"><div class="ei">✅</div><p>Nenhuma garantia vencida.</p></div>`:`<div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Status</th></tr></thead><tbody>
+    ${expVenc.map(t=>`<tr><td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td><td>${esc(t.brand||'')} ${esc(t.model||'')}</td><td>${wBadge(t.warranty)}</td></tr>`).join('')}
+    </tbody></table>`}
+    </div>
+  </div>`}
+
+// ═══════════════ LISTA DE PNEUS ═══════════════
+function buildTireList(tires,machines){
+  const q=APP.tireSearch||'';
+  const filtered=tires.filter(t=>t.status!=='descartado' && [t.code,t.brand,t.model,t.size].some(s=>(s||'').toLowerCase().includes(q.toLowerCase())));
+  return`<div class="shdr"><input value="${esc(q)}" placeholder="Buscar código, marca, modelo, medida..." style="width:280px" oninput="APP.tireSearch=this.value;render()"/>
+    <button class="btn btn-b" onclick="openTireModal()">+ Novo Pneu</button></div>
+  <div class="card"><div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Medida</th><th>Valor</th><th>Sulco (mm)</th><th>Desgaste</th><th>Garantia</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+  ${filtered.length===0?`<tr><td colspan="9"><div class="empty"><div class="ei">🛞</div><p>Nenhum pneu encontrado.</p></div></td></tr>`:''}
+  ${filtered.map(t=>{const m=machines.find(x=>x.id===t.machineId);const ws=tireWearStatus(t);return`<tr>
+    <td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td>
+    <td><strong>${esc(t.brand||'—')}</strong> ${esc(t.model||'')}</td>
+    <td>${esc(t.size||'—')}</td>
+    <td style="color:var(--blue);font-weight:600">${fmt(t.purchaseValue)}</td>
+    <td style="font-size:11px">${t.treadInitial||'—'} → ${t.treadCurrent??'—'}</td>
+    <td><span class="bdg ${ws.cls}">${ws.lbl}</span></td>
+    <td>${wBadge(t.warranty)}</td>
+    <td>${tireStatusBdg(t)}${m?`<div style="font-size:10px;color:var(--muted2);margin-top:3px">${esc(m.name)}</div>`:''}</td>
+    <td><div style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="btn btn-gh btn-sm" onclick="openTireModal('${t.id}')">✏</button>
+      <button class="btn btn-gh btn-sm" onclick="openTireWearModal('${t.id}')">📉</button>
+      <button class="btn btn-d btn-sm" onclick="delTire('${t.id}')">✕</button>
+    </div></td>
+  </tr>`}).join('')}
+  </tbody></table></div></div>`}
+
+// ═══════════════ ALOCAÇÃO ═══════════════
+function buildTireAlloc(tires,machines,tireHist){
+  const installed=tires.filter(t=>t.machineId && t.status!=='descartado');
+  const stock=tires.filter(t=>!t.machineId && t.status!=='descartado');
+  const recent=[...tireHist].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+  return`<div class="shdr"><div class="stitle">Alocação de Pneus</div><button class="btn btn-b" onclick="openTireAllocModal()">+ Instalar Pneu</button></div>
+  <div class="g2">
+    <div class="card"><div class="ctitle b">⚡ Instalados (${installed.length})</div>
+    <div class="tw"><table><thead><tr><th>Pneu</th><th>Máquina</th><th>Posição</th><th>Desgaste</th><th>Ação</th></tr></thead><tbody>
+    ${installed.map(t=>{const m=machines.find(x=>x.id===t.machineId);const ws=tireWearStatus(t);return`<tr><td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td><td><strong>${esc(m?.name||'?')}</strong></td><td style="font-size:11px;color:var(--muted2)">${esc(t.position||'—')}</td><td><span class="bdg ${ws.cls}">${ws.lbl}</span></td><td><button class="btn btn-d btn-sm" onclick="deallocTire('${t.id}')">↩</button></td></tr>`}).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="ctitle">📦 Estoque (${stock.length})</div>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Marca</th><th>Medida</th></tr></thead><tbody>
+    ${stock.map(t=>`<tr><td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td><td>${esc(t.brand||'')} ${esc(t.model||'')}</td><td>${esc(t.size||'—')}</td></tr>`).join('')}
+    </tbody></table></div></div>
+  </div>
+  <div class="card"><div class="ctitle b">📅 Histórico de Movimentação</div>
+  <div class="tw"><table><thead><tr><th>Data</th><th>Pneu</th><th>Máquina</th><th>Posição</th><th>Ação</th></tr></thead><tbody>
+  ${recent.map(h=>{const t=tires.find(x=>x.id===h.tireId),m=machines.find(x=>x.id===h.machId);return`<tr><td style="font-size:11px;color:var(--muted2)">${fmtD(h.date)}</td><td><strong style="font-family:var(--mono)">${esc(t?.code||'—')}</strong></td><td>${esc(m?.name||'—')}</td><td style="font-size:11px;color:var(--muted2)">${esc(h.position||'—')}</td><td><span class="bdg ${h.action==='instalado'?'info':h.action==='rodizio'?'warn':'neu'}">${h.action==='instalado'?'⚡ Instalado':h.action==='rodizio'?'🔄 Rodízio':'↩ Removido'}</span></td></tr>`}).join('')}
+  </tbody></table></div></div>`}
+
+// ═══════════════ DESGASTE ═══════════════
+function buildTireWear(tires,machines){
+  const active=tires.filter(t=>t.status!=='descartado');
+  const sorted=[...active].sort((a,b)=>(tireWearPct(b)??-1)-(tireWearPct(a)??-1));
+  return`<div class="card"><div class="ctitle b">📉 Controle de Desgaste (sulco em mm)</div>
+  <div class="tw"><table><thead><tr><th>Código</th><th>Máquina</th><th>Posição</th><th>Sulco Inicial</th><th>Sulco Atual</th><th>Desgaste</th><th>Última Leitura</th><th>Ação</th></tr></thead><tbody>
+  ${sorted.map(t=>{const m=machines.find(x=>x.id===t.machineId);const ws=tireWearStatus(t);return`<tr>
+    <td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td>
+    <td>${esc(m?.name||'Estoque')}</td>
+    <td style="font-size:11px;color:var(--muted2)">${esc(t.position||'—')}</td>
+    <td>${t.treadInitial||'—'} mm</td>
+    <td>${t.treadCurrent??'—'} mm</td>
+    <td><span class="bdg ${ws.cls}">${ws.lbl}</span></td>
+    <td style="font-size:11px;color:var(--muted2)">${t.lastReading?fmtDate(t.lastReading):'—'}</td>
+    <td><button class="btn btn-b btn-sm" onclick="openTireWearModal('${t.id}')">📉 Ler</button></td>
+  </tr>`}).join('')}
+  </tbody></table></div></div>`}
+
+// ═══════════════ GARANTIAS ═══════════════
+function buildTireWarrantyPage(tires,machines){
+  const active=tires.filter(t=>t.status!=='descartado');
+  const sorted=[...active].sort((a,b)=>(daysLeft(a.warranty)??9999)-(daysLeft(b.warranty)??9999));
+  return`<div class="card"><div class="ctitle b">🛡 Garantias por Criticidade</div>
+  <div class="tw"><table><thead><tr><th>Código</th><th>Marca/Modelo</th><th>Validade</th><th>Dias</th><th>Status</th><th>Máquina</th></tr></thead><tbody>
+  ${sorted.map(t=>{const m=machines.find(x=>x.id===t.machineId),d=daysLeft(t.warranty);return`<tr>
+    <td><strong style="font-family:var(--mono)">${esc(t.code)}</strong></td>
+    <td>${esc(t.brand||'')} ${esc(t.model||'')}</td>
+    <td style="font-size:11px">${fmtDate(t.warranty)||'—'}</td>
+    <td>${d===null?`<span class="bdg neu">—</span>`:d<0?`<span class="bdg err">Venc. há ${Math.abs(d)}d</span>`:`<span class="bdg ${d<60?'err':d<180?'amr':'ok'}">${d}d</span>`}</td>
+    <td>${wBadge(t.warranty)}</td>
+    <td>${t.machineId?esc(m?.name||'?'):`<span class="bdg neu">Estoque</span>`}</td>
+  </tr>`}).join('')}</tbody></table></div></div>`}
+
+// ═══════════════ MODAIS ═══════════════
+function openTireModal(id){
+  const t=id?DB.find('tires',id):null;
+  openModal(`<div class="modal fb"><div class="mtitle b">🛞 ${t?'Editar':'Novo'} Pneu</div>
+    <div class="frow c3"><div><label>Código *</label><input id="fc" value="${esc(t?.code||'')}"/></div><div><label>Marca</label><input id="fbr" value="${esc(t?.brand||'')}"/></div><div><label>Modelo</label><input id="fmo" value="${esc(t?.model||'')}"/></div></div>
+    <div class="frow c3"><div><label>Medida (ex: 18.4-34)</label><input id="fsz" value="${esc(t?.size||'')}"/></div><div><label>DOT/Fabricação</label><input id="fdot" value="${esc(t?.dot||'')}"/></div><div><label>Fornecedor</label><input id="fsup" value="${esc(t?.supplier||'')}"/></div></div>
+    <div class="frow c3"><div><label>Data Compra</label><input type="date" id="fpd" value="${t?.purchaseDate||''}"/></div><div><label>Valor (R$)</label><input type="number" step="0.01" id="fpv" value="${t?.purchaseValue||''}"/></div><div><label>Garantia</label><input type="date" id="fw" value="${t?.warranty||''}"/></div></div>
+    <div class="frow c2"><div><label>Sulco Inicial (mm)</label><input type="number" step="0.1" id="fti" value="${t?.treadInitial||''}"/></div><div><label>Sulco Atual (mm)</label><input type="number" step="0.1" id="ftc" value="${t?.treadCurrent??''}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveTire('${id||''}')">Salvar</button></div>
+  </div>`);
+}
+
+async function saveTire(id){
+  const code=qval('fc');if(!code)return toast('Preencha o código.','err');
+  if(!id&&DB.get('tires').some(t=>t.code===code))return toast('Código já existe.','err');
+  const existing=id?DB.find('tires',id):{};
+  const data={
+    id:id||uid(),code,brand:qval('fbr'),model:qval('fmo'),size:qval('fsz'),dot:qval('fdot'),
+    supplier:qval('fsup'),purchaseDate:qval('fpd'),purchaseValue:qfloat('fpv'),warranty:qval('fw'),
+    treadInitial:qfloat('fti')||null,treadCurrent:qval('ftc')!==''?qfloat('ftc'):null,
+    machineId:existing?.machineId||null,position:existing?.position||null,
+    status:existing?.status||'estoque',lastReading:existing?.lastReading||null
+  };
+  if(id){await DB.update('tires',id,data);}else{await DB.add('tires',data);}
+  closeModal();toast(id?'Atualizado!':'Cadastrado!');render();
+}
+
+async function delTire(id){
+  if(DB.find('tires',id)?.machineId)return toast('Pneu instalado. Remova antes de excluir.','err');
+  if(!await customConfirm({title:'Excluir Pneu',msg:'Esta ação não pode ser desfeita.',icon:'🛞',confirmLabel:'Sim, excluir'}))return;
+  await DB.remove('tires',id);toast('Removido.');render();
+}
+
+function openTireAllocModal(){
+  const tires=DB.get('tires'),machines=DB.get('machines');
+  const stock=tires.filter(t=>!t.machineId&&t.status!=='descartado');
+  openModal(`<div class="modal fb"><div class="mtitle b">🔄 Instalar Pneu</div>
+    <div class="frow c2">
+      <div><label>Pneu *</label><select id="ftire"><option value="">Selecione...</option>${stock.map(t=>`<option value="${t.id}">${esc(t.code)} — ${esc(t.brand||'')} ${esc(t.size||'')}</option>`).join('')}</select>${stock.length===0?`<div class="herr">Nenhum em estoque.</div>`:''}</div>
+      <div><label>Máquina *</label><select id="fmach"><option value="">Selecione...</option>${machines.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow"><div><label>Posição *</label><select id="fpos"><option value="">Selecione...</option>${TIRE_POSICOES.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('')}</select></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveTireAlloc()">✓ Instalar</button></div>
+  </div>`);
+}
+
+async function saveTireAlloc(){
+  const tireId=qval('ftire'),machId=qval('fmach'),position=qval('fpos');
+  if(!tireId)return toast('Selecione o pneu.','err');
+  if(!machId)return toast('Selecione a máquina.','err');
+  if(!position)return toast('Selecione a posição.','err');
+  const machines=DB.get('machines');
+  const occupied=DB.get('tires').find(t=>t.machineId===machId && t.position===position && t.status!=='descartado');
+  if(occupied)return toast(`Posição já ocupada por ${occupied.code}. Remova-o primeiro.`,'err');
+  await DB.update('tires',tireId,{machineId:machId,position,status:'instalado'});
+  await DB.add('tireHist',{id:uid(),tireId,machId,position,action:'instalado',date:nowDT()});
+  closeModal();toast('Pneu instalado!');render();
+}
+
+async function deallocTire(tireId){
+  const t=DB.find('tires',tireId);if(!t)return;
+  if(!await customConfirm({title:'Remover Pneu',msg:'Remover este pneu da máquina? Ele voltará ao estoque.',icon:'🛞',confirmLabel:'Remover',type:'warn'}))return;
+  await DB.add('tireHist',{id:uid(),tireId,machId:t.machineId,position:t.position,action:'removido',date:nowDT()});
+  await DB.update('tires',tireId,{machineId:null,position:null,status:'estoque'});
+  toast('Removido — voltou ao estoque.');render();
+}
+
+function openTireWearModal(id){
+  const t=DB.find('tires',id);if(!t)return;
+  openModal(`<div class="modal fb"><div class="mtitle b">📉 Leitura de Desgaste — ${esc(t.code)}</div>
+    <div class="infobox" style="font-size:12px">Sulco inicial: <strong>${t.treadInitial||'—'} mm</strong>${t.lastReading?` · Última leitura: ${fmtDate(t.lastReading)}`:''}</div>
+    <div class="frow c2"><div><label>Sulco Atual (mm) *</label><input type="number" step="0.1" id="fwc" value="${t.treadCurrent??''}"/></div>
+    <div><label>Data da Leitura</label><input type="date" id="fwd" value="${new Date().toISOString().slice(0,10)}"/></div></div>
+    <div class="mfoot"><button class="btn btn-gh" onclick="closeModal()">Cancelar</button><button class="btn btn-b" onclick="saveTireWear('${id}')">Salvar Leitura</button></div>
+  </div>`);
+}
+
+async function saveTireWear(id){
+  const cur=qfloat('fwc');
+  if(cur<=0)return toast('Informe o sulco atual.','err');
+  await DB.update('tires',id,{treadCurrent:cur,lastReading:qval('fwd')||new Date().toISOString().slice(0,10)});
+  closeModal();toast('Leitura registrada!');render();
+}
+
+// ═══════════════ RELATÓRIO PDF ═══════════════
+function relTires(){
+  const tires=DB.get('tires').filter(t=>t.status!=='descartado'),machines=DB.get('machines');
+  const installed=tires.filter(t=>t.machineId);
+  showRelViewer(`<!DOCTYPE html><html><head><meta charset="UTF-8"/>${relCSS()}</head><body>
+${relHeader('INVENTÁRIO DE PNEUS')}
+<div class="kpis k4"><div class="kpi b"><div class="kpi-lbl">Total</div><div class="kpi-val">${tires.length}</div></div><div class="kpi gr"><div class="kpi-lbl">Instalados</div><div class="kpi-val">${installed.length}</div></div><div class="kpi g"><div class="kpi-lbl">Estoque</div><div class="kpi-val">${tires.length-installed.length}</div></div><div class="kpi g"><div class="kpi-lbl">Valor Total</div><div class="kpi-val" style="font-size:16px">${fmt(tires.reduce((s,t)=>s+(t.purchaseValue||0),0))}</div></div></div>
+<div class="sec"><div class="sec-ttl">Lista de Pneus</div>
+<table><thead><tr><th>#</th><th>Código</th><th>Marca/Modelo</th><th>Medida</th><th>Valor</th><th>Sulco Ini/Atual</th><th>Desgaste</th><th>Garantia</th><th>Máquina/Posição</th></tr></thead>
+<tbody>${tires.map((t,i)=>{const m=machines.find(x=>x.id===t.machineId);const d=daysLeft(t.warranty);const ws=tireWearStatus(t);return`<tr><td>${i+1}</td><td style="font-family:monospace;font-weight:700">${esc(t.code)}</td><td><strong>${esc(t.brand||'')}</strong> ${esc(t.model||'')}</td><td>${esc(t.size||'—')}</td><td style="font-weight:700">${fmt(t.purchaseValue)}</td><td>${t.treadInitial||'—'} / ${t.treadCurrent??'—'} mm</td><td>${ws.cls==='err'?`<span class="bdg err">${ws.lbl}</span>`:ws.cls==='amr'?`<span class="bdg warn">${ws.lbl}</span>`:`<span class="bdg ok">${ws.lbl}</span>`}</td><td>${d===null?'—':d<0?`<span class="bdg err">Vencida</span>`:d<90?`<span class="bdg warn">${d}d</span>`:`<span class="bdg ok">${fmtDate(t.warranty)}</span>`}</td><td>${m?`${esc(m.name)}<br/><span style="font-size:9px;color:#666">${esc(t.position||'')}</span>`:'Estoque'}</td></tr>`}).join('')}
+<tr class="tfoot"><td colspan="4">Total ${tires.length}</td><td>${fmt(tires.reduce((s,t)=>s+(t.purchaseValue||0),0))}</td><td colspan="4"></td></tr></tbody></table></div>
+<div class="footer">PCM Gest · Inventário de Pneus · ${new Date().toLocaleString('pt-BR')}</div></body></html>`,'Inventário de Pneus');
+}
+
+
 
 // ═══════ TERMOS ═══════
 function showTermoViewer(html,title){
