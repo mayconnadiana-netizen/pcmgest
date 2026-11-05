@@ -872,12 +872,28 @@ textarea.ipt{resize:vertical;min-height:44px}
 .cu .sub{color:var(--mu);font-size:12px}
 .cu-bn{background:var(--hl);border-left:3px solid var(--ac);padding:8px 12px;margin-bottom:12px;border-radius:0 6px 6px 0;font-size:12.5px}
 .cu-bn a{color:var(--pr);font-weight:600}
-.cu button,.cu select{font:inherit;font-size:13px;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:6px 12px;cursor:pointer}
+.cu button,.cu select,.cu input[type=search]{font:inherit;font-size:13px;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:6px 12px;cursor:pointer}
 .cu button.p{background:var(--pr);border-color:var(--pr);color:#fff;font-weight:600}
-.cu button:focus-visible,.cu select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.cu button:focus-visible,.cu select:focus-visible,.cu input[type=search]:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .cu .fl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .cu .fl label{display:flex;flex-direction:column;gap:2px;color:var(--mu);font-size:12px}
 .cu .fl select{min-width:150px;max-width:240px}
+.cu .fl input[type=search]{min-width:170px;max-width:240px;cursor:text}
+.cu .fl .fq-n{color:var(--mu);font-size:11px;max-width:240px}
+.cu .fl .ms-l{display:flex;flex-direction:column;gap:2px;color:var(--mu);font-size:12px}
+.cu .ms{position:relative}
+.cu .ms summary{list-style:none;min-width:150px;max-width:240px;font-size:13px;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:6px 28px 6px 12px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative}
+.cu .ms summary::-webkit-details-marker{display:none}
+.cu .ms summary::after{content:"\25BE";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--mu)}
+.cu .ms[open] summary{border-color:var(--pr)}
+.cu .ms summary:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.cu .ms-p{position:absolute;z-index:30;top:calc(100% + 4px);left:0;width:max-content;min-width:100%;max-width:340px;text-align:left;max-height:260px;overflow:auto;background:var(--sf);border:1px solid var(--ln);border-radius:8px;box-shadow:0 8px 24px rgba(24,30,42,.16);padding:6px}
+.cu .fl .ms-p .ms-o{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;margin:0;padding:6px 8px;border-radius:6px;color:var(--tx);font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;text-align:left;cursor:pointer;white-space:nowrap;width:auto}
+.cu .fl .ms-p .ms-o:hover{background:var(--hl)}
+.cu .fl .ms-p .ms-o input{flex:none;width:16px;height:16px;margin:0;padding:0;accent-color:var(--pr);cursor:pointer}
+.cu .fl .ms-p .ms-o span{flex:1;text-align:left}
+.cu .ms-f{border-top:1px solid var(--ln);margin-top:4px;padding-top:6px}
+.cu .ms-f button{padding:3px 10px;font-size:12px}
 .cu .kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));background:var(--sf);border:1px solid var(--ln);border-radius:8px;margin-bottom:14px;overflow:hidden}
 .cu .kp div{padding:14px 16px;border-right:1px solid var(--ln);border-bottom:1px solid var(--ln);margin:0 -1px -1px 0}
 .cu .kp b{display:block;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-top:2px}
@@ -934,6 +950,7 @@ const NADIANA_BAND="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABagAAANwCAIAAA
 // ═══════ AUTH ═══════
 // E-mail do administrador — altere para o seu
 const ADMIN_EMAIL = 'admin@pcmgest.com';
+const ADMIN_NOME = 'Usuário administrador';
 const ADMIN_RECOVERY_HASH = '44fe4686556fd428355b61c308e12ea1a75671ef77df15cec008931121d69d22';
 
 const AUTH = {
@@ -985,6 +1002,7 @@ const AUTH = {
     if (user.passwordHash !== hashed) return { ok: false, msg: 'Senha incorreta.' };
     if (user.status === 'pending') return { ok: false, msg: 'pending' };
     if (user.status === 'blocked') return { ok: false, msg: 'Conta bloqueada. Entre em contato com o administrador.' };
+    if (user.email === ADMIN_EMAIL && user.name !== ADMIN_NOME) { user.name = ADMIN_NOME; try { await this.saveUser(user); } catch(e){} }
     this.save(user);
     return { ok: true };
   },
@@ -2326,6 +2344,7 @@ async function buildAdminShell(){
   const me=AUTH.current();
 
   function userCard(u){
+    if(u.email===ADMIN_EMAIL&&u.name!==ADMIN_NOME)u={...u,name:ADMIN_NOME};
     const isMe=u.email===me.email;
     const avCls=u.role==='admin'?'adm':u.status==='pending'?'pen':'usr';
     const avLetter=(u.name||u.email||'?')[0].toUpperCase();
@@ -7930,7 +7949,14 @@ const N=new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
 const P=v=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(1).replace('.',',')+'%';
 const K=v=>v>=1e6?(v/1e6).toFixed(1).replace('.',',')+' mi':v>=1e3?Math.round(v/1e3)+' mil':Math.round(v);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let rows=[],F={},demo=false,PN={},DIM='pat';
+let rows=[],F={},demo=false,PN={},DIM='pat',FQ='',cuFqT=null;
+/* filtros de seleção múltipla (valor = array). Para tornar outro filtro múltiplo, basta incluir a chave aqui e usar msel() no lugar de sel() */
+const MULTI=new Set(['safra','fam','sis']);let MSO='';
+const fOn=k=>Array.isArray(F[k])?F[k].length>0:!!F[k];
+const fHas=(k,v)=>Array.isArray(F[k])?F[k].includes(v):F[k]==v;
+const fTxt=k=>Array.isArray(F[k])?F[k].join(' + '):F[k];
+/* busca por número de frota (patrimônio): parcial, sem acento e sem diferenciar maiúscula */
+const fq=r=>!FQ||cuNm(r.pat).includes(cuNm(FQ));
 
 function num(v){if(typeof v=='number')return v;if(v==null||v==='')return 0;let s=String(v).trim();if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=parseFloat(s);return isNaN(n)?0:n}
 function dt(v){if(v instanceof Date)return isNaN(v)?null:v;if(typeof v=='number')return v>20000?new Date(Math.round((v-25569)*864e5)):null;if(v==null||v==='')return null;const s=String(v).trim();if(/^\d{5}(\.\d+)?$/.test(s))return dt(parseFloat(s));let m=s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);if(m){const y=+m[3]<100?2000+ +m[3]:+m[3];return new Date(y,m[2]-1,+m[1])}m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],m[2]-1,+m[3]);const d=new Date(s);return isNaN(d)?null:d}
@@ -7951,7 +7977,7 @@ function agg(l){const ps={};let tot=0,bruto=0,desc=0;const docs=new Set();
  return{tot,bruto,desc,docs:docs.size,a,h,cph:h?ch/h:null}}
 const by=(l,k)=>{const o={};l.forEach(r=>o[r[k]]=(o[r[k]]||0)+r.tot);return Object.entries(o).sort((a,b)=>b[1]-a[1])};
 
-function hb(items,lim,k){const mx=Math.max(...items.map(i=>i[1]),1);return items.slice(0,lim).map(([l,v,x])=>{x=x??l;const on=F[k]==x,dim=F[k]&&!on;return`<div class="hb ck${on?' on':''}" data-k="${k}" data-v="${esc(x)}" tabindex="0" role="button" aria-pressed="${on}" style="${dim?'opacity:.4':''}"><em title="${esc(l)}">${esc(l)}</em><i><u style="width:${v/mx*100}%"></u></i><span>${R.format(v)}</span></div>`}).join('')||'<div class="e">Sem dados</div>'}
+function hb(items,lim,k){const mx=Math.max(...items.map(i=>i[1]),1);return items.slice(0,lim).map(([l,v,x])=>{x=x??l;const on=fHas(k,x),dim=fOn(k)&&!on;return`<div class="hb ck${on?' on':''}" data-k="${k}" data-v="${esc(x)}" tabindex="0" role="button" aria-pressed="${on}" style="${dim?'opacity:.4':''}"><em title="${esc(l)}">${esc(l)}</em><i><u style="width:${v/mx*100}%"></u></i><span>${R.format(v)}</span></div>`}).join('')||'<div class="e">Sem dados</div>'}
 
 function chart(l){const mo={};l.forEach(r=>mo[r.m]=(mo[r.m]||0)+r.tot);const ks=Object.keys(mo).sort(),v=ks.map(k=>mo[k]);
  if(!ks.length)return'<div class="e">Sem dados</div>';
@@ -7979,8 +8005,9 @@ function cuRender(){
  if(!rows.length){cuEmpty();return}
  const opt=k=>[...new Set(rows.map(r=>r[k]))].sort(),HF=rows.some(r=>r.forn);
  const sel=(id,l,k)=>`<label>${l}<select data-k="${id}"><option value="">Todos</option>${opt(k).map(o=>`<option value="${esc(o)}" ${F[id]==o?'selected':''}>${esc(k=='pat'&&PN[o]?o+' · '+PN[o]:o)}</option>`).join('')}</select></label>`;
- const l=rows.filter(r=>Object.keys(F).every(k=>!F[k]||r[k]==F[k])),lf=s=>{const S=[].concat(s);return rows.filter(r=>Object.keys(F).every(k=>S.includes(k)||!F[k]||r[k]==F[k]))};
- const LB={unid:'Unidade',faz:'Fazenda',safra:'Safra',fam:'Categoria',mod:'Grupo de bens',esc:'Escopo',tp:'Tipo de gasto',sv:'Item',sis:'Sistema',fx:'Origem',marca:'Marca',forn:'Fornecedor',m:'Mês',pat:'Máquina',prod:'Produto',apl:'Aplicação',grp:'Grupo'},act=Object.keys(F).filter(k=>F[k]),chips=act.length?`<div class="chips">${act.map(k=>`<button class="ck" data-k="${k}" data-v="${esc(F[k])}" title="Remover filtro">${LB[k]||k}: ${esc(k=='m'?M[F[k]%100-1]+'/'+String(F[k]).slice(2,4):F[k])} ✕</button>`).join('')}<button id="cu-cl">Limpar filtros</button></div>`:'';
+ const msel=(id,l,k)=>{const S=Array.isArray(F[id])?F[id]:[],n=S.length,txt=!n?'Todas':n==1?S[0]:n+' selecionadas';return`<div class="ms-l">${l}<details class="ms" data-k="${id}" ${MSO==id?'open':''}><summary title="${esc(S.join(', '))}">${esc(txt)}</summary><div class="ms-p">${opt(k).map(v=>`<label class="ms-o"><input type="checkbox" data-ms="${id}" data-v="${esc(v)}" ${S.includes(v)?'checked':''}/><span>${esc(v)}</span></label>`).join('')}<div class="ms-f"><button type="button" data-msall="${id}">Limpar seleção</button></div></div></details></div>`};
+  const l=rows.filter(r=>fq(r)&&Object.keys(F).every(k=>!fOn(k)||fHas(k,r[k]))),lf=s=>{const S=[].concat(s);return rows.filter(r=>fq(r)&&Object.keys(F).every(k=>S.includes(k)||!fOn(k)||fHas(k,r[k])))};
+ const LB={unid:'Unidade',faz:'Fazenda',safra:'Safra',fam:'Categoria',mod:'Grupo de bens',esc:'Escopo',tp:'Tipo de gasto',sv:'Item',sis:'Sistema',fx:'Origem',marca:'Marca',forn:'Fornecedor',m:'Mês',pat:'Máquina',prod:'Produto',apl:'Aplicação',grp:'Grupo'},act=Object.keys(F).filter(k=>fOn(k)),chips=(act.length||FQ)?`<div class="chips">${act.flatMap(k=>(Array.isArray(F[k])?F[k]:[F[k]]).map(v=>`<button class="ck" data-k="${k}" data-v="${esc(v)}" title="Remover filtro">${LB[k]||k}: ${esc(k=='m'?M[v%100-1]+'/'+String(v).slice(2,4):v)} ✕</button>`)).join('')}${FQ?`<button id="cu-fq-x" title="Remover busca">Frota: ${esc(FQ)} ✕</button>`:''}<button id="cu-cl">Limpar filtros</button></div>`:'';
  const A=agg(l),ms=[...new Set(l.map(r=>r.m))].sort(),L2=lf('m'),ms2=[...new Set(L2.map(r=>r.m))].sort().filter(m=>!F.m||m<=F.m);
  let vm=null,lastLbl='';
  if(ms2.length>1){const c=L2.filter(r=>r.m==ms2[ms2.length-1]).reduce((s,r)=>s+r.tot,0),p=L2.filter(r=>r.m==ms2[ms2.length-2]).reduce((s,r)=>s+r.tot,0);vm=p?c/p-1:null;lastLbl=M[ms2[ms2.length-1]%100-1]+'/'+String(ms2[ms2.length-1]).slice(2,4)}
@@ -7993,7 +8020,7 @@ function cuRender(){
  const pm=new Set(mk.filter(k=>mt[k]<avgM*.3)),al=[];for(const o of hm.values()){const ks=Object.keys(o.c).filter(k=>!pm.has(k)),n=ks.length,tt=ks.reduce((q,k)=>q+o.c[k],0);if(n<4)continue;for(const k of ks){const v=o.c[k],avg=(tt-v)/(n-1);if(v>=30000&&avg&&v/avg>=2&&(!F.m||F.m==k))al.push({p:o.p,m:k,v,avg,mult:v/avg})}}al.sort((a,b)=>(b.v-b.avg)-(a.v-a.avg));const alN=al.length;al.length=Math.min(al.length,15);
  const sp=supAgg(lf('forn')),spT=sp.reduce((s,x)=>s+x.t,0);
  const SYS=by(lf('sis'),'sis'),PP=prodAgg(lf('prod').filter(r=>r.tp=='Manutenção'&&r.sv!='Serviços'),HF).a,TV=PP.slice(0,10),TQ=[...PP].sort((a,b)=>b.q-a.q).slice(0,10);
- const svAll=rows.filter(r=>r.sv=='Serviços'),svIn=lf('fam').filter(r=>r.sv=='Serviços'),svNote=`<div class="sub" style="margin-top:6px">${!svAll.length?'Nenhum serviço detectado no arquivo (procuro unidade SV, produto começando com SV ou família com "serviço").':!svIn.length?`${N.format(svAll.length)} lançamentos de serviço (${R.format(svAll.reduce((q,r)=>q+r.tot,0))}) estão fora dos filtros atuais: ${esc(act.map(k=>(LB[k]||k)+'='+F[k]).join('; '))}. Clique em Limpar filtros.`:''}</div>`;
+ const svAll=rows.filter(r=>r.sv=='Serviços'),svIn=lf('fam').filter(r=>r.sv=='Serviços'),svNote=`<div class="sub" style="margin-top:6px">${!svAll.length?'Nenhum serviço detectado no arquivo (procuro unidade SV, produto começando com SV ou família com "serviço").':!svIn.length?`${N.format(svAll.length)} lançamentos de serviço (${R.format(svAll.reduce((q,r)=>q+r.tot,0))}) estão fora dos filtros atuais: ${esc(act.map(k=>(LB[k]||k)+'='+fTxt(k)).join('; '))}. Clique em Limpar filtros.`:''}</div>`;
  const SVR=lf('prod').filter(r=>r.sv=='Serviços'),SVT=SVR.reduce((q,r)=>q+r.tot,0),SVP=(()=>{const o=new Map();for(const r of SVR){let x=o.get(r.prod);if(!x){x={k:r.prod,t:0,n:0,p:new Set};o.set(r.prod,x)}x.t+=r.tot;x.n++;x.p.add(r.pat)}return[...o.values()].sort((a,b)=>b.t-a.t)})();
  const FXC=(()=>{const o={};for(const r of lf('fx')){if(!r.forn)continue;const x=o[r.fam]??={p:0,e:0};r.fx=='Externo'?x.e+=r.tot:x.p+=r.tot}return Object.entries(o).sort((a,b)=>b[1].p+b[1].e-a[1].p-a[1].e).slice(0,10)})();
  const PC=(()=>{const o=new Map();for(const r of lf('forn')){if(!r.forn||r.fx!='Externo'||r.qtd<=0||r.tot<=0||r.sv=='Serviços')continue;let p=o.get(r.prod);if(!p){p=new Map();o.set(r.prod,p)}let z=p.get(r.forn);if(!z){z={t:0,q:0};p.set(r.forn,z)}z.t+=r.tot;z.q+=r.qtd}
@@ -8003,7 +8030,7 @@ function cuRender(){
   return`<tr class="ck${F.pat==p.pat?' on':''}" data-k="pat" data-v="${esc(p.pat)}" tabindex="0"><td>${esc(p.pat)}</td><td>${esc(p.mod)}</td><td>${esc(p.faz)}</td><td>${R.format(p.tot)}</td><td>${p.h?N.format(p.h):'—'}</td><td>${cph?R2.format(cph):'—'}</td><td class="${dv>.1?'up':dv<-.1?'dn':''}">${dv==null?'—':P(dv)}</td><td><span class="bg ${cl}">${cl}</span></td><td><span class="bg ${st[1]=='ok'?'':st[1]}" ${st[1]=='ok'?'style="background:var(--ok)"':''}>${st[0]}</span></td></tr>`}).join('');
  sub.textContent=`${N.format(l.length)} lançamentos · ${A.a.length} máquinas · ${ms.length} meses`;
  const keep=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.k;
- app.innerHTML=`${chips}<div class="seg" style="margin-bottom:10px">${[['','Tudo'],['Manutenção','Manutenção'],['Combustível e arla','Combustível']].map(([v,n])=>`<button class="${(F.tp||'')==v?'on':''}" data-tp="${v}">${n}</button>`).join('')}</div><div class="seg" style="margin-bottom:10px">${[['','Serviços e peças'],['Serviços','Só serviços'],['Peças e outros','Só peças']].map(([v,n])=>`<button class="${(F.sv||'')==v?'on':''}" data-sv="${v}">${n}</button>`).join('')}</div><div class="fl">${sel('unid','Unidade PCM','unid')}${sel('esc','Escopo','esc')}${sel('faz','Fazenda','faz')}${sel('safra','Safra','safra')}${sel('fam','Categoria','fam')}${sel('sis','Sistema','sis')}${sel('mod','Grupo de bens','mod')}${sel('pat','Equipamento','pat')}${sel('marca','Marca','marca')}${HF?sel('forn','Fornecedor','forn')+sel('fx','Origem','fx'):''}</div>
+ app.innerHTML=`${chips}<div class="seg" style="margin-bottom:10px">${[['','Tudo'],['Manutenção','Manutenção'],['Combustível e arla','Combustível']].map(([v,n])=>`<button class="${(F.tp||'')==v?'on':''}" data-tp="${v}">${n}</button>`).join('')}</div><div class="seg" style="margin-bottom:10px">${[['','Serviços e peças'],['Serviços','Só serviços'],['Peças e outros','Só peças']].map(([v,n])=>`<button class="${(F.sv||'')==v?'on':''}" data-sv="${v}">${n}</button>`).join('')}</div><div class="fl"><label>Buscar frota<input type="search" id="cu-fq" value="${esc(FQ)}" placeholder="Ex.: TR12, CL45" autocomplete="off" spellcheck="false" aria-label="Buscar por número de frota"/>${FQ?`<span class="fq-n">${l.length?N.format(new Set(l.map(r=>r.pat)).size)+' equipamento(s) encontrado(s)':(rows.some(fq)?'Nada nos filtros atuais. Há lançamentos dessa frota fora deles (unidade, safra, tipo...).':'Nenhuma frota encontrada.')}</span>`:''}</label>${sel('unid','Unidade PCM','unid')}${sel('esc','Escopo','esc')}${sel('faz','Fazenda','faz')}${msel('safra','Safra','safra')}${msel('fam','Categoria','fam')}${msel('sis','Sistema','sis')}${sel('mod','Grupo de bens','mod')}${sel('pat','Equipamento','pat')}${sel('marca','Marca','marca')}${HF?sel('forn','Fornecedor','forn')+sel('fx','Origem','fx'):''}</div>
  <div class="kp">
   <div><span>Custo total</span><b>${R.format(A.tot)}</b><small>${N.format(l.length)} lançamentos</small></div>
   <div><span>Custo por hora</span><b>${A.cph?R2.format(A.cph):'—'}</b><small>Horas ou km, só de quem tem leitura</small></div>
@@ -8026,30 +8053,37 @@ function cuRender(){
   <div class="c s4"><h2>Custo por sistema (peças)</h2>${hb(SYS,10,'sis')}</div>
   <div class="c s4"><h2>Peças que mais custam</h2><div class="tw"><table class="d"><thead><tr><th>Produto</th><th>Qtd</th><th>Custo</th></tr></thead><tbody>${TV.map(p=>`<tr class="ck" data-k="prod" data-v="${esc(p.prod)}" tabindex="0"><td title="${esc(p.prod)}">${esc(p.prod)}</td><td>${N.format(p.q)}</td><td>${R.format(p.t)}</td></tr>`).join('')||'<tr><td>Sem dados</td></tr>'}</tbody></table></div></div>
   <div class="c s4"><h2>Peças mais compradas em quantidade</h2><div class="tw"><table class="d"><thead><tr><th>Produto</th><th>Qtd</th><th>Custo</th></tr></thead><tbody>${TQ.map(p=>`<tr class="ck" data-k="prod" data-v="${esc(p.prod)}" tabindex="0"><td title="${esc(p.prod)}">${esc(p.prod)}</td><td>${N.format(p.q)}</td><td>${R.format(p.t)}</td></tr>`).join('')||'<tr><td>Sem dados</td></tr>'}</tbody></table></div><div class="sub" style="margin-top:6px">Quantidades de unidades diferentes (un, L, kg) aparecem somadas por produto.</div></div>
-  <div class="c s12"><h2>Serviços: ${R.format(SVT)} em ${N.format(SVR.length)} lançamentos${A.tot?' ('+(SVT/A.tot*100).toFixed(1).replace('.',',')+'% do custo filtrado)':''}</h2>${SVR.length?`<div class="g" style="gap:14px"><div class="s6"><div class="tw"><table class="d"><thead><tr><th>Serviço</th><th>Lançamentos</th><th>Equipamentos</th><th>Custo</th><th>% serviços</th></tr></thead><tbody>${SVP.slice(0,15).map(x=>`<tr class="ck${F.prod==x.k?' on':''}" data-k="prod" data-v="${esc(x.k)}" tabindex="0"><td title="${esc(x.k)}">${esc(x.k)}</td><td>${N.format(x.n)}</td><td>${x.p.size}</td><td>${R.format(x.t)}</td><td>${SVT?(x.t/SVT*100).toFixed(1).replace('.',','):0}%</td></tr>`).join('')}</tbody></table></div></div><div class="s6"><div class="sub" style="margin-bottom:6px">Por fornecedor</div>${HF?hb(by(SVR.filter(r=>r.forn),'forn'),8,'forn'):'<div class="e">Sem coluna de fornecedor</div>'}<div class="sub" style="margin:10px 0 6px">Por aplicação</div>${hb(by(SVR,'apl'),6,'apl')}</div></div>${SVP.length&&SVP[0].t>SVT*.6?'<div class="sub" style="margin-top:8px">Um único tipo de serviço concentra mais de 60% do gasto: a descrição do extrato não diz o que foi feito. Fornecedor e aplicação ajudam a abrir esse bloco.</div>':''}`:`<div class="e">Nenhum serviço nos filtros atuais. Categorias encontradas no extrato: ${esc([...new Set(rows.map(r=>r.fam))].slice(0,12).join(', '))}. Filtros ativos: ${esc(act.map(k=>(LB[k]||k)+'='+F[k]).join('; ')||'nenhum')}.</div>`}</div>
+  <div class="c s12"><h2>Serviços: ${R.format(SVT)} em ${N.format(SVR.length)} lançamentos${A.tot?' ('+(SVT/A.tot*100).toFixed(1).replace('.',',')+'% do custo filtrado)':''}</h2>${SVR.length?`<div class="g" style="gap:14px"><div class="s6"><div class="tw"><table class="d"><thead><tr><th>Serviço</th><th>Lançamentos</th><th>Equipamentos</th><th>Custo</th><th>% serviços</th></tr></thead><tbody>${SVP.slice(0,15).map(x=>`<tr class="ck${F.prod==x.k?' on':''}" data-k="prod" data-v="${esc(x.k)}" tabindex="0"><td title="${esc(x.k)}">${esc(x.k)}</td><td>${N.format(x.n)}</td><td>${x.p.size}</td><td>${R.format(x.t)}</td><td>${SVT?(x.t/SVT*100).toFixed(1).replace('.',','):0}%</td></tr>`).join('')}</tbody></table></div></div><div class="s6"><div class="sub" style="margin-bottom:6px">Por fornecedor</div>${HF?hb(by(SVR.filter(r=>r.forn),'forn'),8,'forn'):'<div class="e">Sem coluna de fornecedor</div>'}<div class="sub" style="margin:10px 0 6px">Por aplicação</div>${hb(by(SVR,'apl'),6,'apl')}</div></div>${SVP.length&&SVP[0].t>SVT*.6?'<div class="sub" style="margin-top:8px">Um único tipo de serviço concentra mais de 60% do gasto: a descrição do extrato não diz o que foi feito. Fornecedor e aplicação ajudam a abrir esse bloco.</div>':''}`:`<div class="e">Nenhum serviço nos filtros atuais. Categorias encontradas no extrato: ${esc([...new Set(rows.map(r=>r.fam))].slice(0,12).join(', '))}. Filtros ativos: ${esc(act.map(k=>(LB[k]||k)+'='+fTxt(k)).join('; ')||'nenhum')}.</div>`}</div>
   <div class="c s12"><h2>Gasto por equipamento e mês (25 maiores) — clique numa célula para abrir o mês</h2><div class="tw"><table class="d hmt"><thead><tr><th>Equipamento</th><th>Total</th>${hmM.map(m=>`<th>${M[m%100-1]}/${String(m).slice(2,4)}</th>`).join('')}</tr></thead><tbody>${hmR.map(o=>{const mx=Math.max(...Object.values(o.c));return`<tr><td title="${esc(PN[o.p]||'')}">${esc(o.p)} · ${esc((PN[o.p]||'').slice(0,30))}</td><td>${R.format(o.t)}</td>${hmM.map(m=>{const v=o.c[m];return v?`<td class="hm${v==mx?' pk':''}" data-p="${esc(o.p)}" data-mm="${m}" style="background:color-mix(in srgb,var(--pr) ${Math.round(v/mx*45)}%,transparent)" title="${R.format(v)}">${K(v)}</td>`:'<td></td>'}).join('')}</tr>`}).join('')}</tbody></table></div></div>
   <div class="c s12"><h2>Alertas: meses acima de 2x a média da própria máquina (${alN}${alN>15?', 15 maiores':''})</h2>${al.length?`<div class="tw"><table class="d"><thead><tr><th>Equipamento</th><th>Mês</th><th>Custo no mês</th><th>Média dos outros meses</th><th>Vezes a média</th></tr></thead><tbody>${al.map(x=>`<tr class="hm" data-p="${esc(x.p)}" data-mm="${x.m}"><td>${esc(x.p)} · ${esc((PN[x.p]||'').slice(0,40))}</td><td>${M[x.m%100-1]}/${String(x.m).slice(2,4)}</td><td>${R.format(x.v)}</td><td>${R.format(x.avg)}</td><td class="up">${x.mult.toFixed(1).replace('.',',')}x</td></tr>`).join('')}</tbody></table></div>`:'<div class="e">Nenhum mês acima de 2x a média da própria máquina (mínimo de R$ 30 mil no mês e 4 meses de histórico; mês parcial fica de fora).</div>'}</div>
   ${HF&&sp.length?`<div class="c s12"><h2>Fornecedores externos: concentração do gasto</h2><div class="tw"><table class="d"><thead><tr><th>Fornecedor</th><th>Custo</th><th>% do externo</th><th>% acumulado</th><th>Lançamentos</th><th>Equipamentos</th><th>Principal sistema</th></tr></thead><tbody>${(()=>{let c=0;return sp.slice(0,20).map(x=>{c+=x.t;const ts=Object.entries(x.s).sort((a,b)=>b[1]-a[1])[0];return`<tr class="ck${F.forn==x.k?' on':''}" data-k="forn" data-v="${esc(x.k)}" tabindex="0"><td title="${esc(x.k)}">${esc(x.k)}</td><td>${R.format(x.t)}</td><td>${(x.t/spT*100).toFixed(1).replace('.',',')}%</td><td>${(c/spT*100).toFixed(0)}%</td><td>${N.format(x.n)}</td><td>${x.p.size}</td><td>${esc(ts[0])}</td></tr>`}).join('')})()}</tbody></table></div></div>`:''}
   ${HF&&FXC.length?`<div class="c s6"><h2>Estoque próprio × externo</h2>${hb(by(lf('fx').filter(r=>r.forn),'fx'),2,'fx')}<div class="tw" style="margin-top:8px"><table class="d"><thead><tr><th>Categoria</th><th>Estoque próprio</th><th>Externo</th><th>% próprio</th></tr></thead><tbody>${FXC.map(([k,x])=>`<tr><td>${esc(k)}</td><td>${R.format(x.p)}</td><td>${R.format(x.e)}</td><td>${((x.p/(x.p+x.e||1))*100).toFixed(0)}%</td></tr>`).join('')}</tbody></table></div><div class="sub" style="margin-top:6px">Saída de estoque próprio não mostra o fornecedor original da peça.</div></div>`:''}
   ${HF&&PC.length?`<div class="c s6"><h2>Preço: itens vendidos por mais de um fornecedor externo</h2><div class="tw"><table class="d"><thead><tr><th>Produto</th><th>Menor preço médio</th><th>Maior preço médio</th><th>Se tudo fosse ao menor</th></tr></thead><tbody>${PC.slice(0,12).map(x=>`<tr><td title="${esc(x.prod)}">${esc(x.prod)} (${x.n})</td><td title="${esc(x.b.f)}">${R2.format(x.b.u)} · ${esc(x.b.f.slice(0,18))}</td><td title="${esc(x.w.f)}">${R2.format(x.w.u)} · ${esc(x.w.f.slice(0,18))}</td><td class="up">${R.format(x.eco)}</td></tr>`).join('')}</tbody></table></div><div class="sub" style="margin-top:6px">Compara preço médio pago no período. Confira unidade e data da compra antes de renegociar.</div></div>`:''}
-  <div class="c s12"><h2>Detalhamento por</h2><div class="seg">${DM.map(([k,n])=>`<button class="${DIM==k?'on':''}" data-d="${k}">${n}</button>`).join('')}</div><div class="tw"><table class="d"><thead><tr><th>${DL[DIM]}</th><th>Custo</th><th>% do total</th><th>Lançamentos</th><th>Equipamentos</th><th>Fornecedores</th></tr></thead><tbody>${dl.slice(0,150).map(x=>`<tr class="ck${F[DIM]==x.k?' on':''}" data-k="${DIM}" data-v="${esc(x.k)}" tabindex="0"><td title="${esc(x.k)}">${esc(DIM=='pat'&&PN[x.k]?x.k+' · '+PN[x.k]:x.k)}</td><td>${R.format(x.t)}</td><td>${dt0?(x.t/dt0*100).toFixed(1).replace('.',','):0}%</td><td>${N.format(x.n)}</td><td>${x.p.size}</td><td>${x.f.size}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="c s12"><h2>Detalhamento por</h2><div class="seg">${DM.map(([k,n])=>`<button class="${DIM==k?'on':''}" data-d="${k}">${n}</button>`).join('')}</div><div class="tw"><table class="d"><thead><tr><th>${DL[DIM]}</th><th>Custo</th><th>% do total</th><th>Lançamentos</th><th>Equipamentos</th><th>Fornecedores</th></tr></thead><tbody>${dl.slice(0,150).map(x=>`<tr class="ck${fHas(DIM,x.k)?' on':''}" data-k="${DIM}" data-v="${esc(x.k)}" tabindex="0"><td title="${esc(x.k)}">${esc(DIM=='pat'&&PN[x.k]?x.k+' · '+PN[x.k]:x.k)}</td><td>${R.format(x.t)}</td><td>${dt0?(x.t/dt0*100).toFixed(1).replace('.',','):0}%</td><td>${N.format(x.n)}</td><td>${x.p.size}</td><td>${x.f.size}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="c s12"><h2>Produtos: preço pago e fornecedores</h2>${HF?'':'<div class="sub" style="margin-bottom:8px">Para comparar fornecedores, inclua a coluna FORNECEDOR no extrato (hoje a tabela só tem marca e fabricante).</div>'}<div class="tw"><table><thead><tr><th>Produto</th><th>Marca</th><th>Principal fornecedor</th><th>% do custo</th><th>Qtd</th><th>Custo</th><th>Preço médio</th><th>Menor</th><th>Maior</th><th>Variação</th></tr></thead><tbody>${PA.a.slice(0,30).map(p=>`<tr class="ck${F.prod==p.prod?' on':''}" data-k="prod" data-v="${esc(p.prod)}" tabindex="0"><td title="${esc(p.prod)}">${esc(p.prod)}</td><td>${esc(p.marca)}</td><td title="${p.nf?p.nf+' fornecedor(es)':''}">${p.best?esc(p.best[0]):'—'}</td><td>${p.best?(p.share*100).toFixed(0)+'%':'—'}</td><td>${N.format(p.q)}</td><td>${R.format(p.t)}</td><td>${R2.format(p.avg)}</td><td>${p.mn<1e12?R2.format(p.mn):'—'}</td><td>${p.mx?R2.format(p.mx):'—'}</td><td class="${p.var>.15?'up':''}">${p.var==null?'—':P(p.var)}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="c s12"><h2>Maiores lançamentos</h2><div class="tw"><table class="d2"><thead><tr><th>Data</th><th>Equipamento</th><th>Produto</th><th>Fornecedor</th><th>Qtd</th><th>Unit.</th><th>Total</th><th>Req.</th></tr></thead><tbody>${[...l].sort((a,b)=>b.tot-a.tot).slice(0,100).map(r=>`<tr><td>${new Date(r.ts).toLocaleDateString('pt-BR')}</td><td title="${esc(PN[r.pat]||'')}">${esc(r.pat)}</td><td title="${esc(r.prod)}">${esc(r.prod)}</td><td>${esc(r.forn||'—')}</td><td>${N.format(r.qtd)}</td><td>${R2.format(r.un)}</td><td>${R.format(r.tot)}</td><td>${esc(r.doc??'')}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="c s12"><h2>Máquinas: custo por hora (ou km) vs média do grupo e curva ABC</h2><div class="tw"><table><thead><tr><th>Patrimônio</th><th>Grupo de bens</th><th>Fazenda</th><th>Custo</th><th>Horas/km</th><th>R$/h ou km</th><th>vs grupo</th><th>ABC</th><th>Status</th></tr></thead><tbody>${trs}</tbody></table></div></div>
  </div>`;
  app.querySelectorAll('select').forEach(s=>{s.onchange=()=>{F[s.dataset.k]=s.value;cuRender();const n=app.querySelector(`select[data-k="${s.dataset.k}"]`);n&&n.focus()}});
- app.querySelectorAll('.ck').forEach(e=>{const go=()=>{const k=e.dataset.k,v=e.dataset.v;F[k]=F[k]==v?'':v;cuRender()};e.onclick=go;e.onkeydown=ev=>{if(ev.key=='Enter'||ev.key==' '){ev.preventDefault();go()}}});
+ app.querySelectorAll('.ck').forEach(e=>{const go=()=>{const k=e.dataset.k,v=e.dataset.v;if(MULTI.has(k)){const a=Array.isArray(F[k])?F[k]:[];F[k]=(a.includes(v)?a.filter(x=>x!=v):[...a,v]).sort()}else F[k]=F[k]==v?'':v;cuRender()};e.onclick=go;e.onkeydown=ev=>{if(ev.key=='Enter'||ev.key==' '){ev.preventDefault();go()}}});
+ app.querySelectorAll('details.ms').forEach(d=>d.addEventListener('toggle',()=>{if(d.open){MSO=d.dataset.k;app.querySelectorAll('details.ms[open]').forEach(o=>{if(o!==d)o.open=false})}else if(MSO==d.dataset.k)MSO=''}));
+ app.querySelectorAll('input[data-ms]').forEach(c=>c.onchange=()=>{const k=c.dataset.ms,v=c.dataset.v,a=Array.isArray(F[k])?F[k]:[];F[k]=(c.checked?[...a.filter(x=>x!=v),v]:a.filter(x=>x!=v)).sort();MSO=k;cuRender();const n=[...app.querySelectorAll('input[data-ms]')].find(i=>i.dataset.ms==k&&i.dataset.v==v);n&&n.focus()});
+ app.querySelectorAll('button[data-msall]').forEach(b=>b.onclick=()=>{F[b.dataset.msall]=[];MSO=b.dataset.msall;cuRender()});
+ if(!window.__cuMsClose){window.__cuMsClose=1;document.addEventListener('click',ev=>{if(MSO&&!(ev.target.closest&&ev.target.closest('.ms')))document.querySelectorAll('.cu details.ms[open]').forEach(d=>d.open=false)})}
  app.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{F.sv=b.dataset.sv;cuRender()});
  app.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{F.tp=b.dataset.tp;cuRender()});
  app.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{DIM=b.dataset.d;cuRender()});
  app.querySelectorAll('.hm[data-p]').forEach(c=>c.onclick=()=>{F.pat=c.dataset.p;F.m=c.dataset.mm;cuRender()});
- const cl=document.getElementById('cu-cl');if(cl)cl.onclick=()=>{F={};cuRender()};
+ const cl=document.getElementById('cu-cl');if(cl)cl.onclick=()=>{F={};FQ='';cuRender()};
+ const fqx=document.getElementById('cu-fq-x');if(fqx)fqx.onclick=()=>{FQ='';cuRender();const n=document.getElementById('cu-fq');n&&n.focus()};
+ const fqi=document.getElementById('cu-fq');if(fqi){fqi.oninput=()=>{clearTimeout(cuFqT);cuFqT=setTimeout(()=>{const pos=fqi.selectionStart;FQ=fqi.value.trim();cuRender();const n=document.getElementById('cu-fq');if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},250)};fqi.onkeydown=ev=>{if(ev.key=='Escape'&&fqi.value){ev.stopPropagation();fqi.value='';FQ='';cuRender();const n=document.getElementById('cu-fq');n&&n.focus()}}}
  cuBanner()}
 
 
 const CU_APPUN=()=>(typeof APP!=='undefined'&&APP&&APP.unidade)||'';
 /* ── estado inicial de filtros ── */
 function cuInitFilters(isDemo){
+  FQ='';
   F=rows.some(r=>r.esc=='Máquinas e veículos')&&rows.some(r=>r.esc!='Máquinas e veículos')?{esc:'Máquinas e veículos'}:{};
   if(!isDemo)F.tp='Manutenção';
   const u=cuNm(CU_APPUN());
@@ -8104,7 +8138,7 @@ window.custoFile=inp=>{
 window.custoClear=async()=>{
   if(!(window.customConfirm?await customConfirm({title:'Apagar extrato salvo',msg:'Remove os dados de custo guardados neste navegador. O arquivo original não é afetado.',icon:'🗑',confirmLabel:'Apagar'}):confirm('Apagar o extrato salvo neste navegador?')))return;
   try{await cuDel('extrato')}catch(e){}
-  rows=[];PN={};F={};demo=false;cuMeta=null;cuHasSaved=false;cuRender();
+  rows=[];PN={};F={};FQ='';demo=false;cuMeta=null;cuHasSaved=false;cuRender();
 };
 window.custoRestore=async()=>{cuLoaded=false;await window.custoMount()};
 
